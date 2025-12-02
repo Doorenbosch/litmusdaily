@@ -1,4 +1,4 @@
-// The Litmus - App Logic
+// The Litmus - News Publication App Logic
 
 // Configuration
 const CONFIG = {
@@ -13,6 +13,8 @@ let currentRegion = CONFIG.defaultRegion;
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     initRegionSelector();
+    initSidebarTabs();
+    initArticleCards();
     loadContent(currentRegion);
     startAutoRefresh();
 });
@@ -36,14 +38,51 @@ function initRegionSelector() {
     });
 }
 
+// Sidebar Tab Switching
+function initSidebarTabs() {
+    const tabs = document.querySelectorAll('.sidebar-tab');
+    const weekContent = document.getElementById('week-ahead-content');
+    const audioContent = document.getElementById('audio-content');
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            if (tab.textContent.includes('WEEK')) {
+                weekContent?.classList.remove('hidden');
+                audioContent?.classList.add('hidden');
+            } else {
+                weekContent?.classList.add('hidden');
+                audioContent?.classList.remove('hidden');
+            }
+        });
+    });
+}
+
+// Article Card Click Handlers
+function initArticleCards() {
+    const cards = document.querySelectorAll('.article-card');
+    
+    cards.forEach(card => {
+        card.addEventListener('click', () => {
+            const section = card.dataset.section;
+            // Scroll to main story or expand article
+            // For now, just scroll to main story
+            document.querySelector('.main-story')?.scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        });
+    });
+}
+
 // Load Content
 async function loadContent(region) {
-    const briefContainer = document.querySelector('.brief-content');
-    const weekContainer = document.querySelector('.week-content');
+    const mainStory = document.querySelector('.main-story');
     
     // Add loading state
-    briefContainer?.classList.add('loading');
-    weekContainer?.classList.add('loading');
+    mainStory?.classList.add('loading');
     
     try {
         // Load morning brief
@@ -52,24 +91,20 @@ async function loadContent(region) {
             renderMorningBrief(morningData);
         }
         
-        // Load week ahead (optional - may not exist for all regions)
+        // Load week ahead
         try {
             const weekData = await fetchJSON(`${CONFIG.contentPath}/${region}/week-ahead.json`);
             if (weekData) {
                 renderWeekAhead(weekData);
             }
         } catch (e) {
-            // Week ahead is optional
             console.log('Week ahead data not available');
         }
         
     } catch (error) {
         console.error('Error loading content:', error);
-        showError('Unable to load latest intelligence. Please refresh.');
     } finally {
-        // Remove loading state
-        briefContainer?.classList.remove('loading');
-        weekContainer?.classList.remove('loading');
+        mainStory?.classList.remove('loading');
     }
 }
 
@@ -84,64 +119,68 @@ async function fetchJSON(url) {
 
 // Render Morning Brief
 function renderMorningBrief(data) {
-    // Update headline
-    const headline = document.getElementById('brief-headline');
-    if (headline && data.headline) {
-        headline.textContent = data.headline;
+    // Update main headline
+    updateElement('brief-headline', data.headline);
+    
+    // Update lead (use first section as lead if no dedicated lead)
+    if (data.sections) {
+        // For the lead, create a compelling opening from the_lead or overnight
+        const lead = data.sections.the_lead || data.sections.overnight;
+        updateElement('brief-lead', lead);
+        
+        // Update main story sections
+        updateElement('section-mechanism', data.sections.the_mechanism || data.sections.overnight);
+        updateElement('section-complication', data.sections.the_complication || data.sections.the_setup);
+        updateElement('section-behavioral', data.sections.the_behavioral_layer || data.sections.what_matters);
+        updateElement('section-forward', data.sections.the_forward_view || '');
+        updateElement('section-closing', data.sections.the_closing_line || data.sections.the_take);
+        
+        // Update left sidebar cards
+        updateElement('card-overnight-excerpt', truncate(data.sections.overnight || data.sections.the_mechanism, 120));
+        updateElement('card-setup-excerpt', truncate(data.sections.the_setup || data.sections.the_complication, 120));
+        updateElement('card-matters-excerpt', truncate(data.sections.what_matters || data.sections.the_behavioral_layer, 120));
     }
     
     // Update timestamp
-    const timestamp = document.getElementById('brief-timestamp');
-    if (timestamp && data.generated_at) {
-        timestamp.textContent = formatTime(data.generated_at);
-    }
-    
-    // Update date
-    const dateEl = document.getElementById('brief-date');
-    if (dateEl && data.generated_at) {
-        dateEl.textContent = formatDate(data.generated_at);
-    }
-    
-    // Update sections
-    if (data.sections) {
-        updateSection('section-overnight', data.sections.overnight);
-        updateSection('section-setup', data.sections.the_setup);
-        updateSection('section-matters', data.sections.what_matters);
-        updateSection('section-take', data.sections.the_take);
+    if (data.generated_at) {
+        updateElement('brief-timestamp', formatTime(data.generated_at));
+        updateElement('brief-date', formatDate(data.generated_at));
     }
     
     // Update market data
     if (data.btc_price) {
-        const btcPrice = document.getElementById('btc-price');
-        if (btcPrice) {
-            btcPrice.textContent = formatPrice(data.btc_price);
-        }
+        updateElement('btc-price', formatPrice(data.btc_price));
     }
     
     if (data.total_market_cap) {
-        const marketCap = document.getElementById('total-market');
-        if (marketCap) {
-            marketCap.textContent = formatMarketCap(data.total_market_cap);
-        }
+        updateElement('total-market', formatMarketCap(data.total_market_cap));
     }
 }
 
 // Render Week Ahead
 function renderWeekAhead(data) {
     if (data.sections) {
-        updateSection('week-fulcrum', data.sections.fulcrum);
-        updateSection('week-levels', data.sections.levels);
-        updateSection('week-unpriced', data.sections.unpriced);
-        updateSection('week-wildcard', data.sections.wildcard);
+        // Update trending items
+        updateElement('week-fulcrum-excerpt', truncate(data.sections.fulcrum, 80));
+        updateElement('week-levels-excerpt', truncate(data.sections.levels, 80));
+        updateElement('week-unpriced-excerpt', truncate(data.sections.unpriced, 80));
+        updateElement('week-wildcard-excerpt', truncate(data.sections.wildcard, 80));
     }
 }
 
-// Update section helper
-function updateSection(id, content) {
+// Update element helper
+function updateElement(id, content) {
     const element = document.getElementById(id);
     if (element && content) {
         element.textContent = content;
     }
+}
+
+// Truncate text
+function truncate(text, maxLength) {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength).trim() + '...';
 }
 
 // Format helpers
@@ -181,12 +220,6 @@ function formatMarketCap(cap) {
         return `$${(cap / 1e9).toFixed(0)}B`;
     }
     return `$${cap}`;
-}
-
-// Error display
-function showError(message) {
-    // Could enhance this with a proper toast/notification
-    console.error(message);
 }
 
 // Auto-refresh
