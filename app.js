@@ -378,16 +378,13 @@ function togglePlayPause() {
 // Set Playing State
 function setPlayingState(playing) {
     isPlaying = playing;
-    const playIcon = document.getElementById('play-icon');
-    const pauseIcon = document.getElementById('pause-icon');
+    const playBtn = document.getElementById('audio-play-btn');
     
-    if (playIcon && pauseIcon) {
+    if (playBtn) {
         if (playing) {
-            playIcon.classList.add('hidden');
-            pauseIcon.classList.remove('hidden');
+            playBtn.classList.add('playing');
         } else {
-            playIcon.classList.remove('hidden');
-            pauseIcon.classList.add('hidden');
+            playBtn.classList.remove('playing');
         }
     }
 }
