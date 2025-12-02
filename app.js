@@ -2,13 +2,19 @@
 
 const CONFIG = {
     contentPath: './content',
-    defaultRegion: 'americas'
+    defaultRegion: 'americas',
+    breakdownRSS: 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://feeds.megaphone.fm/the-breakdown')
 };
 
 // Data store
 let briefData = null;
 let currentSection = 'lead';
 let currentRegion = CONFIG.defaultRegion;
+
+// Audio player state
+let audioElement = null;
+let isPlaying = false;
+let currentEpisode = null;
 
 // Section definitions with display names and headlines
 const SECTIONS = {
@@ -48,7 +54,9 @@ const SECTIONS = {
 document.addEventListener('DOMContentLoaded', () => {
     initEditionPicker();
     initIndexCards();
+    initAudioPlayer();
     loadContent(currentRegion);
+    loadBreakdownPodcast();
 });
 
 // Edition (Region) Picker
@@ -315,4 +323,258 @@ function formatTime(date) {
         hour12: true,
         timeZoneName: 'short'
     });
+}
+
+// ========== PODCAST / AUDIO PLAYER ==========
+
+// Initialize Audio Player
+function initAudioPlayer() {
+    audioElement = document.getElementById('audio-element');
+    const playBtn = document.getElementById('audio-play-btn');
+    const progressBar = document.querySelector('.audio-progress-bar');
+    
+    if (!audioElement || !playBtn) return;
+    
+    // Play/Pause button
+    playBtn.addEventListener('click', togglePlayPause);
+    
+    // Progress bar click to seek
+    if (progressBar) {
+        progressBar.addEventListener('click', (e) => {
+            if (!audioElement.duration) return;
+            const rect = progressBar.getBoundingClientRect();
+            const percent = (e.clientX - rect.left) / rect.width;
+            audioElement.currentTime = percent * audioElement.duration;
+        });
+    }
+    
+    // Audio element events
+    audioElement.addEventListener('timeupdate', updateProgress);
+    audioElement.addEventListener('loadedmetadata', updateDuration);
+    audioElement.addEventListener('ended', onAudioEnded);
+    audioElement.addEventListener('play', () => setPlayingState(true));
+    audioElement.addEventListener('pause', () => setPlayingState(false));
+}
+
+// Toggle Play/Pause
+function togglePlayPause() {
+    if (!audioElement || !audioElement.src) return;
+    
+    if (isPlaying) {
+        audioElement.pause();
+    } else {
+        audioElement.play();
+    }
+}
+
+// Set Playing State
+function setPlayingState(playing) {
+    isPlaying = playing;
+    const playIcon = document.getElementById('play-icon');
+    const pauseIcon = document.getElementById('pause-icon');
+    
+    if (playIcon && pauseIcon) {
+        if (playing) {
+            playIcon.classList.add('hidden');
+            pauseIcon.classList.remove('hidden');
+        } else {
+            playIcon.classList.remove('hidden');
+            pauseIcon.classList.add('hidden');
+        }
+    }
+}
+
+// Update Progress Bar
+function updateProgress() {
+    if (!audioElement || !audioElement.duration) return;
+    
+    const percent = (audioElement.currentTime / audioElement.duration) * 100;
+    const progressEl = document.getElementById('audio-progress');
+    const currentTimeEl = document.getElementById('audio-current-time');
+    
+    if (progressEl) {
+        progressEl.style.width = percent + '%';
+    }
+    
+    if (currentTimeEl) {
+        currentTimeEl.textContent = formatAudioTime(audioElement.currentTime);
+    }
+}
+
+// Update Duration Display
+function updateDuration() {
+    if (!audioElement || !audioElement.duration) return;
+    
+    const totalTimeEl = document.getElementById('audio-total-time');
+    const durationEl = document.getElementById('audio-duration');
+    
+    if (totalTimeEl) {
+        totalTimeEl.textContent = formatAudioTime(audioElement.duration);
+    }
+    
+    if (durationEl) {
+        const mins = Math.round(audioElement.duration / 60);
+        durationEl.textContent = mins + ' MIN';
+    }
+}
+
+// On Audio Ended
+function onAudioEnded() {
+    setPlayingState(false);
+    const progressEl = document.getElementById('audio-progress');
+    if (progressEl) {
+        progressEl.style.width = '0%';
+    }
+}
+
+// Format Audio Time (mm:ss)
+function formatAudioTime(seconds) {
+    if (!seconds || !isFinite(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return mins + ':' + secs.toString().padStart(2, '0');
+}
+
+// Load The Breakdown Podcast
+async function loadBreakdownPodcast() {
+    try {
+        const response = await fetch(CONFIG.breakdownRSS);
+        if (!response.ok) throw new Error('Failed to fetch RSS');
+        
+        const xmlText = await response.text();
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(xmlText, 'text/xml');
+        
+        // Get first (latest) episode
+        const item = xml.querySelector('item');
+        if (!item) throw new Error('No episodes found');
+        
+        // Parse episode data
+        const title = item.querySelector('title')?.textContent || 'Latest Episode';
+        const enclosure = item.querySelector('enclosure');
+        const audioUrl = enclosure?.getAttribute('url') || '';
+        const pubDate = item.querySelector('pubDate')?.textContent;
+        const duration = item.querySelector('duration')?.textContent; // itunes:duration
+        
+        // Get artwork from channel or item
+        const channel = xml.querySelector('channel');
+        const itunesImage = channel?.querySelector('image')?.querySelector('url')?.textContent 
+            || item.querySelector('image')?.getAttribute('href')
+            || 'https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/50/cf/92/50cf9200-0060-3f98-cc0c-2c032a67528c/mza_7907752030028388498.jpg/600x600bb.jpg';
+        
+        currentEpisode = {
+            title,
+            audioUrl,
+            pubDate: pubDate ? new Date(pubDate) : new Date(),
+            duration,
+            artwork: itunesImage
+        };
+        
+        renderPodcastEpisode(currentEpisode);
+        
+    } catch (error) {
+        console.error('Error loading podcast:', error);
+        // Keep default placeholder content
+    }
+}
+
+// Render Podcast Episode
+function renderPodcastEpisode(episode) {
+    // Update title
+    const titleEl = document.getElementById('audio-title');
+    if (titleEl) {
+        titleEl.textContent = episode.title;
+    }
+    
+    // Update artwork
+    const artworkEl = document.querySelector('.audio-artwork img');
+    if (artworkEl && episode.artwork) {
+        artworkEl.src = episode.artwork;
+    }
+    
+    // Update recency
+    const recencyEl = document.getElementById('audio-recency');
+    if (recencyEl && episode.pubDate) {
+        recencyEl.textContent = getRelativeTime(episode.pubDate);
+    }
+    
+    // Update duration if available
+    const durationEl = document.getElementById('audio-duration');
+    if (durationEl && episode.duration) {
+        const mins = parseDuration(episode.duration);
+        if (mins > 0) {
+            durationEl.textContent = mins + ' MIN';
+        }
+    }
+    
+    // Set audio source
+    if (audioElement && episode.audioUrl) {
+        audioElement.src = episode.audioUrl;
+    }
+    
+    // Update total time display
+    const totalTimeEl = document.getElementById('audio-total-time');
+    if (totalTimeEl && episode.duration) {
+        const secs = parseDurationSeconds(episode.duration);
+        if (secs > 0) {
+            totalTimeEl.textContent = formatAudioTime(secs);
+        }
+    }
+}
+
+// Get Relative Time (e.g., "3 h ago")
+function getRelativeTime(date) {
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    
+    if (diffMins < 2) return 'just now';
+    if (diffMins < 60) return diffMins + ' m ago';
+    
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return diffHours + ' h ago';
+    
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays === 1) return 'yesterday';
+    if (diffDays < 7) return diffDays + ' d ago';
+    
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+// Parse Duration (iTunes format: HH:MM:SS or MM:SS or seconds)
+function parseDuration(duration) {
+    if (!duration) return 0;
+    
+    // If just a number, assume seconds
+    if (/^\d+$/.test(duration)) {
+        return Math.round(parseInt(duration) / 60);
+    }
+    
+    // Parse HH:MM:SS or MM:SS
+    const parts = duration.split(':').map(Number);
+    if (parts.length === 3) {
+        return parts[0] * 60 + parts[1] + Math.round(parts[2] / 60);
+    } else if (parts.length === 2) {
+        return parts[0] + Math.round(parts[1] / 60);
+    }
+    
+    return 0;
+}
+
+// Parse Duration to Seconds
+function parseDurationSeconds(duration) {
+    if (!duration) return 0;
+    
+    if (/^\d+$/.test(duration)) {
+        return parseInt(duration);
+    }
+    
+    const parts = duration.split(':').map(Number);
+    if (parts.length === 3) {
+        return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    } else if (parts.length === 2) {
+        return parts[0] * 60 + parts[1];
+    }
+    
+    return 0;
 }
