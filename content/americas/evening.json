@@ -1,15 +1,15 @@
 {
-  "headline": "Risk Assets Rally on Fed Optimism",
+  "headline": "Risk Assets Rally on Macro Relief",
   "sections": {
-    "the_day": "Crypto markets posted a robust session with Bitcoin surging past $91k and Ethereum breaking decisively through $3k. Trading volumes were elevated but not exceptional. The rally synchronized with equity markets, particularly tech, in what became a broad-based risk-on day. No crypto-specific catalysts emerged; this was pure sentiment.",
-    "the_move_explained": "Markets are pricing in a more dovish Fed trajectory following softer-than-expected economic data. The correlation trade remains firmly intact\u2014crypto moved in lockstep with Nasdaq futures. When macro uncertainty recedes, speculative assets get their bid back.",
-    "into_tonight": "Asian markets will set the tone for whether this momentum sustains or fades into profit-taking. Watch for any Fed speaker commentary that could either validate or challenge today's repricing."
+    "the_day": "Bitcoin climbed above $91k while Ethereum reclaimed $3k, extending a broad rally across risk assets. Both majors posted their strongest single-day gains in over a fortnight. Volumes were elevated but not exceptional\u2014this was steady accumulation rather than speculative frenzy. No single catalyst dominated headlines; instead, a confluence of diminishing macro anxiety lifted sentiment.",
+    "the_move_explained": "The rally appears rooted in stabilizing bond yields and softening dollar strength, both of which tend to precede crypto upside. Correlation with tech equities remained tight\u2014when Nasdaq rallied 1.8%, digital assets followed with beta. This wasn't crypto-native news driving price; it was macro conditions becoming less hostile.",
+    "into_tonight": "Asian session liquidity will test whether this momentum holds without Western participation. Watch for profit-taking near resistance levels if volumes thin."
   },
   "region": "americas",
   "type": "evening",
-  "generated_at": "2025-12-02T23:09:24.674410+00:00",
-  "btc_price": 91873,
-  "eth_price": 3012.76,
-  "total_market_cap": 3197516158757.46,
-  "btc_24h_change": 5.975090549447856
+  "generated_at": "2025-12-02T23:57:29.150781+00:00",
+  "btc_price": 91353,
+  "eth_price": 2997.77,
+  "total_market_cap": 3182790944202.693,
+  "btc_24h_change": 5.878257907664022
 }
