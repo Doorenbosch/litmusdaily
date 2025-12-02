@@ -352,6 +352,7 @@ a {
     display: flex;
     align-items: center;
     gap: 6px;
+    flex-wrap: wrap;
 }
 
 .audio-show-name {
@@ -372,6 +373,25 @@ a {
     font-size: 0.8rem;
     font-weight: 600;
     color: var(--ink-tertiary);
+}
+
+.audio-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.audio-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-tertiary);
+    transition: color 0.15s;
+}
+
+.audio-link:hover {
+    color: var(--burgundy);
 }
 
 /* Audio Player Controls - Right Side */

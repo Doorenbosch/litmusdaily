@@ -3,7 +3,7 @@
 const CONFIG = {
     contentPath: './content',
     defaultRegion: 'americas',
-    breakdownRSS: 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://feeds.megaphone.fm/NLWLLC2118417614')
+    breakdownAPI: '/api/breakdown'
 };
 
 // Data store
@@ -358,12 +358,20 @@ function initAudioPlayer() {
 
 // Toggle Play/Pause
 function togglePlayPause() {
-    if (!audioElement || !audioElement.src) return;
+    if (!audioElement || !currentEpisode) return;
+    
+    // Lazy load audio source on first play
+    if (!audioElement.src && currentEpisode.audioUrl) {
+        audioElement.src = currentEpisode.audioUrl;
+        audioElement.load();
+    }
     
     if (isPlaying) {
         audioElement.pause();
     } else {
-        audioElement.play();
+        audioElement.play().catch(err => {
+            console.error('Playback error:', err);
+        });
     }
 }
 
@@ -435,79 +443,48 @@ function formatAudioTime(seconds) {
     return mins + ':' + secs.toString().padStart(2, '0');
 }
 
-// Load The Breakdown Podcast
+// Load The Breakdown Podcast via API
 async function loadBreakdownPodcast() {
+    const titleEl = document.getElementById('audio-title');
+    
     try {
-        const response = await fetch(CONFIG.breakdownRSS);
-        if (!response.ok) throw new Error('Failed to fetch RSS');
+        const response = await fetch(CONFIG.breakdownAPI);
         
-        const xmlText = await response.text();
-        const parser = new DOMParser();
-        const xml = parser.parseFromString(xmlText, 'text/xml');
-        
-        // Get first (latest) episode
-        const item = xml.querySelector('item');
-        if (!item) throw new Error('No episodes found');
-        
-        // Parse episode data
-        const title = item.querySelector('title')?.textContent || 'Latest Episode';
-        const enclosure = item.querySelector('enclosure');
-        const audioUrl = enclosure?.getAttribute('url') || '';
-        const pubDate = item.querySelector('pubDate')?.textContent;
-        
-        // Get duration - try multiple formats
-        let duration = null;
-        // Try itunes:duration (may be in seconds or HH:MM:SS)
-        const itunesDuration = item.getElementsByTagName('itunes:duration')[0]?.textContent;
-        if (itunesDuration) {
-            duration = itunesDuration;
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
         }
         
-        // Get artwork - try multiple sources
-        const channel = xml.querySelector('channel');
-        let artwork = null;
+        const data = await response.json();
         
-        // Try item-level itunes:image
-        const itemImage = item.getElementsByTagName('itunes:image')[0];
-        if (itemImage) {
-            artwork = itemImage.getAttribute('href');
+        if (!data.success || !data.episodes || data.episodes.length === 0) {
+            throw new Error('No episodes in response');
         }
         
-        // Fall back to channel-level itunes:image
-        if (!artwork) {
-            const channelImage = channel?.getElementsByTagName('itunes:image')[0];
-            if (channelImage) {
-                artwork = channelImage.getAttribute('href');
-            }
-        }
-        
-        // Fall back to channel image url
-        if (!artwork) {
-            artwork = channel?.querySelector('image url')?.textContent;
-        }
-        
-        // Default Breakdown artwork
-        if (!artwork) {
-            artwork = 'https://megaphone.imgix.net/podcasts/bcb63e62-d56f-11eb-9e47-43b3c17dbba3/image/The_Breakdown_Show_Art.jpg';
-        }
+        // Get latest episode
+        const episode = data.episodes[0];
         
         currentEpisode = {
-            title,
-            audioUrl,
-            pubDate: pubDate ? new Date(pubDate) : new Date(),
-            duration,
-            artwork
+            title: episode.title,
+            audioUrl: episode.audioUrl,
+            pubDate: episode.pubDateISO ? new Date(episode.pubDateISO) : new Date(),
+            durationSec: episode.durationSec,
+            durationFormatted: episode.durationFormatted,
+            artwork: episode.imageUrl || data.show?.image || null,
+            summary: episode.summary
         };
         
         renderPodcastEpisode(currentEpisode);
         
     } catch (error) {
         console.error('Error loading podcast:', error);
+        
         // Show error state
-        const titleEl = document.getElementById('audio-title');
         if (titleEl) {
-            titleEl.textContent = 'Unable to load episode';
+            titleEl.textContent = 'Podcast temporarily unavailable';
         }
+        
+        // Retry after 30 seconds
+        setTimeout(loadBreakdownPodcast, 30000);
     }
 }
 
@@ -523,6 +500,9 @@ function renderPodcastEpisode(episode) {
     const artworkEl = document.querySelector('.audio-artwork img');
     if (artworkEl && episode.artwork) {
         artworkEl.src = episode.artwork;
+        artworkEl.onerror = () => {
+            artworkEl.src = 'https://megaphone.imgix.net/podcasts/bcb63e62-d56f-11eb-9e47-43b3c17dbba3/image/The_Breakdown_Show_Art.jpg';
+        };
     }
     
     // Update recency
@@ -531,28 +511,25 @@ function renderPodcastEpisode(episode) {
         recencyEl.textContent = getRelativeTime(episode.pubDate);
     }
     
-    // Update duration if available
+    // Update duration header
     const durationEl = document.getElementById('audio-duration');
-    if (durationEl && episode.duration) {
-        const mins = parseDuration(episode.duration);
-        if (mins > 0) {
-            durationEl.textContent = mins + ' MIN';
-        }
-    }
-    
-    // Set audio source
-    if (audioElement && episode.audioUrl) {
-        audioElement.src = episode.audioUrl;
+    if (durationEl && episode.durationSec) {
+        const mins = Math.round(episode.durationSec / 60);
+        durationEl.textContent = mins + ' MIN';
     }
     
     // Update total time display
     const totalTimeEl = document.getElementById('audio-total-time');
-    if (totalTimeEl && episode.duration) {
-        const secs = parseDurationSeconds(episode.duration);
-        if (secs > 0) {
-            totalTimeEl.textContent = formatAudioTime(secs);
+    if (totalTimeEl) {
+        if (episode.durationFormatted) {
+            totalTimeEl.textContent = episode.durationFormatted;
+        } else if (episode.durationSec) {
+            totalTimeEl.textContent = formatAudioTime(episode.durationSec);
         }
     }
+    
+    // Don't set audio src yet - wait for user click (preload="none" approach)
+    // This avoids eager downloads
 }
 
 // Get Relative Time (e.g., "3 h ago")
@@ -574,27 +551,7 @@ function getRelativeTime(date) {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
-// Parse Duration (iTunes format: HH:MM:SS or MM:SS or seconds)
-function parseDuration(duration) {
-    if (!duration) return 0;
-    
-    // If just a number, assume seconds
-    if (/^\d+$/.test(duration)) {
-        return Math.round(parseInt(duration) / 60);
-    }
-    
-    // Parse HH:MM:SS or MM:SS
-    const parts = duration.split(':').map(Number);
-    if (parts.length === 3) {
-        return parts[0] * 60 + parts[1] + Math.round(parts[2] / 60);
-    } else if (parts.length === 2) {
-        return parts[0] + Math.round(parts[1] / 60);
-    }
-    
-    return 0;
-}
-
-// Parse Duration to Seconds
+// Parse Duration to Seconds (kept for backward compatibility)
 function parseDurationSeconds(duration) {
     if (!duration) return 0;
     
