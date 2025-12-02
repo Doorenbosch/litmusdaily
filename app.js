@@ -3,7 +3,7 @@
 const CONFIG = {
     contentPath: './content',
     defaultRegion: 'americas',
-    breakdownRSS: 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://feeds.megaphone.fm/the-breakdown')
+    breakdownRSS: 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://feeds.megaphone.fm/NLWLLC2118417614')
 };
 
 // Data store
@@ -454,27 +454,60 @@ async function loadBreakdownPodcast() {
         const enclosure = item.querySelector('enclosure');
         const audioUrl = enclosure?.getAttribute('url') || '';
         const pubDate = item.querySelector('pubDate')?.textContent;
-        const duration = item.querySelector('duration')?.textContent; // itunes:duration
         
-        // Get artwork from channel or item
+        // Get duration - try multiple formats
+        let duration = null;
+        // Try itunes:duration (may be in seconds or HH:MM:SS)
+        const itunesDuration = item.getElementsByTagName('itunes:duration')[0]?.textContent;
+        if (itunesDuration) {
+            duration = itunesDuration;
+        }
+        
+        // Get artwork - try multiple sources
         const channel = xml.querySelector('channel');
-        const itunesImage = channel?.querySelector('image')?.querySelector('url')?.textContent 
-            || item.querySelector('image')?.getAttribute('href')
-            || 'https://is1-ssl.mzstatic.com/image/thumb/Podcasts116/v4/50/cf/92/50cf9200-0060-3f98-cc0c-2c032a67528c/mza_7907752030028388498.jpg/600x600bb.jpg';
+        let artwork = null;
+        
+        // Try item-level itunes:image
+        const itemImage = item.getElementsByTagName('itunes:image')[0];
+        if (itemImage) {
+            artwork = itemImage.getAttribute('href');
+        }
+        
+        // Fall back to channel-level itunes:image
+        if (!artwork) {
+            const channelImage = channel?.getElementsByTagName('itunes:image')[0];
+            if (channelImage) {
+                artwork = channelImage.getAttribute('href');
+            }
+        }
+        
+        // Fall back to channel image url
+        if (!artwork) {
+            artwork = channel?.querySelector('image url')?.textContent;
+        }
+        
+        // Default Breakdown artwork
+        if (!artwork) {
+            artwork = 'https://megaphone.imgix.net/podcasts/bcb63e62-d56f-11eb-9e47-43b3c17dbba3/image/The_Breakdown_Show_Art.jpg';
+        }
         
         currentEpisode = {
             title,
             audioUrl,
             pubDate: pubDate ? new Date(pubDate) : new Date(),
             duration,
-            artwork: itunesImage
+            artwork
         };
         
         renderPodcastEpisode(currentEpisode);
         
     } catch (error) {
         console.error('Error loading podcast:', error);
-        // Keep default placeholder content
+        // Show error state
+        const titleEl = document.getElementById('audio-title');
+        if (titleEl) {
+            titleEl.textContent = 'Unable to load episode';
+        }
     }
 }
 

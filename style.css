@@ -280,11 +280,18 @@ a {
 
 /* Audio Card - Matching iOS Design */
 .audio-card {
+    display: flex;
+    align-items: stretch;
     background: var(--white);
     border-radius: 12px;
-    padding: 16px;
     margin-bottom: var(--xl);
     box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+
+.audio-card-content {
+    flex: 1;
+    padding: 16px;
 }
 
 .audio-header {
@@ -332,9 +339,9 @@ a {
 
 .audio-title {
     font-family: var(--sans);
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 700;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.01em;
     line-height: 1.3;
     color: var(--ink);
     text-transform: uppercase;
@@ -345,7 +352,6 @@ a {
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-bottom: 12px;
 }
 
 .audio-show-name {
@@ -368,19 +374,21 @@ a {
     color: var(--ink-tertiary);
 }
 
-/* Audio Player Controls */
+/* Audio Player Controls - Right Side */
 .audio-player {
     display: flex;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    gap: 16px;
-    padding: 16px;
+    gap: 12px;
+    padding: 16px 20px;
     background: var(--teal);
-    border-radius: 16px;
+    min-width: 140px;
 }
 
 .audio-play-btn {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     background: var(--white);
     border: none;
     border-radius: 50%;
@@ -390,6 +398,7 @@ a {
     justify-content: center;
     flex-shrink: 0;
     transition: transform 0.15s;
+    color: var(--teal);
 }
 
 .audio-play-btn:hover {
@@ -401,13 +410,13 @@ a {
 }
 
 .audio-play-btn svg {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     color: var(--teal);
 }
 
 .audio-play-btn .play-icon {
-    margin-left: 2px;
+    margin-left: 3px;
 }
 
 .audio-play-btn .hidden {
@@ -415,16 +424,16 @@ a {
 }
 
 .audio-progress-container {
-    flex: 1;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 6px;
 }
 
 .audio-progress-bar {
-    height: 8px;
+    height: 6px;
     background: rgba(255,255,255,0.3);
-    border-radius: 4px;
+    border-radius: 3px;
     overflow: hidden;
     cursor: pointer;
 }
@@ -433,7 +442,7 @@ a {
     height: 100%;
     width: 0%;
     background: var(--white);
-    border-radius: 4px;
+    border-radius: 3px;
     transition: width 0.1s linear;
 }
 
@@ -445,13 +454,30 @@ a {
 .audio-current-time,
 .audio-total-time {
     font-family: var(--sans);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 700;
     color: var(--paper);
 }
 
 #audio-element {
     display: none;
+}
+
+/* Responsive audio card */
+@media (max-width: 600px) {
+    .audio-card {
+        flex-direction: column;
+    }
+    
+    .audio-player {
+        flex-direction: row;
+        min-width: auto;
+        padding: 12px 16px;
+    }
+    
+    .audio-progress-container {
+        flex: 1;
+    }
 }
 
 /* Article Content */
