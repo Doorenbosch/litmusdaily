@@ -132,6 +132,7 @@ function renderWeekAhead(data) {
         updateSection('week-fulcrum', data.sections.fulcrum);
         updateSection('week-levels', data.sections.levels);
         updateSection('week-unpriced', data.sections.unpriced);
+        updateSection('week-wildcard', data.sections.wildcard);
     }
 }
 

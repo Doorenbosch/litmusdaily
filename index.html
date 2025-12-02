@@ -40,67 +40,114 @@
             </div>
         </div>
 
-        <!-- Morning Brief -->
-        <main class="brief-container">
-            <section class="brief" id="morning-brief">
-                <div class="brief-header">
-                    <span class="brief-label">MORNING BRIEF</span>
-                    <span class="brief-time" id="brief-timestamp">6:00 AM EST</span>
+        <!-- Three Column Layout -->
+        <main class="three-column-grid">
+            
+            <!-- Column 1: Morning Brief -->
+            <section class="column column-brief" id="morning-brief">
+                <div class="column-header">
+                    <span class="column-label">MORNING BRIEF</span>
+                    <span class="column-time" id="brief-timestamp">6:00 AM EST</span>
                 </div>
                 
-                <h1 class="brief-headline" id="brief-headline">The Momentum Machine Breaks Down</h1>
+                <h2 class="column-headline" id="brief-headline">The Momentum Machine Breaks Down</h2>
                 
-                <div class="brief-meta">
-                    <span class="brief-author">L/tmus AI Editorial</span>
-                    <span class="brief-date" id="brief-date">2 Dec 2025</span>
+                <div class="column-meta">
+                    <span class="column-author">L/tmus AI Editorial</span>
+                    <span class="column-date" id="brief-date">2 Dec 2025</span>
                 </div>
 
-                <article class="brief-content" id="brief-content">
-                    <section class="brief-section">
-                        <h2>Overnight</h2>
+                <article class="column-content" id="brief-content">
+                    <section class="content-section">
+                        <h3>Overnight</h3>
                         <p id="section-overnight">November's $3.5 billion ETF outflow wasn't just profit-taking—it was the institutional bid stepping away. Bitcoin's 6% overnight decline to $85,945 reveals what happens when algorithmic momentum strategies all hit the same exit.</p>
                     </section>
 
-                    <section class="brief-section">
-                        <h2>The Setup</h2>
+                    <section class="content-section">
+                        <h3>The Setup</h3>
                         <p id="section-setup">The US session inherits a market searching for new buyers. ETF flows turned negative for the first time in three weeks, and the options market has flipped to put-heavy positioning. The $95,000 level—previously support—now acts as resistance.</p>
                     </section>
 
-                    <section class="brief-section">
-                        <h2>What Matters Today</h2>
+                    <section class="content-section">
+                        <h3>What Matters Today</h3>
                         <p id="section-matters">Fed Chair Powell speaks at 14:00 EST. Markets are pricing 65% odds of a December cut, but any hawkish surprise could accelerate the de-risking. Watch the ETF flow data at market close—two consecutive outflow days would confirm distribution.</p>
                     </section>
 
-                    <section class="brief-section the-take">
-                        <h2>The Take</h2>
+                    <section class="content-section the-take">
+                        <h3>The Take</h3>
                         <p id="section-take">The bull market isn't over, but the easy phase is. What comes next requires patience and conviction that most retail participants don't have.</p>
                     </section>
                 </article>
             </section>
 
-            <!-- The Week Ahead -->
-            <section class="week-ahead" id="week-ahead">
-                <div class="brief-header">
-                    <span class="brief-label">THE WEEK AHEAD</span>
+            <!-- Column 2: Daily Audio Brief -->
+            <section class="column column-audio" id="daily-audio">
+                <div class="column-header">
+                    <span class="column-label">THE DAILY AUDIO</span>
+                    <span class="column-time">The Breakdown</span>
                 </div>
 
-                <div class="week-content" id="week-content">
-                    <section class="brief-section">
-                        <h2>This Week's Fulcrum</h2>
+                <div class="audio-featured">
+                    <div class="audio-artwork">
+                        <img src="https://i.scdn.co/image/ab6765630000ba8a2a3a4a7b1e5d4c8f3e6a9b0c" alt="The Breakdown" id="podcast-artwork">
+                        <div class="audio-play-overlay">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <h2 class="audio-title" id="podcast-title">Today's Episode</h2>
+                    <p class="audio-description" id="podcast-description">Daily crypto news and analysis with Nathaniel Whittemore.</p>
+                    
+                    <div class="audio-meta">
+                        <span class="audio-duration" id="podcast-duration">~20 min</span>
+                        <span class="audio-date" id="podcast-date">Dec 2, 2025</span>
+                    </div>
+
+                    <a href="#" class="audio-listen-btn" id="podcast-link" target="_blank">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
+                        </svg>
+                        Listen Now
+                    </a>
+                </div>
+
+                <div class="audio-about">
+                    <h3>About The Breakdown</h3>
+                    <p>NLW's daily take on the most important stories in crypto and the macro landscape. The podcast institutional investors actually listen to.</p>
+                </div>
+            </section>
+
+            <!-- Column 3: The Week Ahead -->
+            <section class="column column-week" id="week-ahead">
+                <div class="column-header">
+                    <span class="column-label">THE WEEK AHEAD</span>
+                </div>
+
+                <div class="column-content" id="week-content">
+                    <section class="content-section">
+                        <h3>This Week's Fulcrum</h3>
                         <p id="week-fulcrum">Friday's jobs report looms as the macro fulcrum. Weak data strengthens the rate-cut case; strong data gives the Fed cover to pause. Either outcome moves crypto—the question is which direction.</p>
                     </section>
 
-                    <section class="brief-section">
-                        <h2>Levels Worth Knowing</h2>
+                    <section class="content-section">
+                        <h3>Levels Worth Knowing</h3>
                         <p id="week-levels">BTC $92,000 is the line. Below it, momentum traders capitulate and the next support is $85,000. Above $98,500, the squeeze resumes. ETH faces its own test at $3,400—a break below suggests rotation out of alts continues.</p>
                     </section>
 
-                    <section class="brief-section">
-                        <h2>The Unpriced Story</h2>
+                    <section class="content-section">
+                        <h3>The Unpriced Story</h3>
                         <p id="week-unpriced">Stablecoin supply is quietly expanding while prices fall. This divergence historically precedes accumulation phases. The market is focused on price; the smart money is watching liquidity.</p>
+                    </section>
+
+                    <section class="content-section">
+                        <h3>The Underestimated</h3>
+                        <p id="week-wildcard">MicroStrategy's inclusion in the Nasdaq-100 on December 23 could create forced buying from index funds. The reflexive loop may have one more chapter.</p>
                     </section>
                 </div>
             </section>
+
         </main>
 
         <!-- Footer -->
