@@ -324,12 +324,12 @@ Return ONLY valid JSON with this exact structure:
 {{
     "headline": "Compelling 5-7 word headline that captures your thesis",
     "sections": {{
-        "the_session": "Your 70-100 word opening analysis of today's character",
-        "the_flows": "Your 120-160 word analysis of where money moved",
-        "the_divergence": "Your 100-140 word analysis of what doesn't fit the narrative",
-        "the_regime_check": "Your 80-120 word assessment of whether anything fundamental changed",
-        "the_overnight_setup": "Your 80-120 word preview of what to watch overnight",
-        "the_takeaway": "Your 20-35 word crystallizing statement"
+        "the_lead": "Your 60-90 word opening thesis",
+        "the_mechanism": "Your 130-170 word analysis of how/why this is happening",
+        "the_complication": "Your 100-140 word analysis of what doesn't fit",
+        "the_behavioral_layer": "Your 100-140 word behavioral/psychological insight",
+        "the_forward_view": "Your 100-140 word decision framework for what to watch",
+        "the_closing_line": "Your 20-35 word crystallizing statement"
     }}
 }}
 
