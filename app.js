@@ -331,14 +331,21 @@ function renderIndexCards(data) {
     if (!data.sections) return;
     
     const sections = getCurrentSections();
+    const firstSectionKey = currentBriefType === 'evening' ? 'session' : 'lead';
     
     Object.keys(sections).forEach(key => {
         const section = sections[key];
         const content = data.sections[section.field] || '';
         
-        // Generate a headline from the content (first few words or use default)
-        const headline = generateHeadline(content, section.defaultHeadline);
-        const excerpt = truncate(content, 100);
+        // Use brief's main headline for first section, generate for others
+        let headline;
+        if (key === firstSectionKey && data.headline) {
+            headline = data.headline;
+        } else {
+            headline = generateHeadline(content, section.defaultHeadline);
+        }
+        
+        const excerpt = truncate(content, 120);
         
         setText(`index-${key}-headline`, headline);
         setText(`index-${key}-excerpt`, excerpt);

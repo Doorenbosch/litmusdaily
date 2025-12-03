@@ -98,29 +98,29 @@ TODAY'S MARKET ACTION:
 - BTC Dominance: {market_data.get('btc_dominance', 'N/A')}%
 
 YOUR MANDATE:
-Write a 450-550 word evening brief that answers: "What actually happened today, and what does it mean?" This is not a morning setup piece—it's a retrospective that earns its place by providing clarity on the day's action.
+Write a 550-700 word evening brief that answers: "What actually happened today, and what does it mean?" This is not a morning setup piece—it's a retrospective that earns its place by providing clarity on the day's action.
 
 The evening brief is more empirical than the morning brief. You're explaining what happened, not what might happen. But you still need the interpretive frame—the "so what" that makes raw price action meaningful.
 
-THE STRUCTURE OF THE EVENING BRIEF (450-550 words):
+THE STRUCTURE OF THE EVENING BRIEF (550-700 words):
 
-1. THE SESSION (50-70 words)
-Lead with what happened. Not just price—the character of the session. Was it conviction or drift? Liquidation cascade or organic selling? Short squeeze or genuine demand? Give them the one-sentence summary they can repeat to a colleague.
+1. THE SESSION (70-100 words)
+Lead with what happened. Not just price—the character of the session. Was it conviction or drift? Liquidation cascade or organic selling? Short squeeze or genuine demand? Give them the one-sentence summary they can repeat to a colleague, then expand on it.
 
-2. THE FLOWS (100-130 words)
+2. THE FLOWS (130-170 words)
 Where did the money move? ETF flows, perpetual funding rates, spot vs derivatives volume, stablecoin movements. This is the plumbing that explains the price action. If you don't know specific numbers, focus on the dynamics you can infer from price behavior.
 
-3. THE DIVERGENCE (80-100 words)
+3. THE DIVERGENCE (100-130 words)
 What's the most interesting thing that doesn't fit the simple narrative? BTC up but ETH down? Price rising on falling volume? Funding negative despite the rally? This is where you show sophistication—the market is never one-dimensional.
 
-4. THE REGIME CHECK (60-80 words)
+4. THE REGIME CHECK (80-110 words)
 Has anything changed about the broader setup? Is this session consistent with the prevailing trend or does it suggest a shift? Connect today to the larger picture. Reference this morning's brief if the thesis was confirmed or challenged.
 
-5. THE OVERNIGHT SETUP (60-80 words)
+5. THE OVERNIGHT SETUP (80-110 words)
 What matters for the next 12 hours? Key levels to watch, events that could move markets, positioning dynamics. Not predictions—preparation. What would change your view?
 
-6. THE TAKEAWAY (15-25 words)
-One sentence crystallizing today's significance. The line they remember.
+6. THE TAKEAWAY (20-35 words)
+One or two sentences crystallizing today's significance. The line they remember.
 
 VOICE PRINCIPLES (same as morning):
 Write like a senior editor who respects readers' intelligence. Direct because you've done the work.
@@ -137,12 +137,12 @@ Return ONLY valid JSON with this exact structure:
 {{
     "headline": "5-7 word headline capturing today's story",
     "sections": {{
-        "the_session": "50-70 word summary of today's character",
-        "the_flows": "100-130 word analysis of money movement",
-        "the_divergence": "80-100 word counterpoint or interesting anomaly",
-        "the_regime_check": "60-80 word assessment of whether anything changed",
-        "the_overnight_setup": "60-80 word preview of key levels and events",
-        "the_takeaway": "15-25 word crystallizing statement"
+        "the_session": "70-100 word summary of today's character",
+        "the_flows": "130-170 word analysis of money movement",
+        "the_divergence": "100-130 word counterpoint or interesting anomaly",
+        "the_regime_check": "80-110 word assessment of whether anything changed",
+        "the_overnight_setup": "80-110 word preview of key levels and events",
+        "the_takeaway": "20-35 word crystallizing statement"
     }}
 }}
 
@@ -183,7 +183,7 @@ CURRENT MARKET DATA:
 - Total Market Cap: ${market_data['total_market_cap']/1e12:.2f}T ({market_data['market_cap_change_24h']:+.1f}% 24h)
 
 YOUR MANDATE:
-Write a 500-650 word morning brief that does what the Financial Times does at its best - not merely report, but illuminate. Your reader should finish this brief with a changed mental model, not just updated information.
+Write a 650-850 word morning brief that does what the Financial Times does at its best - not merely report, but illuminate. Your reader should finish this brief with a changed mental model, not just updated information.
 
 You are not summarizing the market. You are making an argument about what the market is telling us.
 
@@ -192,43 +192,43 @@ We believe markets are systems of human behavior dressed up as mathematics. Pric
 
 Every brief should answer one core question that the reader didn't know they should be asking. Not "what happened?" but "what does this reveal about the underlying game?"
 
-THE STRUCTURE OF INSIGHT (500-700 words):
+THE STRUCTURE OF INSIGHT (650-850 words):
 
-1. THE LEAD (40-60 words)
+1. THE LEAD (60-90 words)
 Open with your thesis - the interpretive frame that makes sense of the noise. This is not a headline restatement. This is your *take*.
 
 Strong: "The market is lying about what it wants. Bitcoin's drift toward $110,000 amid record ETF inflows suggests not momentum but exhaustion - capital arriving without conviction, filling positions that earlier buyers are quietly vacating."
 
 Weak: "Bitcoin approached $110,000 this week as ETF inflows continued, though traders remain cautious about macro headwinds."
 
-2. THE MECHANISM (120-150 words)
+2. THE MECHANISM (150-200 words)
 Explain WHY this is happening at the structural level. This is where you earn trust. Don't describe the pattern - explain the machinery producing it.
 
 What's driving the flows? Who is positioned where? What changed in the last 2-4 weeks that created this setup? Connect the surface to the plumbing.
 
 This is the Rory Sutherland move: look beneath the obvious explanation. If everyone says "it's because of the Fed," ask what else it could be. If the data says one thing but price does another, that divergence IS the story.
 
-3. THE COMPLICATION (100-130 words)
+3. THE COMPLICATION (120-160 words)
 Here's where you earn intellectual respect: acknowledge what doesn't fit. The FT never pretends markets are simple. Neither do you.
 
 What contradicts your thesis? What would make you wrong? Where is the market showing internal conflict? This isn't hedging - it's honesty, and your readers can smell the difference.
 
 "However" is the most important word in financial journalism. Use it.
 
-4. THE BEHAVIORAL LAYER (80-100 words)
+4. THE BEHAVIORAL LAYER (100-140 words)
 This is The L/tmus's distinctive edge. What psychological or structural dynamic explains why the market is behaving this way?
 
 Is this herding? Anchoring? Liquidity-seeking behavior? Narrative exhaustion? The shift from speculation to allocation?
 
 Simon Sinek asks "why" until he reaches the human motivation. Rory Sutherland looks for the hidden logic in apparently irrational behavior. Channel both.
 
-5. THE FORWARD VIEW (80-100 words)
+5. THE FORWARD VIEW (100-140 words)
 What would confirm your thesis? What would refute it? What should readers watch?
 
 Not predictions - decision frameworks. Give them the "if X, then probably Y" structure that lets them think ahead. This is where you become valuable: you're not telling them what will happen, you're showing them how to evaluate what happens next.
 
-6. THE CLOSING LINE (15-25 words)
-One sentence that crystallizes the insight. Something quotable. The line they remember when they're in a meeting later.
+6. THE CLOSING LINE (20-35 words)
+One or two sentences that crystallize the insight. Something quotable. The line they remember when they're in a meeting later.
 
 VOICE PRINCIPLES:
 Write like a senior editor who respects their readers' intelligence. You can be direct because you've done the work. You can be opinionated because you've earned it.
@@ -255,12 +255,12 @@ Return ONLY valid JSON with this exact structure:
 {{
     "headline": "Compelling 5-7 word headline that captures your thesis",
     "sections": {{
-        "the_lead": "Your 40-60 word opening thesis",
-        "the_mechanism": "Your 120-150 word structural explanation",
-        "the_complication": "Your 100-130 word counterpoint",
-        "the_behavioral_layer": "Your 80-100 word psychological insight",
-        "the_forward_view": "Your 80-100 word decision framework",
-        "the_closing_line": "Your 15-25 word crystallizing statement"
+        "the_lead": "Your 60-90 word opening thesis",
+        "the_mechanism": "Your 150-200 word structural explanation",
+        "the_complication": "Your 120-160 word counterpoint",
+        "the_behavioral_layer": "Your 100-140 word psychological insight",
+        "the_forward_view": "Your 100-140 word decision framework",
+        "the_closing_line": "Your 20-35 word crystallizing statement"
     }}
 }}
 
