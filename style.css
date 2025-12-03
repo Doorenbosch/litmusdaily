@@ -182,7 +182,7 @@ a {
 /* ========== EDITORIAL GRID ========== */
 .editorial-grid {
     display: grid;
-    grid-template-columns: 280px 1fr 260px;
+    grid-template-columns: 260px 1fr 300px;
     gap: var(--xl);
     margin-top: var(--xl);
 }
@@ -652,6 +652,7 @@ a {
 /* ========== MARKET MOOD 9-BOX ========== */
 .market-mood {
     margin-bottom: var(--lg);
+    overflow: hidden;
 }
 
 .mood-header {
@@ -683,6 +684,7 @@ a {
     grid-template-rows: 1fr auto;
     gap: 4px;
     margin-bottom: var(--md);
+    max-width: 100%;
 }
 
 .nine-box-y-axis {
@@ -695,7 +697,7 @@ a {
     writing-mode: vertical-rl;
     text-orientation: mixed;
     transform: rotate(180deg);
-    font-size: 0.6rem;
+    font-size: 0.55rem;
     color: var(--ink-tertiary);
     padding: 4px 0;
 }
@@ -713,6 +715,7 @@ a {
     grid-template-rows: repeat(3, 1fr);
     gap: 2px;
     aspect-ratio: 1;
+    max-width: 100%;
     position: relative;
     background: var(--white);
     border-radius: 4px;

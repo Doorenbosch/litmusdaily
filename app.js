@@ -428,10 +428,12 @@ function renderMarketMood(data) {
     const gridRect = grid.getBoundingClientRect();
     const gridSize = gridRect.width;
     
-    // Map coordinates (breadth: 0-100 → 0-100%, mv: low-high → 100-0%)
+    // Map coordinates (breadth: 0-100 → 0-100%, mv: low→top, high→bottom)
     const mapX = (b) => (b / 100) * 100;
     const mapY = (mv) => {
-        const normalized = (mvRange.high - mv) / (mvRange.high - mvRange.low);
+        // Low M/V = high activity = frenzied = top (0%)
+        // High M/V = low activity = quiet = bottom (100%)
+        const normalized = (mv - mvRange.low) / (mvRange.high - mvRange.low);
         return Math.max(0, Math.min(100, normalized * 100));
     };
     
