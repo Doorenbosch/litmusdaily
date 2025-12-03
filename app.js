@@ -910,35 +910,67 @@ function renderReadingPane(sectionKey) {
     const articleHeader = document.querySelector('.article-header');
     
     if (imageContainer && imageEl) {
-        if (isFirstSection && briefData.image_keywords) {
-            // Show loading state
+        if (isFirstSection) {
+            // Always show image for THE LEAD section
             imageEl.classList.add('loading');
             
-            // Use Unsplash Source API for free editorial images
-            const keywords = encodeURIComponent(briefData.image_keywords);
-            const imageUrl = `https://source.unsplash.com/1200x600/?${keywords}`;
+            // Local fallback image (place in root folder)
+            // Dimensions: 1200x600px (2:1 aspect ratio)
+            const localFallback = './images/lead-fallback.jpg';
             
-            // Fallback images based on market sentiment
-            const fallbackImages = [
-                'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&h=600&fit=crop', // Trading floor
-                'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=1200&h=600&fit=crop', // Bitcoin coins
+            // Curated Unsplash fallback images (financial/crypto themed)
+            const unsplashFallbacks = [
+                'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&h=600&fit=crop', // Trading screens
                 'https://images.unsplash.com/photo-1642790106117-e829e14a795f?w=1200&h=600&fit=crop', // Crypto chart
-                'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1200&h=600&fit=crop', // Ethereum
+                'https://images.unsplash.com/photo-1620321023374-d1a68fbc720d?w=1200&h=600&fit=crop', // Financial district
+                'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=1200&h=600&fit=crop', // City skyline
+                'https://images.unsplash.com/photo-1559526324-593bc073d938?w=1200&h=600&fit=crop', // Abstract data
             ];
             
-            // Try to load the image
-            const tempImg = new Image();
-            tempImg.onload = function() {
-                imageEl.src = this.src;
-                imageEl.classList.remove('loading');
+            // Choose image source
+            let imageUrl;
+            if (briefData.image_keywords) {
+                // Use Unsplash search if keywords provided
+                const keywords = encodeURIComponent(briefData.image_keywords);
+                imageUrl = `https://source.unsplash.com/1200x600/?${keywords}`;
+            } else {
+                // Use random fallback based on headline hash for consistency
+                const hash = headline.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+                imageUrl = unsplashFallbacks[hash % unsplashFallbacks.length];
+            }
+            
+            // Try to load the image with fallback chain
+            const loadImage = (url, fallbackIndex = 0) => {
+                const tempImg = new Image();
+                tempImg.onload = function() {
+                    imageEl.src = this.src;
+                    imageEl.classList.remove('loading');
+                };
+                tempImg.onerror = function() {
+                    // Try next fallback
+                    if (fallbackIndex < unsplashFallbacks.length) {
+                        loadImage(unsplashFallbacks[fallbackIndex], fallbackIndex + 1);
+                    } else {
+                        // Final fallback: local image or hide container
+                        const localImg = new Image();
+                        localImg.onload = function() {
+                            imageEl.src = localFallback;
+                            imageEl.classList.remove('loading');
+                        };
+                        localImg.onerror = function() {
+                            // No image available - hide container
+                            imageContainer.style.display = 'none';
+                            if (articleLabel) articleLabel.style.display = 'block';
+                            if (articleHeadline) articleHeadline.style.display = 'block';
+                            if (articleHeader) articleHeader.classList.remove('with-image');
+                        };
+                        localImg.src = localFallback;
+                    }
+                };
+                tempImg.src = url;
             };
-            tempImg.onerror = function() {
-                // Use fallback image
-                const fallback = fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
-                imageEl.src = fallback;
-                imageEl.classList.remove('loading');
-            };
-            tempImg.src = imageUrl;
+            
+            loadImage(imageUrl);
             
             // Update overlay text
             if (imageLabelEl) imageLabelEl.textContent = section.label;
@@ -952,7 +984,10 @@ function renderReadingPane(sectionKey) {
             if (articleHeader) articleHeader.classList.add('with-image');
             
             // Track image view
-            trackEvent('lead_image_view', { keywords: briefData.image_keywords });
+            trackEvent('lead_image_view', { 
+                has_keywords: !!briefData.image_keywords,
+                keywords: briefData.image_keywords || 'fallback'
+            });
         } else {
             imageContainer.style.display = 'none';
             // Show regular header for non-lead sections
