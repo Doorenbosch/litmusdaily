@@ -1,4 +1,8 @@
 // Market Mood API - Calculates 9-box positioning from CoinGecko data
+// Uses stored historical data for real trails
+
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 export default async function handler(req, res) {
     // Set CORS headers
@@ -11,7 +15,7 @@ export default async function handler(req, res) {
     }
     
     try {
-        // Fetch global market data
+        // Fetch current global market data
         const globalRes = await fetch('https://api.coingecko.com/api/v3/global');
         if (!globalRes.ok) throw new Error('Failed to fetch global data');
         const globalData = await globalRes.json();
@@ -23,7 +27,7 @@ export default async function handler(req, res) {
         if (!coinsRes.ok) throw new Error('Failed to fetch coins data');
         const coins = await coinsRes.json();
         
-        // Calculate breadth (% of top 100 coins that are green in 24h)
+        // Calculate current breadth (% of top 100 coins that are green in 24h)
         const greenCoins = coins.filter(c => c.price_change_percentage_24h > 0).length;
         const breadth = (greenCoins / coins.length) * 100;
         
@@ -31,26 +35,45 @@ export default async function handler(req, res) {
         const totalMarketCap = globalData.data?.total_market_cap?.usd || 0;
         const totalVolume24h = globalData.data?.total_volume?.usd || 0;
         
-        // Calculate M/V ratio (Market Cap / Volume)
-        // Lower ratio = more volume activity = "frenzied"
-        // Higher ratio = less volume activity = "quiet"
-        const mvRatio24h = totalVolume24h > 0 ? totalMarketCap / totalVolume24h : 0;
+        // Calculate current M/V ratio
+        const mvRatio24h = totalVolume24h > 0 ? totalMarketCap / totalVolume24h : 20;
         
-        // For 7-day average, we'd need historical data
-        // For now, estimate based on typical weekend drop-off
-        // In production, this should come from stored historical data
-        const mvRatio7d = mvRatio24h * 1.15; // Typically ~15% higher due to weekend lulls
+        // Load historical data for trails
+        let history = { hourly: [], daily: [] };
+        try {
+            const historyPath = join(process.cwd(), 'data', 'mood-history.json');
+            const historyData = readFileSync(historyPath, 'utf8');
+            history = JSON.parse(historyData);
+        } catch (e) {
+            console.log('No history file found, using current data only');
+        }
         
-        // Generate mock trail data (in production, store and retrieve actual historical data)
-        // Trail shows movement over last 24 hours
-        const trail = generateMockTrail(breadth, mvRatio24h);
+        // Build 24H trail from hourly data
+        const trail24h = history.hourly && history.hourly.length > 0 
+            ? history.hourly.map(p => ({ breadth: p.breadth, mv: p.mv }))
+            : [{ breadth, mv: mvRatio24h }];
         
-        // Calculate average breadth from trail (in production, use actual 24h data)
-        const breadthAvg24h = trail.reduce((sum, p) => sum + p.breadth, 0) / trail.length;
+        // Add current point to trail if different from last
+        const lastPoint = trail24h[trail24h.length - 1];
+        if (!lastPoint || Math.abs(lastPoint.breadth - breadth) > 0.5 || Math.abs(lastPoint.mv - mvRatio24h) > 0.5) {
+            trail24h.push({ breadth, mv: mvRatio24h });
+        }
+        
+        // Build 7-day trail from daily data
+        const trail7d = history.daily && history.daily.length > 0
+            ? history.daily.map(p => ({ breadth: p.breadth, mv: p.mv }))
+            : [];
+        
+        // Calculate 7-day average M/V ratio
+        let mvRatio7d = mvRatio24h;
+        if (trail7d.length > 0) {
+            mvRatio7d = trail7d.reduce((sum, p) => sum + p.mv, 0) / trail7d.length;
+        }
+        
+        // Calculate average breadth from 24h trail
+        const breadthAvg24h = trail24h.reduce((sum, p) => sum + p.breadth, 0) / trail24h.length;
         
         // M/V range for visualization
-        // These bounds should be calibrated based on historical data
-        // Typical crypto M/V ratios range from ~10x (frenzied) to ~40x (quiet)
         const mvRange = { low: 10, high: 45 };
         
         return res.status(200).json({
@@ -60,8 +83,13 @@ export default async function handler(req, res) {
             breadthAvg24h: Math.round(breadthAvg24h * 10) / 10,
             mvRatio24h: Math.round(mvRatio24h * 10) / 10,
             mvRatio7d: Math.round(mvRatio7d * 10) / 10,
-            trail,
+            trail: trail24h,      // 24H trail for daily view
+            trail7d: trail7d,     // 7-day trail for weekend view
             mvRange,
+            dataPoints: {
+                hourly: trail24h.length,
+                daily: trail7d.length
+            },
             raw: {
                 totalMarketCap,
                 totalVolume24h,
@@ -77,48 +105,13 @@ export default async function handler(req, res) {
         return res.status(200).json({
             success: false,
             error: error.message,
-            // Fallback values
             breadth: 55,
             breadthAvg24h: 52,
             mvRatio24h: 22,
             mvRatio7d: 25,
-            trail: [
-                { breadth: 50, mv: 26 },
-                { breadth: 52, mv: 24 },
-                { breadth: 54, mv: 23 },
-                { breadth: 55, mv: 22 }
-            ],
+            trail: [{ breadth: 55, mv: 22 }],
+            trail7d: [],
             mvRange: { low: 10, high: 45 }
         });
     }
-}
-
-// Generate mock trail data
-// In production, this should be actual stored historical data points
-function generateMockTrail(currentBreadth, currentMv) {
-    const points = [];
-    const numPoints = 5;
-    
-    // Work backwards from current position
-    for (let i = 0; i < numPoints; i++) {
-        const progress = i / (numPoints - 1);
-        
-        // Add some variation to simulate real movement
-        const variation = Math.sin(i * 1.5) * 5;
-        const breadthOffset = (1 - progress) * 10 + variation;
-        const mvOffset = (1 - progress) * 3 + (Math.cos(i * 1.2) * 2);
-        
-        points.push({
-            breadth: Math.max(0, Math.min(100, currentBreadth - breadthOffset)),
-            mv: Math.max(10, currentMv + mvOffset)
-        });
-    }
-    
-    // Ensure current position is at the end
-    points.push({
-        breadth: currentBreadth,
-        mv: currentMv
-    });
-    
-    return points;
 }
