@@ -82,6 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Initialize UI
     initIndexCards();
+    initSectors();  // Clickable sector expand/collapse
     renderMoodTrail();
     renderSegments();
     
@@ -379,33 +380,48 @@ async function loadSegmentsData() {
     }
 }
 
-// Render segments with real data
+// Render sectors with real data
 function renderSegments() {
     if (!segmentsData) return;
     
-    const container = document.getElementById('segments-list');
+    // Try new sectors-list first, fall back to segments-list
+    const container = document.getElementById('sectors-list') || document.getElementById('segments-list');
     if (!container) return;
     
     Object.entries(segmentsData.segments || {}).forEach(([key, data]) => {
-        const item = container.querySelector(`[data-segment="${key}"]`);
+        // Try new data-sector first, fall back to data-segment
+        const item = container.querySelector(`[data-sector="${key}"]`) || 
+                     container.querySelector(`[data-segment="${key}"]`);
         if (!item) return;
         
-        const changeEl = item.querySelector('.segment-change');
-        const fillEl = item.querySelector('.segment-fill');
+        // Try new class names first, fall back to old ones
+        const changeEl = item.querySelector('.sector-change') || item.querySelector('.segment-change');
+        const fillEl = item.querySelector('.sector-fill') || item.querySelector('.segment-fill');
+        const tokensEl = item.querySelector('.sector-tokens') || item.querySelector('.segment-tokens');
         
         if (changeEl && data.change !== undefined) {
             const isPositive = data.change >= 0;
             const isNeutral = Math.abs(data.change) < 0.5;
             
             changeEl.textContent = `${isPositive ? '+' : ''}${data.change.toFixed(1)}%`;
-            changeEl.className = `segment-change ${isNeutral ? 'neutral' : (isPositive ? 'positive' : 'negative')}`;
+            
+            // Determine the base class name
+            const baseClass = changeEl.classList.contains('sector-change') ? 'sector-change' : 'segment-change';
+            changeEl.className = `${baseClass} ${isNeutral ? 'neutral' : (isPositive ? 'positive' : 'negative')}`;
             
             if (fillEl) {
                 // Normalize change to bar width (0-100%)
                 const width = Math.min(Math.abs(data.change) * 5 + 20, 100);
                 fillEl.style.width = `${width}%`;
-                fillEl.className = `segment-fill ${isNeutral ? 'neutral' : (isPositive ? 'positive' : 'negative')}`;
+                
+                const fillBaseClass = fillEl.classList.contains('sector-fill') ? 'sector-fill' : 'segment-fill';
+                fillEl.className = `${fillBaseClass} ${isNeutral ? 'neutral' : (isPositive ? 'positive' : 'negative')}`;
             }
+        }
+        
+        // Update tokens if available
+        if (tokensEl && data.coins) {
+            tokensEl.textContent = data.coins.join(', ');
         }
     });
 }
@@ -428,6 +444,26 @@ function initIndexCards() {
             
             // Track
             trackEvent('magazine_section_view', { section: sectionKey });
+        });
+    });
+}
+
+// Initialize sector click-to-expand
+function initSectors() {
+    const sectors = document.querySelectorAll('.sector-item');
+    
+    sectors.forEach(sector => {
+        sector.addEventListener('click', () => {
+            const isExpanded = sector.classList.contains('expanded');
+            
+            // Collapse all others
+            sectors.forEach(s => s.classList.remove('expanded'));
+            
+            // Toggle current
+            if (!isExpanded) {
+                sector.classList.add('expanded');
+                trackEvent('sector_expand', { sector: sector.dataset.sector });
+            }
         });
     });
 }

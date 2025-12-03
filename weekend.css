@@ -323,6 +323,169 @@
     background: var(--ink-tertiary);
 }
 
+/* ===== Sectors Section (Clickable) ===== */
+.sectors-section {
+    margin-top: var(--lg);
+}
+
+.sectors-header {
+    margin-bottom: var(--md);
+    padding-bottom: var(--sm);
+    border-bottom: 2px solid var(--teal);
+}
+
+.sectors-label {
+    display: block;
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--burgundy);
+}
+
+.sectors-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.sector-item {
+    padding: var(--sm) 0;
+    border-bottom: 1px solid var(--rule);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.sector-item:hover {
+    background: var(--paper-dark);
+    margin: 0 calc(var(--sm) * -1);
+    padding-left: var(--sm);
+    padding-right: var(--sm);
+}
+
+.sector-item:last-child {
+    border-bottom: none;
+}
+
+.sector-item.expanded {
+    background: var(--white);
+    margin: 0 calc(var(--sm) * -1);
+    padding: var(--sm);
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.sector-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.sector-name {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.sector-change {
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.sector-change.positive {
+    color: var(--teal);
+}
+
+.sector-change.negative {
+    color: var(--burgundy);
+}
+
+.sector-change.neutral {
+    color: var(--ink-tertiary);
+}
+
+.sector-tokens {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    color: var(--ink-tertiary);
+    margin-bottom: 6px;
+}
+
+.sector-bar {
+    height: 4px;
+    background: var(--rule);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.sector-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.sector-fill.positive {
+    background: var(--teal);
+}
+
+.sector-fill.negative {
+    background: var(--burgundy);
+}
+
+.sector-fill.neutral {
+    background: var(--ink-tertiary);
+}
+
+/* Expandable Detail */
+.sector-detail {
+    display: none;
+    margin-top: var(--sm);
+    padding-top: var(--sm);
+    border-top: 1px solid var(--rule);
+}
+
+.sector-item.expanded .sector-detail {
+    display: block;
+}
+
+.sector-about {
+    font-family: var(--serif);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--ink-secondary);
+    margin: 0 0 var(--xs) 0;
+}
+
+.sector-drivers {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--ink-tertiary);
+    margin: 0 0 var(--xs) 0;
+}
+
+.sector-drivers strong {
+    color: var(--ink-secondary);
+}
+
+.sector-weekly {
+    font-family: var(--serif);
+    font-size: 0.8rem;
+    font-style: italic;
+    line-height: 1.5;
+    color: var(--ink);
+    margin: var(--sm) 0 0 0;
+    padding-top: var(--xs);
+    border-top: 1px dashed var(--rule);
+}
+
+.sector-weekly:empty {
+    display: none;
+}
+
 /* Weekend Market Mood - 7-day burgundy trail */
 .market-mood .mood-trail #trail-path-7day {
     stroke-width: 3;
