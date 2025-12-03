@@ -1,16 +1,19 @@
 {
     "region": "apac",
     "type": "morning",
-    "generated_at": "2025-12-02T06:00:00+08:00",
-    "headline": "Wall Street Hits the Exit",
+    "generated_at": "2025-12-03T06:00:00+08:00",
+    "headline": "Asia Inherits the Damage",
     "sections": {
-        "overnight": "The US session delivered the sharpest single-day decline since the election rally began. $637 million in liquidations cleared leveraged longs as Bitcoin dropped from $91,000 to $85,945. ETF outflows hit $540 million—the largest daily exit in two months.",
-        "the_setup": "Asia inherits a damaged chart. The rally's trendline from November is broken, and the first meaningful support sits at $82,000. Perpetual funding has normalized, suggesting the leverage flush is complete, but that doesn't mean buyers are ready.",
-        "what_matters": "Hong Kong spot ETF volumes will signal regional institutional appetite. Japan's FSA meets this week on crypto custody rules—any tightening could pressure regional sentiment. Watch whether Korean retail, often a leading indicator, steps in or stays away.",
-        "the_take": "The overnight move was violent but healthy. Markets needed to reset positioning. The next 48 hours will reveal whether this is a buying opportunity or the start of something worse."
+        "the_lead": "The US session delivered the sharpest single-day decline since the election rally began. $637 million in liquidations cleared leveraged longs as Bitcoin dropped from $91,000 to $85,945. ETF outflows hit $540 million—the largest daily exit in two months. Asia opens with a damaged chart and difficult questions about what comes next.",
+        "the_mechanism": "The rally's trendline from November is broken, and the first meaningful support sits at $82,000. Perpetual funding has normalized, suggesting the leverage flush is complete, but that doesn't mean buyers are ready to step in. The volume profile tells the story: selling happened on elevated participation while bounces occurred in thin air. This is classic distribution behavior—the kind that precedes extended consolidation or further downside, not rapid recovery.",
+        "the_complication": "Yet the broader liquidity picture offers some hope. Hong Kong's spot Bitcoin ETF recorded net inflows even as US products saw redemptions, suggesting regional institutional appetite remains intact. Korean exchanges show retail accumulation at these levels, historically a contrarian indicator worth watching. The question is whether regional buyers have enough firepower to absorb what Western institutions are selling.",
+        "the_behavioral_layer": "What distinguishes this selloff from typical corrections is the absence of panic. Social sentiment metrics show engagement dropping, not spiking. This is apathy, not capitulation—and markets often need the latter to truly bottom. The danger for bulls is that indifferent holders become sellers gradually, creating a slow bleed rather than a sharp flush that invites buyers back in quickly.",
+        "the_forward_view": "Japan's FSA meets this week on crypto custody rules—any tightening could pressure regional sentiment at an inopportune moment. Watch Bitcoin's behavior around $85,000 during Asian hours; a failure to hold invites a test of $82,000 where significant buyer interest has clustered. The overnight session favors patience over heroism.",
+        "the_closing_line": "The market is asking a simple question: who buys now? Until that answer becomes clear, rallies are for selling, not chasing."
     },
     "btc_price": 85945,
     "eth_price": 3180,
     "total_market_cap": 3200000000000,
-    "btc_24h_change": -6.2
+    "btc_24h_change": -6.2,
+    "eth_24h_change": -7.1
 }

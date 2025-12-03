@@ -111,7 +111,12 @@ document.addEventListener('DOMContentLoaded', () => {
     initAudioPlayer();
     initSettings();
     loadUserCoins();
-    loadContent(currentRegion, currentBriefType);
+    
+    // Check brief availability first, then load content
+    checkBriefAvailability(currentRegion).then(() => {
+        loadContent(currentRegion, currentBriefType);
+    });
+    
     loadBreakdownPodcast();
     
     // Load live market data
@@ -134,7 +139,18 @@ function initEditionPicker() {
             buttons.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentRegion = btn.dataset.region;
-            loadContent(currentRegion, currentBriefType);
+            
+            // Reset to morning brief when switching regions
+            currentBriefType = 'morning';
+            const morningTab = document.querySelector('.brief-tab[data-brief="morning"]');
+            const eveningTab = document.querySelector('.brief-tab[data-brief="evening"]');
+            if (morningTab) morningTab.classList.add('active');
+            if (eveningTab) eveningTab.classList.remove('active');
+            
+            // Check availability for new region, then load content
+            checkBriefAvailability(currentRegion).then(() => {
+                loadContent(currentRegion, currentBriefType);
+            });
         });
     });
 }
@@ -145,6 +161,11 @@ function initBriefSelector() {
     
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
+            // Don't allow clicking unavailable tabs
+            if (tab.classList.contains('unavailable')) {
+                return;
+            }
+            
             const briefType = tab.dataset.brief;
             
             // Update active state
@@ -164,6 +185,71 @@ function initBriefSelector() {
             loadContent(currentRegion, currentBriefType);
         });
     });
+}
+
+// Check which briefs are available for a region and update tabs
+async function checkBriefAvailability(region) {
+    const morningTab = document.querySelector('.brief-tab[data-brief="morning"]');
+    const eveningTab = document.querySelector('.brief-tab[data-brief="evening"]');
+    
+    // Check morning brief
+    try {
+        const morningResponse = await fetch(`${CONFIG.contentPath}/${region}/morning.json`);
+        if (morningResponse.ok) {
+            const morningData = await morningResponse.json();
+            if (morningTab) {
+                morningTab.classList.remove('unavailable');
+                // Update time display based on actual data
+                const timeEl = morningTab.querySelector('.brief-tab-time');
+                if (timeEl && morningData.generated_at) {
+                    const date = new Date(morningData.generated_at);
+                    timeEl.textContent = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                }
+            }
+        } else {
+            if (morningTab) morningTab.classList.add('unavailable');
+        }
+    } catch (e) {
+        if (morningTab) morningTab.classList.add('unavailable');
+    }
+    
+    // Check evening brief
+    try {
+        const eveningResponse = await fetch(`${CONFIG.contentPath}/${region}/evening.json`);
+        if (eveningResponse.ok) {
+            const eveningData = await eveningResponse.json();
+            // Check if evening brief is from today
+            const today = new Date().toISOString().split('T')[0];
+            const briefDate = eveningData.generated_at ? eveningData.generated_at.split('T')[0] : null;
+            
+            if (briefDate === today) {
+                if (eveningTab) {
+                    eveningTab.classList.remove('unavailable');
+                    const timeEl = eveningTab.querySelector('.brief-tab-time');
+                    if (timeEl && eveningData.generated_at) {
+                        const date = new Date(eveningData.generated_at);
+                        timeEl.textContent = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                    }
+                }
+            } else {
+                // Evening brief exists but from a previous day - mark as unavailable
+                if (eveningTab) eveningTab.classList.add('unavailable');
+            }
+        } else {
+            if (eveningTab) eveningTab.classList.add('unavailable');
+        }
+    } catch (e) {
+        if (eveningTab) eveningTab.classList.add('unavailable');
+    }
+    
+    // If current tab is unavailable, switch to available one
+    const activeTab = document.querySelector('.brief-tab.active');
+    if (activeTab && activeTab.classList.contains('unavailable')) {
+        const availableTab = document.querySelector('.brief-tab:not(.unavailable)');
+        if (availableTab) {
+            availableTab.click();
+        }
+    }
 }
 
 // Rebuild Index Cards for Brief Type

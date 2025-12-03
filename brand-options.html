@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Litmus Brand Options</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;600;700&family=Playfair+Display:wght@500;600;700&family=Libre+Baskerville:wght@400;700&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --burgundy: #8A123C;
+            --ink: #1a1a1a;
+            --paper: #faf7f5;
+            --paper-dark: #f5f0eb;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--paper);
+            padding: 40px;
+        }
+        
+        h1 {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #666;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 60px;
+        }
+        
+        .option {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+        }
+        
+        .option-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 24px;
+        }
+        
+        .masthead {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            background: var(--paper);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            margin-right: 16px;
+        }
+        
+        .notes {
+            font-size: 0.8rem;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        /* ===== OPTION A: The Litmus (Mixed Case) ===== */
+        .brand-a {
+            font-family: 'Source Serif Pro', Georgia, serif;
+            font-weight: 700;
+            font-size: 2.2rem;
+            color: var(--burgundy);
+            letter-spacing: 0.01em;
+        }
+        
+        /* ===== OPTION B: LITMUS (Single Word, Bold) ===== */
+        .brand-b {
+            font-family: 'Source Serif Pro', Georgia, serif;
+            font-weight: 700;
+            font-size: 2.8rem;
+            color: var(--burgundy);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        
+        /* ===== OPTION C: L/TMUS (Slash incorporated) ===== */
+        .brand-c {
+            font-family: 'Source Serif Pro', Georgia, serif;
+            font-weight: 700;
+            font-size: 2.4rem;
+            color: var(--burgundy);
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+        .brand-c .slash {
+            color: var(--burgundy);
+            font-style: italic;
+        }
+        
+        /* ===== OPTION D: The Litmus (Playfair Display) ===== */
+        .brand-d {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-weight: 600;
+            font-size: 2.4rem;
+            color: var(--burgundy);
+            letter-spacing: -0.01em;
+        }
+        
+        /* ===== OPTION E: LITMUS (Black, minimal) ===== */
+        .brand-e {
+            font-family: 'Source Serif Pro', Georgia, serif;
+            font-weight: 700;
+            font-size: 2.6rem;
+            color: var(--ink);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        
+        /* ===== OPTION F: The Litmus (Libre Baskerville - FT style) ===== */
+        .brand-f {
+            font-family: 'Libre Baskerville', Georgia, serif;
+            font-weight: 700;
+            font-size: 2rem;
+            color: var(--ink);
+            letter-spacing: 0;
+        }
+        
+        /* ===== OPTION G: Litmus (One word, elegant) ===== */
+        .brand-g {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-weight: 600;
+            font-size: 3rem;
+            color: var(--burgundy);
+            letter-spacing: 0.02em;
+        }
+        
+        /* ===== OPTION H: Current for comparison ===== */
+        .brand-current {
+            font-family: 'Source Serif Pro', Georgia, serif;
+            font-weight: 700;
+            font-size: 2rem;
+            color: var(--burgundy);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+        
+        .divider {
+            border: none;
+            border-top: 2px solid var(--paper-dark);
+            margin: 40px 0;
+        }
+        
+        .recommendation {
+            background: var(--burgundy);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-left: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Masthead Brand Options</h1>
+    
+    <div class="options">
+        
+        <!-- Current -->
+        <div class="option">
+            <div class="option-label">Current Execution</div>
+            <div class="masthead">
+                <img src="litmuslogo.png" class="logo-icon" alt="">
+                <span class="brand-current">The Litmus Daily</span>
+            </div>
+            <p class="notes">
+                <strong>Issues:</strong> Too long, over-spaced (0.15em), feels generic. Wide tracking was a 2010s luxury trend that's now dated.
+            </p>
+        </div>
+        
+        <hr class="divider">
+        
+        <!-- Option A -->
+        <div class="option">
+            <div class="option-label">Option A — Mixed Case, Tight <span class="recommendation">Recommended</span></div>
+            <div class="masthead">
+                <img src="litmuslogo.png" class="logo-icon" alt="">
+                <span class="brand-a">The Litmus</span>
+            </div>
+            <p class="notes">
+                <strong>Why it works:</strong> Mixed case is modern yet authoritative. Tight tracking (0.01em) creates density and impact. "The" adds gravitas like "The Economist". Burgundy maintains brand identity. Drop "Daily"—your readers know it's daily.
+            </p>
+        </div>
+        
+        <!-- Option B -->
+        <div class="option">
+            <div class="option-label">Option B — Single Word, Bold</div>
+            <div class="masthead">
+                <img src="litmuslogo.png" class="logo-icon" alt="">
+                <span class="brand-b">Litmus</span>
+            </div>
+            <p class="notes">
+                <strong>Why it works:</strong> Maximum impact with minimum characters. Like Bloomberg, Reuters, Axios. The single word becomes the brand. Slightly wider tracking (0.04em) works here because the word is short.
+            </p>
+        </div>
+        
+        <!-- Option C -->
+        <div class="option">
+            <div class="option-label">Option C — Slash Incorporated</div>
+            <div class="masthead">
+                <img src="litmuslogo.png" class="logo-icon" alt="">
+                <span class="brand-c">L<span class="slash">/</span>tmus</span>
+            </div>
+            <p class="notes">
+                <strong>Why it works:</strong> The "/" from your logo becomes part of the wordmark. Distinctive, ownable, memorable. Creates visual consistency between icon and name. Nobody else has this.
+            </p>
+        </div>
+        
+        <!-- Option D -->
+        <div class="option">
+            <div class="option-label">Option D — Playfair Display</div>
+            <div class="masthead">
+                <img src="litmuslogo.png" class="logo-icon" alt="">
+                <span class="brand-d">The Litmus</span>
+            </div>
+            <p class="notes">
+                <strong>Why it works:</strong> Playfair has more personality and contrast than Source Serif. Slightly editorial, slightly modern. Negative tracking (-0.01em) creates cohesion.
+            </p>
+        </div>
+        
+        <!-- Option E -->
+        <div class="option">
+            <div class="option-label">Option E — Black, Minimal</div>
+            <div class="masthead">
+                <img src="litmuslogo.png" class="logo-icon" alt="">
+                <span class="brand-e">Litmus</span>
+            </div>
+            <p class="notes">
+                <strong>Why it works:</strong> Let the logo carry the burgundy brand color. Black text is classic newspaper—FT, WSJ, NYT all use black mastheads. Creates contrast with the colorful logo.
+            </p>
+        </div>
+        
+        <!-- Option F -->
+        <div class="option">
+            <div class="option-label">Option F — FT Style (Libre Baskerville)</div>
+            <div class="masthead">
+                <img src="litmuslogo.png" class="logo-icon" alt="">
+                <span class="brand-f">The Litmus</span>
+            </div>
+            <p class="notes">
+                <strong>Why it works:</strong> Libre Baskerville is closer to the actual FT masthead font. Zero tracking, black ink, serious journalism vibes. Most traditional option.
+            </p>
+        </div>
+        
+        <!-- Option G -->
+        <div class="option">
+            <div class="option-label">Option G — Cormorant Garamond</div>
+            <div class="masthead">
+                <img src="litmuslogo.png" class="logo-icon" alt="">
+                <span class="brand-g">Litmus</span>
+            </div>
+            <p class="notes">
+                <strong>Why it works:</strong> Elegant, refined, high-contrast. Larger size works because the letterforms are thinner. Premium feel without being stuffy. One word keeps it clean.
+            </p>
+        </div>
+        
+    </div>
+</body>
+</html>

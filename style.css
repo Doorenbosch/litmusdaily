@@ -309,12 +309,16 @@ a {
 
 /* Brief unavailable state */
 .brief-tab.unavailable {
-    opacity: 0.5;
-    cursor: default;
+    opacity: 0.45;
+    cursor: not-allowed;
 }
 
-.brief-tab.unavailable::after {
-    content: 'Soon';
+.brief-tab.unavailable:hover {
+    background: transparent;
+}
+
+.brief-tab.unavailable .brief-tab-time::after {
+    content: ' · Soon';
     font-size: 0.55rem;
     text-transform: uppercase;
     color: var(--ink-tertiary);
