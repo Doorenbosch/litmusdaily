@@ -649,6 +649,247 @@ a {
     border-left: 1px solid var(--rule);
 }
 
+/* ========== MARKET MOOD 9-BOX ========== */
+.market-mood {
+    margin-bottom: var(--lg);
+}
+
+.mood-header {
+    margin-bottom: var(--md);
+}
+
+.mood-label {
+    display: block;
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--burgundy);
+    margin-bottom: var(--xs);
+}
+
+.mood-title {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+/* 9-Box Container */
+.nine-box-container {
+    display: grid;
+    grid-template-columns: 20px 1fr;
+    grid-template-rows: 1fr auto;
+    gap: 4px;
+    margin-bottom: var(--md);
+}
+
+.nine-box-y-axis {
+    grid-row: 1;
+    grid-column: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    font-size: 0.6rem;
+    color: var(--ink-tertiary);
+    padding: 4px 0;
+}
+
+.nine-box-y-axis span:nth-child(2) {
+    font-weight: 600;
+    color: var(--ink-secondary);
+}
+
+.nine-box-grid {
+    grid-row: 1;
+    grid-column: 2;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 2px;
+    aspect-ratio: 1;
+    position: relative;
+    background: var(--white);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.nine-box-x-axis {
+    grid-row: 2;
+    grid-column: 2;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    color: var(--ink-tertiary);
+    padding-top: 4px;
+}
+
+.nine-box-x-axis span:nth-child(2) {
+    font-weight: 600;
+    color: var(--ink-secondary);
+}
+
+/* Individual Boxes */
+.box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--sans);
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-align: center;
+    padding: 4px;
+}
+
+.box-neutral {
+    background: rgba(232, 223, 213, 0.3);
+    color: rgba(138, 18, 60, 0.5);
+}
+
+.box-positive {
+    background: rgba(18, 108, 138, 0.15);
+    color: var(--teal);
+}
+
+.box-positive-strong {
+    background: rgba(18, 108, 138, 0.25);
+    color: var(--teal);
+}
+
+.box-negative {
+    background: rgba(138, 18, 60, 0.12);
+    color: var(--burgundy);
+}
+
+.box-negative-strong {
+    background: rgba(138, 18, 60, 0.22);
+    color: var(--burgundy);
+}
+
+/* Trail SVG */
+.mood-trail {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.trail-line {
+    fill: none;
+    stroke: url(#trailGradient);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Dots */
+.mood-dot {
+    position: absolute;
+    border-radius: 50%;
+    z-index: 3;
+    transform: translate(-50%, -50%);
+}
+
+.mood-dot-teal {
+    width: 16px;
+    height: 16px;
+    background: var(--teal);
+    border: 2px solid var(--white);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+.mood-dot-burgundy {
+    width: 14px;
+    height: 14px;
+    background: var(--burgundy);
+    border: 2px solid var(--white);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+.mood-dot-start {
+    width: 10px;
+    height: 10px;
+    background: var(--teal);
+    opacity: 0.3;
+}
+
+/* Description */
+.mood-description {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--ink-secondary);
+    margin-bottom: var(--md);
+}
+
+/* Legend */
+.mood-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.7rem;
+    color: var(--ink-tertiary);
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.legend-dot-teal {
+    background: var(--teal);
+}
+
+.legend-dot-burgundy {
+    background: var(--burgundy);
+}
+
+/* Active zone highlight */
+.box.active-zone {
+    outline: 2px solid var(--ink);
+    outline-offset: -2px;
+    z-index: 1;
+}
+
+/* Mood Link */
+.mood-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: var(--md);
+    padding-top: var(--md);
+    border-top: 1px solid var(--rule);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--teal);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.mood-link:hover {
+    color: var(--burgundy);
+}
+
+.mood-link svg {
+    flex-shrink: 0;
+}
+
 .sidebar-header {
     display: flex;
     justify-content: space-between;
