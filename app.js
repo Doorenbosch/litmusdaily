@@ -1055,6 +1055,17 @@ function renderWeekAheadPane(sectionKey) {
     const section = weekAheadData.sections[sectionKey];
     if (!section) return;
     
+    // Hide lead image (Week Ahead doesn't have images)
+    const imageContainer = document.getElementById('reading-image');
+    const articleLabel = document.getElementById('reading-label');
+    const articleHeadline = document.getElementById('reading-headline');
+    const articleHeader = document.querySelector('.article-header');
+    
+    if (imageContainer) imageContainer.style.display = 'none';
+    if (articleLabel) articleLabel.style.display = 'block';
+    if (articleHeadline) articleHeadline.style.display = 'block';
+    if (articleHeader) articleHeader.classList.remove('with-image');
+    
     const labelMap = {
         fulcrum: "THIS WEEK'S FULCRUM",
         levels: "LEVELS WORTH KNOWING",
@@ -1063,10 +1074,9 @@ function renderWeekAheadPane(sectionKey) {
     };
     
     // Update label with teal color indicator
-    const labelEl = document.getElementById('reading-label');
-    if (labelEl) {
-        labelEl.textContent = labelMap[sectionKey] || sectionKey.toUpperCase();
-        labelEl.style.color = 'var(--teal)';
+    if (articleLabel) {
+        articleLabel.textContent = labelMap[sectionKey] || sectionKey.toUpperCase();
+        articleLabel.style.color = 'var(--teal)';
     }
     
     // Update headline
