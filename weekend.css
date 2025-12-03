@@ -416,12 +416,14 @@
 }
 
 .relative-label {
+    display: block;
     font-family: var(--sans);
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--burgundy);
+    margin-bottom: var(--xs);
 }
 
 .relative-chart {
