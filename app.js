@@ -414,6 +414,9 @@ function renderMarketMood(data) {
     setText('legend-teal', `${mvRatio24h.toFixed(1)}x · Active 24H volumes & 24H trail`);
     setText('legend-burgundy', `${mvRatio7d.toFixed(1)}x · Active @ avg last 7day volumes`);
     
+    // Update Market Activity in header (uses 7d avg M/V - same as burgundy dot)
+    updateMarketActivity(mvRatio7d, mvRange);
+    
     // Position dots
     const gridRect = grid.getBoundingClientRect();
     const gridSize = gridRect.width;
@@ -508,6 +511,34 @@ function getMarketZone(breadth, mv, mvRange) {
     ];
     
     return zones[row][col];
+}
+
+// Update Market Activity indicator in header
+function updateMarketActivity(mvRatio, mvRange) {
+    const el = document.getElementById('market-activity');
+    if (!el) return;
+    
+    // Calculate activity level based on M/V ratio
+    // Lower M/V = more volume relative to market cap = more active
+    const mvNormalized = (mvRatio - mvRange.low) / (mvRange.high - mvRange.low);
+    
+    let activity, cssClass;
+    if (mvNormalized < 0.25) {
+        activity = 'Frenzied';
+        cssClass = 'frenzied';
+    } else if (mvNormalized < 0.45) {
+        activity = 'Active';
+        cssClass = 'active';
+    } else if (mvNormalized < 0.70) {
+        activity = 'Moderate';
+        cssClass = 'moderate';
+    } else {
+        activity = 'Quiet';
+        cssClass = 'quiet';
+    }
+    
+    el.textContent = activity;
+    el.className = 'ticker-value ticker-activity ' + cssClass;
 }
 
 // Load Week Ahead

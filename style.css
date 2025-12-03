@@ -159,6 +159,15 @@ a {
 .ticker-change.up { color: #0a7c42; }
 .ticker-change.down { color: var(--burgundy); }
 
+/* Market Activity indicator */
+.ticker-activity {
+    font-weight: 600;
+}
+.ticker-activity.frenzied { color: var(--burgundy); }
+.ticker-activity.active { color: #0a7c42; }
+.ticker-activity.moderate { color: var(--teal); }
+.ticker-activity.quiet { color: var(--ink-tertiary); }
+
 /* ========== SECTION NAV ========== */
 .section-nav {
     display: flex;
