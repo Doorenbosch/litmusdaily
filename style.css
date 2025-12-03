@@ -879,29 +879,6 @@ a {
     z-index: 1;
 }
 
-/* Mood Link */
-.mood-link {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: var(--md);
-    padding-top: var(--md);
-    border-top: 1px solid var(--rule);
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--teal);
-    text-decoration: none;
-    transition: color 0.15s;
-}
-
-.mood-link:hover {
-    color: var(--burgundy);
-}
-
-.mood-link svg {
-    flex-shrink: 0;
-}
-
 .sidebar-header {
     display: flex;
     justify-content: space-between;

@@ -403,20 +403,6 @@ function renderMarketMood(data) {
     setText('mood-title', MOOD_ZONES[zone]?.label || 'Market Mood');
     setText('mood-description', MOOD_DESCRIPTIONS[zone] || '');
     
-    // Update link text with short summary
-    const linkSummaries = {
-        'strong-rally': 'Strong conviction — broad participation',
-        'leadership': 'Select leaders — elevated activity',
-        'steady-advance': 'Healthy advance — sustainable pace',
-        'consolidation': 'Digesting gains — awaiting direction',
-        'concentration': 'Narrow leadership — fragile setup',
-        'rotation': 'Capital rotating — direction unclear',
-        'weak-rally': 'Lacking conviction — may stall',
-        'drift': 'Indecisive — low conviction',
-        'capitulation': 'Potential washout — watch for exhaustion'
-    };
-    setText('mood-link-text', linkSummaries[zone] || 'View analysis');
-    
     // Update breadth display
     setText('breadth-value', `${Math.round(breadth)}% of coins are green`);
     
