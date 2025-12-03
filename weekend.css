@@ -1,5 +1,34 @@
 /* ========== WEEKEND MAGAZINE STYLES ========== */
 
+/* Weekend Masthead */
+.brand-link {
+    display: flex;
+    align-items: center;
+    gap: var(--md);
+    text-decoration: none;
+}
+
+.brand-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+}
+
+.edition-label {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--burgundy);
+}
+
+.publication-date {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    color: var(--ink-secondary);
+}
+
 /* Magazine Hero */
 .magazine-hero {
     margin-bottom: var(--xl);
