@@ -171,47 +171,73 @@
             <aside class="context-sidebar">
                 
                 <!-- Market Mood with 7-Day Trail -->
-                <section class="sidebar-section">
-                    <div class="sidebar-header">
-                        <h2 class="sidebar-title">Market Mood</h2>
-                        <span class="sidebar-subtitle">7-Day View</span>
-                    </div>
-                    <div class="mood-box-container">
-                        <div class="mood-grid-wrapper">
-                            <!-- Y-axis labels -->
-                            <div class="mood-y-labels">
-                                <span>Busy</span>
-                                <span></span>
-                                <span>Quiet</span>
+                <section class="market-mood">
+                    <header class="mood-header">
+                        <span class="mood-label">MARKET MOOD</span>
+                        <h3 class="mood-title" id="mood-title-weekend">Strong Rally</h3>
+                    </header>
+                    
+                    <div class="nine-box-container">
+                        <div class="nine-box-y-axis">
+                            <span class="y-label-top">Frenzied</span>
+                            <span class="y-label-mid">M/V ratio</span>
+                            <span class="y-label-bottom">Quiet</span>
+                        </div>
+                        <div class="nine-box-wrapper">
+                            <div class="nine-box-grid" id="nine-box-grid-weekend">
+                                <!-- Row 1: Frenzied (top) -->
+                                <div class="box box-neutral" data-zone="concentration">CONCENTRATION</div>
+                                <div class="box box-positive" data-zone="leadership">LEADERSHIP</div>
+                                <div class="box box-positive-strong" data-zone="strong-rally">STRONG RALLY</div>
+                                <!-- Row 2: Normal -->
+                                <div class="box box-negative" data-zone="rotation">ROTATION</div>
+                                <div class="box box-neutral" data-zone="consolidation">CONSOLIDATION</div>
+                                <div class="box box-positive" data-zone="steady-advance">STEADY ADVANCE</div>
+                                <!-- Row 3: Quiet (bottom) -->
+                                <div class="box box-negative-strong" data-zone="capitulation">CAPITULATION</div>
+                                <div class="box box-negative" data-zone="drift">DRIFT</div>
+                                <div class="box box-neutral" data-zone="weak-rally">WEAK RALLY</div>
+                                
+                                <!-- 7-Day Trail path (SVG overlay) - Burgundy -->
+                                <svg class="mood-trail" id="mood-trail-7day" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                    <defs>
+                                        <linearGradient id="trailGradient7day" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" style="stop-color:#8A123C;stop-opacity:0.2" />
+                                            <stop offset="50%" style="stop-color:#8A123C;stop-opacity:0.5" />
+                                            <stop offset="100%" style="stop-color:#8A123C;stop-opacity:1" />
+                                        </linearGradient>
+                                    </defs>
+                                    <path id="trail-path-7day" class="trail-line" d="" stroke="url(#trailGradient7day)" />
+                                </svg>
+                                
+                                <!-- Current position dot (teal) -->
+                                <div class="mood-dot mood-dot-teal" id="mood-dot-weekend"></div>
                             </div>
-                            <!-- 9-box grid -->
-                            <div class="mood-grid" id="mood-grid-weekend">
-                                <div class="mood-cell" data-x="0" data-y="2"></div>
-                                <div class="mood-cell" data-x="1" data-y="2"></div>
-                                <div class="mood-cell" data-x="2" data-y="2"></div>
-                                <div class="mood-cell" data-x="0" data-y="1"></div>
-                                <div class="mood-cell" data-x="1" data-y="1"></div>
-                                <div class="mood-cell" data-x="2" data-y="1"></div>
-                                <div class="mood-cell" data-x="0" data-y="0"></div>
-                                <div class="mood-cell" data-x="1" data-y="0"></div>
-                                <div class="mood-cell" data-x="2" data-y="0"></div>
-                                <!-- Trail and current dot rendered by JS -->
-                                <svg class="mood-trail-svg" id="mood-trail-weekend"></svg>
-                                <div class="mood-dot current" id="mood-dot-weekend"></div>
-                            </div>
-                            <!-- X-axis labels -->
-                            <div class="mood-x-labels">
-                                <span>Losing</span>
-                                <span></span>
-                                <span>Winning</span>
+                            <div class="nine-box-x-axis">
+                                <span>0%</span>
+                                <span id="breadth-value-weekend">71% of coins are green</span>
+                                <span>100%</span>
                             </div>
                         </div>
-                        <div class="mood-legend">
-                            <span class="legend-item"><span class="legend-line"></span> 7-day path</span>
-                            <span class="legend-item"><span class="legend-dot"></span> Current</span>
+                    </div>
+                    
+                    <p class="mood-description" id="mood-description-weekend">
+                        Broad participation with high conviction. The market is moving decisively higher with strong volume confirmation.
+                    </p>
+                    
+                    <div class="mood-legend">
+                        <div class="legend-item">
+                            <span class="legend-dot legend-dot-burgundy"></span>
+                            <span>7-day trail</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot legend-dot-teal"></span>
+                            <span>Current</span>
                         </div>
                     </div>
                 </section>
+
+                <div class="sidebar-divider"></div>
 
                 <!-- Crypto Segments Performance -->
                 <section class="sidebar-section">

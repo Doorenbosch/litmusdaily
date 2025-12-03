@@ -153,11 +153,11 @@ function renderKeyDates(dates) {
 async function loadMoodHistory() {
     try {
         const response = await fetch(CONFIG.moodHistoryPath);
-        if (!response.ok) return;
+        if (!response.ok) throw new Error('Not found');
         
         const data = await response.json();
-        // Get last 7 days
-        moodHistory = (data.history || []).slice(-7);
+        // Get last 7 days from daily data
+        moodHistory = (data.daily || []).slice(-7);
         
     } catch (error) {
         console.error('[Weekend] Mood history error:', error);
@@ -169,54 +169,152 @@ async function loadMoodHistory() {
 // Generate mock mood history for demo
 function generateMockMoodHistory() {
     const history = [];
+    // Generate 7 days of plausible data
+    let breadth = 60 + Math.random() * 20;
+    let mv = 15 + Math.random() * 10;
+    
     for (let i = 6; i >= 0; i--) {
+        // Random walk with some momentum
+        breadth += (Math.random() - 0.4) * 8;
+        breadth = Math.max(20, Math.min(90, breadth));
+        mv += (Math.random() - 0.5) * 5;
+        mv = Math.max(5, Math.min(35, mv));
+        
         history.push({
-            volume: 40 + Math.random() * 40,
-            winners_pct: 30 + Math.random() * 50
+            breadth: breadth,
+            mv: mv
         });
     }
     return history;
 }
 
-// Render mood trail on 9-box grid
+// Zone labels for mood
+const MOOD_ZONES = {
+    'strong-rally': { label: 'Strong Rally' },
+    'leadership': { label: 'Leadership' },
+    'concentration': { label: 'Concentration' },
+    'steady-advance': { label: 'Steady Advance' },
+    'consolidation': { label: 'Consolidation' },
+    'rotation': { label: 'Rotation' },
+    'weak-rally': { label: 'Weak Rally' },
+    'drift': { label: 'Drift' },
+    'capitulation': { label: 'Capitulation' }
+};
+
+const MOOD_DESCRIPTIONS = {
+    'strong-rally': 'Broad participation with high conviction. The market is moving decisively higher with strong volume confirmation.',
+    'leadership': 'Concentrated gains in leading assets. Strong momentum but watch for breadth expansion or contraction.',
+    'concentration': 'Narrow market with high activity. A few assets leading while most lag behind.',
+    'steady-advance': 'Healthy breadth with measured gains. Sustainable advance with balanced participation.',
+    'consolidation': 'Balanced market digesting gains. Neither buyers nor sellers in clear control.',
+    'rotation': 'Active repositioning across sectors. Money moving but direction unclear.',
+    'weak-rally': 'Gains on low conviction. Price rises lack volume confirmation.',
+    'drift': 'Quiet market with slight negative bias. Neither strong buying nor selling pressure.',
+    'capitulation': 'High volume selling pressure. Potential exhaustion point worth monitoring.'
+};
+
+// Render 7-day mood trail
 function renderMoodTrail() {
-    const grid = document.getElementById('mood-grid-weekend');
-    const svg = document.getElementById('mood-trail-weekend');
-    const dot = document.getElementById('mood-dot-weekend');
+    const grid = document.getElementById('nine-box-grid-weekend');
+    const trailPath = document.getElementById('trail-path-7day');
+    const currentDot = document.getElementById('mood-dot-weekend');
     
-    if (!grid || !svg || !moodHistory.length) return;
+    if (!grid || !moodHistory.length) {
+        console.log('[Weekend] No grid or mood history');
+        return;
+    }
     
-    const gridRect = grid.getBoundingClientRect();
-    const cellWidth = gridRect.width / 3;
-    const cellHeight = gridRect.height / 3;
+    // M/V range for mapping (same as Today page)
+    const mvRange = { low: 5, high: 35 };
     
-    // Convert mood data to coordinates
-    const points = moodHistory.map(point => {
-        // X: winners_pct (0-100) -> (0-100% of grid width)
-        const x = (point.winners_pct / 100) * gridRect.width;
-        // Y: volume (0-100) -> inverted (high volume = top)
-        const y = (1 - point.volume / 100) * gridRect.height;
-        return { x, y };
+    // Map coordinates (breadth: 0-100 → 0-100%, mv: low→bottom, high→top)
+    const mapX = (b) => Math.max(0, Math.min(100, (b / 100) * 100));
+    const mapY = (mv) => {
+        // High MV = top (0%), Low MV = bottom (100%)
+        const normalized = (mv - mvRange.low) / (mvRange.high - mvRange.low);
+        return Math.max(0, Math.min(100, (1 - normalized) * 100));
+    };
+    
+    // Convert mood history to coordinates
+    const points = moodHistory.map(point => ({
+        x: mapX(point.breadth),
+        y: mapY(point.mv)
+    }));
+    
+    // Draw 7-day trail path
+    if (trailPath && points.length > 1) {
+        // Create smooth path using Catmull-Rom spline
+        let d = `M ${points[0].x} ${points[0].y}`;
+        
+        for (let i = 1; i < points.length; i++) {
+            const prev = points[i - 1];
+            const curr = points[i];
+            const next = points[i + 1] || curr;
+            const prevPrev = points[i - 2] || prev;
+            
+            const tension = 0.3;
+            const cp1x = prev.x + (curr.x - prevPrev.x) * tension;
+            const cp1y = prev.y + (curr.y - prevPrev.y) * tension;
+            const cp2x = curr.x - (next.x - prev.x) * tension;
+            const cp2y = curr.y - (next.y - prev.y) * tension;
+            
+            d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${curr.x} ${curr.y}`;
+        }
+        
+        trailPath.setAttribute('d', d);
+    }
+    
+    // Position current dot (last point in history = today)
+    const current = moodHistory[moodHistory.length - 1];
+    if (currentDot && current) {
+        currentDot.style.left = `${mapX(current.breadth)}%`;
+        currentDot.style.top = `${mapY(current.mv)}%`;
+    }
+    
+    // Determine current zone
+    const zone = getMarketZone(current.breadth, current.mv, mvRange);
+    
+    // Update title and description
+    setText('mood-title-weekend', MOOD_ZONES[zone]?.label || 'Market Mood');
+    setText('mood-description-weekend', MOOD_DESCRIPTIONS[zone] || '');
+    setText('breadth-value-weekend', `${Math.round(current.breadth)}% of coins are green`);
+    
+    // Highlight active zone
+    document.querySelectorAll('#nine-box-grid-weekend .box').forEach(box => {
+        box.classList.remove('active-zone');
+        if (box.dataset.zone === zone) {
+            box.classList.add('active-zone');
+        }
     });
     
-    // Draw trail path
-    if (points.length > 1) {
-        const pathData = points.map((p, i) => 
-            `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`
-        ).join(' ');
-        
-        svg.innerHTML = `
-            <path class="mood-trail-path" d="${pathData}" />
-        `;
-    }
-    
-    // Position current dot (last point)
-    const current = points[points.length - 1];
-    if (current) {
-        dot.style.left = `${current.x}px`;
-        dot.style.top = `${current.y}px`;
-    }
+    console.log('[Weekend] Mood trail rendered:', { zone, current, points: points.length });
 }
+
+// Get market zone based on breadth and M/V ratio
+function getMarketZone(breadth, mv, mvRange) {
+    const mvNorm = (mv - mvRange.low) / (mvRange.high - mvRange.low);
+    
+    // Determine column (breadth)
+    let col;
+    if (breadth < 33) col = 0;
+    else if (breadth < 67) col = 1;
+    else col = 2;
+    
+    // Determine row (M/V - lower value = frenzied = top)
+    let row;
+    if (mvNorm < 0.33) row = 0;  // Frenzied
+    else if (mvNorm < 0.67) row = 1;  // Normal
+    else row = 2;  // Quiet
+    
+    const zones = [
+        ['concentration', 'leadership', 'strong-rally'],
+        ['rotation', 'consolidation', 'steady-advance'],
+        ['capitulation', 'drift', 'weak-rally']
+    ];
+    
+    return zones[row][col];
+}
+
 
 // Load segments data
 async function loadSegmentsData() {
