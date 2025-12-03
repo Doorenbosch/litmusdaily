@@ -19,12 +19,55 @@
                 <img src="litmuslogo.png" alt="The Litmus Daily" class="logo-icon">
                 <span class="brand-name">The Litmus Daily</span>
             </div>
-            <nav class="edition-picker">
-                <button class="edition active" data-region="americas">Americas</button>
-                <button class="edition" data-region="emea">EMEA</button>
-                <button class="edition" data-region="apac">APAC</button>
+            <nav class="masthead-actions">
+                <div class="edition-picker">
+                    <button class="edition active" data-region="americas">Americas</button>
+                    <button class="edition" data-region="emea">EMEA</button>
+                    <button class="edition" data-region="apac">APAC</button>
+                </div>
+                <button class="settings-btn" id="settings-btn" aria-label="Settings">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+                    </svg>
+                </button>
             </nav>
         </header>
+
+        <!-- Settings Modal -->
+        <div class="modal-overlay" id="settings-modal">
+            <div class="modal">
+                <header class="modal-header">
+                    <h2 class="modal-title">Settings</h2>
+                    <button class="modal-close" id="modal-close">&times;</button>
+                </header>
+                
+                <div class="modal-body">
+                    <!-- Coin Selection -->
+                    <section class="settings-section">
+                        <h3 class="settings-label">Select Coins for Insight</h3>
+                        <p class="settings-help">Bitcoin included. You have currently selected <span id="coin-count">0</span> additional coins of the maximum of 4 coins.</p>
+                        <p class="settings-selected">Coins selected: <span id="coins-selected-list">BTC, ETH</span></p>
+                        
+                        <div class="coin-search">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <path d="M21 21l-4.35-4.35"/>
+                            </svg>
+                            <input type="text" id="coin-search" placeholder="Search coins...">
+                        </div>
+                        
+                        <div class="coin-list" id="coin-list">
+                            <!-- Coins loaded dynamically -->
+                        </div>
+                    </section>
+                </div>
+                
+                <footer class="modal-footer">
+                    <button class="btn-primary" id="save-settings">Save Settings</button>
+                </footer>
+            </div>
+        </div>
 
         <!-- Market Strip -->
         <div class="market-strip">
@@ -116,6 +159,16 @@
                         <p class="card-excerpt" id="index-takeaway-excerpt">The bull market isn't over, but the easy phase is. What comes next requires patience and conviction...</p>
                     </article>
                 </nav>
+                
+                <!-- Your Coins Section -->
+                <section class="your-coins" id="your-coins">
+                    <header class="your-coins-header">
+                        <span class="your-coins-label">YOUR COINS LAST 24H</span>
+                    </header>
+                    <div class="coin-rows" id="coin-rows">
+                        <!-- Dynamic coin rows -->
+                    </div>
+                </section>
             </aside>
 
             <!-- Center: Reading Pane -->

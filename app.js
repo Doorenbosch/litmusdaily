@@ -6,15 +6,24 @@ const CONFIG = {
     breakdownAPI: '/api/breakdown',
     marketMoodAPI: '/api/market-mood',
     coinGeckoAPI: 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum&order=market_cap_desc&sparkline=false&price_change_percentage=24h',
+    topCoinsAPI: 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h',
     globalAPI: 'https://api.coingecko.com/api/v3/global',
     marketUpdateInterval: 60000 // 1 minute
 };
+
+// Default coins (always included)
+const DEFAULT_COINS = ['bitcoin', 'ethereum'];
+const MAX_USER_COINS = 4;
 
 // Data store
 let briefData = null;
 let currentSection = 'lead';
 let currentRegion = CONFIG.defaultRegion;
 let currentBriefType = 'morning';
+
+// User coins
+let userCoins = [];
+let allCoins = [];
 
 // Audio player state
 let audioElement = null;
@@ -100,16 +109,20 @@ document.addEventListener('DOMContentLoaded', () => {
     initBriefSelector();
     initIndexCards();
     initAudioPlayer();
+    initSettings();
+    loadUserCoins();
     loadContent(currentRegion, currentBriefType);
     loadBreakdownPodcast();
     
     // Load live market data
     loadMarketData();
     loadMarketMood();
+    loadYourCoins();
     
     // Update market data every minute
     setInterval(loadMarketData, CONFIG.marketUpdateInterval);
     setInterval(loadMarketMood, CONFIG.marketUpdateInterval);
+    setInterval(loadYourCoins, CONFIG.marketUpdateInterval);
 });
 
 // Edition (Region) Picker
@@ -1057,4 +1070,553 @@ function parseDurationSeconds(duration) {
     }
     
     return 0;
+}
+
+// ========== USER COINS & SETTINGS ==========
+
+// Locked coins that can't be removed
+const LOCKED_COINS = ['bitcoin', 'ethereum'];
+
+// Available coins for selection (top coins by market cap)
+const AVAILABLE_COINS = [
+    { id: 'bitcoin', symbol: 'BTC', name: 'Bitcoin' },
+    { id: 'ethereum', symbol: 'ETH', name: 'Ethereum' },
+    { id: 'tether', symbol: 'USDT', name: 'Tether' },
+    { id: 'binancecoin', symbol: 'BNB', name: 'BNB' },
+    { id: 'solana', symbol: 'SOL', name: 'Solana' },
+    { id: 'ripple', symbol: 'XRP', name: 'XRP' },
+    { id: 'usd-coin', symbol: 'USDC', name: 'USD Coin' },
+    { id: 'cardano', symbol: 'ADA', name: 'Cardano' },
+    { id: 'avalanche-2', symbol: 'AVAX', name: 'Avalanche' },
+    { id: 'dogecoin', symbol: 'DOGE', name: 'Dogecoin' },
+    { id: 'polkadot', symbol: 'DOT', name: 'Polkadot' },
+    { id: 'chainlink', symbol: 'LINK', name: 'Chainlink' },
+    { id: 'tron', symbol: 'TRX', name: 'TRON' },
+    { id: 'matic-network', symbol: 'MATIC', name: 'Polygon' },
+    { id: 'shiba-inu', symbol: 'SHIB', name: 'Shiba Inu' },
+    { id: 'litecoin', symbol: 'LTC', name: 'Litecoin' },
+    { id: 'bitcoin-cash', symbol: 'BCH', name: 'Bitcoin Cash' },
+    { id: 'uniswap', symbol: 'UNI', name: 'Uniswap' },
+    { id: 'stellar', symbol: 'XLM', name: 'Stellar' },
+    { id: 'vechain', symbol: 'VET', name: 'VeChain' },
+    { id: 'cosmos', symbol: 'ATOM', name: 'Cosmos' },
+    { id: 'monero', symbol: 'XMR', name: 'Monero' },
+    { id: 'ethereum-classic', symbol: 'ETC', name: 'Ethereum Classic' },
+    { id: 'filecoin', symbol: 'FIL', name: 'Filecoin' },
+    { id: 'hedera-hashgraph', symbol: 'HBAR', name: 'Hedera' },
+    { id: 'aave', symbol: 'AAVE', name: 'Aave' },
+    { id: 'algorand', symbol: 'ALGO', name: 'Algorand' },
+    { id: 'near', symbol: 'NEAR', name: 'NEAR Protocol' },
+    { id: 'fantom', symbol: 'FTM', name: 'Fantom' },
+    { id: 'the-sandbox', symbol: 'SAND', name: 'The Sandbox' }
+];
+
+// Selected user coins (stored in localStorage)
+let selectedCoins = [];
+
+// Initialize settings modal
+function initSettings() {
+    const modal = document.getElementById('settings-modal');
+    const openBtn = document.getElementById('settings-btn');
+    const closeBtn = document.getElementById('modal-close');
+    const saveBtn = document.getElementById('save-settings');
+    const searchInput = document.getElementById('coin-search');
+    
+    if (openBtn) {
+        openBtn.addEventListener('click', () => {
+            modal.classList.add('active');
+            renderCoinList();
+        });
+    }
+    
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+    }
+    
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+    }
+    
+    if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+            saveSettings();
+            modal.classList.remove('active');
+        });
+    }
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            renderCoinList(e.target.value.toLowerCase());
+        });
+    }
+}
+
+// Load user coins from localStorage
+function loadUserCoins() {
+    const stored = localStorage.getItem('litmus_user_coins');
+    if (stored) {
+        try {
+            selectedCoins = JSON.parse(stored);
+        } catch (e) {
+            selectedCoins = [];
+        }
+    }
+    
+    // Always include locked coins
+    LOCKED_COINS.forEach(id => {
+        if (!selectedCoins.includes(id)) {
+            selectedCoins.unshift(id);
+        }
+    });
+    
+    updateSelectedDisplay();
+    loadUserCoinPrices();
+}
+
+// Save settings
+function saveSettings() {
+    // Filter out locked coins for storage (they're always included)
+    const toStore = selectedCoins.filter(id => !LOCKED_COINS.includes(id));
+    localStorage.setItem('litmus_user_coins', JSON.stringify(toStore));
+    loadUserCoinPrices();
+}
+
+// Render coin list in modal
+function renderCoinList(filter = '') {
+    const container = document.getElementById('coin-list');
+    if (!container) return;
+    
+    const filtered = AVAILABLE_COINS.filter(coin => 
+        coin.name.toLowerCase().includes(filter) ||
+        coin.symbol.toLowerCase().includes(filter)
+    );
+    
+    container.innerHTML = filtered.map(coin => {
+        const isLocked = LOCKED_COINS.includes(coin.id);
+        const isSelected = selectedCoins.includes(coin.id);
+        const lockedClass = isLocked ? 'locked' : '';
+        const checkClass = isSelected ? 'selected' : 'unselected';
+        
+        return `
+            <div class="coin-item ${lockedClass}" data-coin-id="${coin.id}">
+                <img src="https://assets.coingecko.com/coins/images/${getCoinImageId(coin.id)}/small/${coin.id}.png" 
+                     class="coin-icon" 
+                     alt="${coin.name}"
+                     onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 36 36%22><circle fill=%22%23ccc%22 cx=%2218%22 cy=%2218%22 r=%2218%22/></svg>'">
+                <div class="coin-info">
+                    <div class="coin-name">${coin.name}</div>
+                    <div class="coin-symbol">${coin.symbol}</div>
+                </div>
+                <div class="coin-check ${checkClass} ${isLocked ? 'locked' : ''}">
+                    ${isSelected ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Add click handlers
+    container.querySelectorAll('.coin-item:not(.locked)').forEach(item => {
+        item.addEventListener('click', () => toggleCoin(item.dataset.coinId));
+    });
+}
+
+// Get CoinGecko image ID (simplified mapping)
+function getCoinImageId(coinId) {
+    const imageIds = {
+        'bitcoin': '1',
+        'ethereum': '279',
+        'tether': '325',
+        'binancecoin': '825',
+        'solana': '4128',
+        'ripple': '44',
+        'usd-coin': '6319',
+        'cardano': '975',
+        'avalanche-2': '12559',
+        'dogecoin': '5',
+        'polkadot': '12171',
+        'chainlink': '877',
+        'tron': '1094',
+        'matic-network': '4713',
+        'shiba-inu': '11939',
+        'litecoin': '2',
+        'bitcoin-cash': '780',
+        'uniswap': '12504',
+        'stellar': '100',
+        'vechain': '1167',
+        'cosmos': '1481',
+        'monero': '69',
+        'ethereum-classic': '453',
+        'filecoin': '12817',
+        'hedera-hashgraph': '3688',
+        'aave': '12645',
+        'algorand': '4030',
+        'near': '10365',
+        'fantom': '4001',
+        'the-sandbox': '12129'
+    };
+    return imageIds[coinId] || '1';
+}
+
+// Toggle coin selection
+function toggleCoin(coinId) {
+    const maxAdditional = 4;
+    const additionalCount = selectedCoins.filter(id => !LOCKED_COINS.includes(id)).length;
+    
+    if (selectedCoins.includes(coinId)) {
+        // Remove
+        selectedCoins = selectedCoins.filter(id => id !== coinId);
+    } else {
+        // Add (check limit)
+        if (additionalCount >= maxAdditional) {
+            // Show warning or remove oldest
+            alert(`Maximum ${maxAdditional} additional coins. Remove one first.`);
+            return;
+        }
+        selectedCoins.push(coinId);
+    }
+    
+    updateSelectedDisplay();
+    renderCoinList(document.getElementById('coin-search')?.value?.toLowerCase() || '');
+}
+
+// Update selected coins display
+function updateSelectedDisplay() {
+    const countEl = document.getElementById('coin-count');
+    const listEl = document.getElementById('coins-selected-list');
+    
+    const additionalCount = selectedCoins.filter(id => !LOCKED_COINS.includes(id)).length;
+    
+    if (countEl) {
+        countEl.textContent = additionalCount;
+    }
+    
+    if (listEl) {
+        const symbols = selectedCoins.map(id => {
+            const coin = AVAILABLE_COINS.find(c => c.id === id);
+            return coin ? coin.symbol : id.toUpperCase();
+        });
+        listEl.textContent = symbols.join(', ');
+    }
+}
+
+// Load user coin prices and display
+async function loadUserCoinPrices() {
+    const container = document.getElementById('coin-rows');
+    if (!container) return;
+    
+    // Only show non-locked coins (BTC/ETH already in header)
+    const userCoins = selectedCoins.filter(id => !LOCKED_COINS.includes(id));
+    
+    if (userCoins.length === 0) {
+        container.innerHTML = '<p class="no-coins">No additional coins selected. <a href="#" id="open-settings-link">Add coins</a></p>';
+        const link = document.getElementById('open-settings-link');
+        if (link) {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('settings-modal').classList.add('active');
+                renderCoinList();
+            });
+        }
+        return;
+    }
+    
+    try {
+        const ids = userCoins.join(',');
+        const response = await fetch(
+            `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${ids}&order=market_cap_desc&sparkline=false&price_change_percentage=24h`
+        );
+        
+        if (!response.ok) throw new Error('Failed to fetch');
+        
+        const coins = await response.json();
+        
+        container.innerHTML = coins.map((coin, index) => {
+            const change = coin.price_change_percentage_24h || 0;
+            const isUp = change >= 0;
+            const changeClass = isUp ? 'up' : 'down';
+            const arrow = isUp 
+                ? '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12,4 20,16 4,16"/></svg>'
+                : '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12,20 4,8 20,8"/></svg>';
+            
+            return `
+                <div class="coin-row">
+                    <span class="coin-row-rank">#${coin.market_cap_rank || '—'}</span>
+                    <img src="${coin.image}" class="coin-row-icon" alt="${coin.name}" onerror="this.style.display='none'">
+                    <span class="coin-row-symbol">${coin.symbol.toUpperCase()}</span>
+                    <span class="coin-row-price">${formatCoinPrice(coin.current_price)}</span>
+                    <span class="coin-row-change ${changeClass}">
+                        ${arrow}
+                        ${Math.abs(change).toFixed(1)}%
+                    </span>
+                </div>
+            `;
+        }).join('');
+        
+    } catch (error) {
+        console.error('Error loading user coins:', error);
+        container.innerHTML = '<p class="coin-error">Unable to load coin data</p>';
+    }
+}
+
+// Format coin price
+function formatCoinPrice(price) {
+    if (!price) return '$0';
+    
+    if (price >= 1000) {
+        return '$' + price.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    } else if (price >= 1) {
+        return '$' + price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    } else if (price >= 0.01) {
+        return '$' + price.toFixed(4);
+    } else {
+        return '$' + price.toFixed(6);
+    }
+}
+
+// ========== USER SETTINGS & COINS ==========
+
+// Load user coins from localStorage
+function loadUserCoins() {
+    const saved = localStorage.getItem('litmus_user_coins');
+    if (saved) {
+        try {
+            userCoins = JSON.parse(saved);
+        } catch (e) {
+            userCoins = [];
+        }
+    }
+}
+
+// Save user coins to localStorage
+function saveUserCoins() {
+    localStorage.setItem('litmus_user_coins', JSON.stringify(userCoins));
+}
+
+// Initialize settings modal
+function initSettings() {
+    const settingsBtn = document.getElementById('settings-btn');
+    const modal = document.getElementById('settings-modal');
+    const closeBtn = document.getElementById('modal-close');
+    const saveBtn = document.getElementById('save-settings');
+    const searchInput = document.getElementById('coin-search');
+    
+    if (settingsBtn) {
+        settingsBtn.addEventListener('click', () => {
+            openSettingsModal();
+        });
+    }
+    
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeSettingsModal);
+    }
+    
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeSettingsModal();
+            }
+        });
+    }
+    
+    if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+            saveUserCoins();
+            loadYourCoins();
+            closeSettingsModal();
+        });
+    }
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            filterCoinList(e.target.value);
+        });
+    }
+}
+
+// Open settings modal
+async function openSettingsModal() {
+    const modal = document.getElementById('settings-modal');
+    if (modal) {
+        modal.classList.add('active');
+        await loadCoinList();
+        renderCoinList();
+        updateCoinCount();
+    }
+}
+
+// Close settings modal
+function closeSettingsModal() {
+    const modal = document.getElementById('settings-modal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+// Load all coins from CoinGecko
+async function loadCoinList() {
+    if (allCoins.length > 0) return; // Already loaded
+    
+    try {
+        const response = await fetch(CONFIG.topCoinsAPI);
+        if (response.ok) {
+            allCoins = await response.json();
+        }
+    } catch (error) {
+        console.error('Error loading coin list:', error);
+    }
+}
+
+// Render coin list in modal
+function renderCoinList(filter = '') {
+    const container = document.getElementById('coin-list');
+    if (!container) return;
+    
+    const filterLower = filter.toLowerCase();
+    const filteredCoins = allCoins.filter(coin => 
+        coin.name.toLowerCase().includes(filterLower) ||
+        coin.symbol.toLowerCase().includes(filterLower)
+    );
+    
+    container.innerHTML = filteredCoins.map(coin => {
+        const isDefault = DEFAULT_COINS.includes(coin.id);
+        const isSelected = isDefault || userCoins.includes(coin.id);
+        const isLocked = isDefault;
+        
+        return `
+            <div class="coin-item ${isLocked ? 'locked' : ''}" data-coin-id="${coin.id}" ${isLocked ? '' : 'onclick="toggleCoin(\'' + coin.id + '\')"'}>
+                <img class="coin-icon" src="${coin.image}" alt="${coin.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 fill=%22%23ccc%22/></svg>'">
+                <div class="coin-info">
+                    <div class="coin-name">${coin.name}</div>
+                    <div class="coin-symbol">${coin.symbol}</div>
+                </div>
+                <div class="coin-check ${isLocked ? 'locked' : isSelected ? 'selected' : 'unselected'}">
+                    ${isSelected ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20,6 9,17 4,12"/></svg>' : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Toggle coin selection
+function toggleCoin(coinId) {
+    const index = userCoins.indexOf(coinId);
+    
+    if (index > -1) {
+        // Deselect
+        userCoins.splice(index, 1);
+    } else {
+        // Select (if under max)
+        if (userCoins.length < MAX_USER_COINS) {
+            userCoins.push(coinId);
+        } else {
+            // Show feedback that max is reached
+            alert(`Maximum ${MAX_USER_COINS} additional coins allowed.`);
+            return;
+        }
+    }
+    
+    renderCoinList(document.getElementById('coin-search')?.value || '');
+    updateCoinCount();
+}
+
+// Filter coin list by search
+function filterCoinList(query) {
+    renderCoinList(query);
+}
+
+// Update coin count display
+function updateCoinCount() {
+    const countEl = document.getElementById('coin-count');
+    const listEl = document.getElementById('coins-selected-list');
+    
+    if (countEl) {
+        countEl.textContent = userCoins.length;
+    }
+    
+    if (listEl) {
+        const allSelected = [...DEFAULT_COINS.map(id => id === 'bitcoin' ? 'BTC' : 'ETH'), ...userCoins.map(id => {
+            const coin = allCoins.find(c => c.id === id);
+            return coin ? coin.symbol.toUpperCase() : id.toUpperCase();
+        })];
+        listEl.textContent = allSelected.join(', ');
+    }
+}
+
+// ========== YOUR COINS DISPLAY ==========
+
+// Load and display user's coins
+async function loadYourCoins() {
+    if (userCoins.length === 0) {
+        const container = document.getElementById('your-coins');
+        if (container) container.style.display = 'none';
+        return;
+    }
+    
+    try {
+        const coinIds = userCoins.join(',');
+        const response = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${coinIds}&order=market_cap_desc&sparkline=false&price_change_percentage=24h`);
+        
+        if (!response.ok) return;
+        
+        const coins = await response.json();
+        renderYourCoins(coins);
+        
+    } catch (error) {
+        console.error('Error loading your coins:', error);
+    }
+}
+
+// Render Your Coins section
+function renderYourCoins(coins) {
+    const container = document.getElementById('your-coins');
+    const rowsContainer = document.getElementById('coin-rows');
+    
+    if (!container || !rowsContainer) return;
+    
+    if (coins.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+    
+    container.style.display = 'block';
+    
+    rowsContainer.innerHTML = coins.map(coin => {
+        const change = coin.price_change_percentage_24h || 0;
+        const isUp = change >= 0;
+        const arrow = isUp 
+            ? '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-8 8h5v8h6v-8h5z"/></svg>'
+            : '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20l8-8h-5V4H9v8H4z"/></svg>';
+        
+        return `
+            <div class="coin-row">
+                <span class="coin-row-rank">#${coin.market_cap_rank || '—'}</span>
+                <img class="coin-row-icon" src="${coin.image}" alt="${coin.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 fill=%22%23ccc%22/></svg>'">
+                <span class="coin-row-symbol">${coin.symbol.toUpperCase()}</span>
+                <span class="coin-row-price">$${formatCoinPrice(coin.current_price)}</span>
+                <span class="coin-row-change ${isUp ? 'up' : 'down'}">
+                    ${arrow}
+                    ${Math.abs(change).toFixed(1)}%
+                </span>
+            </div>
+        `;
+    }).join('');
+}
+
+// Format coin price (smart decimals)
+function formatCoinPrice(price) {
+    if (price >= 1000) {
+        return price.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    } else if (price >= 1) {
+        return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    } else if (price >= 0.01) {
+        return price.toFixed(4);
+    } else {
+        return price.toFixed(6);
+    }
 }
