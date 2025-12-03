@@ -365,7 +365,7 @@ a {
 
 .index-title {
     font-family: var(--sans);
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -411,7 +411,7 @@ a {
 
 .brief-tab-label {
     font-family: var(--sans);
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -474,7 +474,7 @@ a {
 }
 
 .card-label {
-    font-size: 0.6rem;
+    font-size: 0.7rem;
     font-weight: 600;
     letter-spacing: 0.08em;
     color: var(--teal);
@@ -752,7 +752,7 @@ a {
 }
 
 .article-label {
-    font-size: 0.65rem;
+    font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.1em;
     color: var(--burgundy);
