@@ -1680,31 +1680,43 @@ function updateCoinCount() {
 // Load and display user's coins
 async function loadYourCoins() {
     if (userCoins.length === 0) {
-        const container = document.getElementById('your-coins');
+        const container = document.getElementById('relative-performance');
         if (container) container.style.display = 'none';
         return;
     }
     
     try {
+        // Fetch user's coins
         const coinIds = userCoins.join(',');
-        const response = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${coinIds}&order=market_cap_desc&sparkline=false&price_change_percentage=24h`);
+        const coinsResponse = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${coinIds}&order=market_cap_desc&sparkline=false&price_change_percentage=24h`);
         
-        if (!response.ok) return;
+        // Fetch market data for baseline
+        const globalResponse = await fetch('https://api.coingecko.com/api/v3/global');
         
-        const coins = await response.json();
-        renderYourCoins(coins);
+        if (!coinsResponse.ok) return;
+        
+        const coins = await coinsResponse.json();
+        
+        // Get market 24h change (fallback to 0 if unavailable)
+        let marketChange = 0;
+        if (globalResponse.ok) {
+            const globalData = await globalResponse.json();
+            marketChange = globalData.data?.market_cap_change_percentage_24h_usd || 0;
+        }
+        
+        renderRelativePerformance(coins, marketChange);
         
     } catch (error) {
         console.error('Error loading your coins:', error);
     }
 }
 
-// Render Your Coins section
-function renderYourCoins(coins) {
-    const container = document.getElementById('your-coins');
-    const rowsContainer = document.getElementById('coin-rows');
+// Render Relative Performance section
+function renderRelativePerformance(coins, marketChange) {
+    const container = document.getElementById('relative-performance');
+    const chartContainer = document.getElementById('relative-chart');
     
-    if (!container || !rowsContainer) return;
+    if (!container || !chartContainer) return;
     
     if (coins.length === 0) {
         container.style.display = 'none';
@@ -1713,26 +1725,50 @@ function renderYourCoins(coins) {
     
     container.style.display = 'block';
     
-    rowsContainer.innerHTML = coins.map(coin => {
-        const change = coin.price_change_percentage_24h || 0;
-        const isUp = change >= 0;
-        const arrow = isUp 
-            ? '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-8 8h5v8h6v-8h5z"/></svg>'
-            : '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20l8-8h-5V4H9v8H4z"/></svg>';
+    // Update market change display
+    const marketChangeEl = document.getElementById('market-24h-change');
+    if (marketChangeEl) {
+        const sign = marketChange >= 0 ? '+' : '';
+        marketChangeEl.textContent = `${sign}${marketChange.toFixed(1)}%`;
+    }
+    
+    // Build coin rows
+    const coinRows = coins.map(coin => {
+        const coinChange = coin.price_change_percentage_24h || 0;
+        const relativeChange = coinChange - marketChange;
+        const isOutperforming = relativeChange >= 0;
+        
+        // Bar width: scale relative change to percentage of half the container
+        // Max bar = 50% of container (full one side)
+        // Scale: 5% relative = 50% bar width (adjust as needed)
+        const maxRelative = 5; // ±5% relative = full bar
+        const barWidth = Math.min(Math.abs(relativeChange) / maxRelative * 50, 50);
+        
+        const sign = coinChange >= 0 ? '+' : '';
+        const relSign = relativeChange >= 0 ? '+' : '';
         
         return `
-            <div class="coin-row">
-                <span class="coin-row-rank">#${coin.market_cap_rank || '—'}</span>
-                <img class="coin-row-icon" src="${coin.image}" alt="${coin.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 fill=%22%23ccc%22/></svg>'">
-                <span class="coin-row-symbol">${coin.symbol.toUpperCase()}</span>
-                <span class="coin-row-price">$${formatCoinPrice(coin.current_price)}</span>
-                <span class="coin-row-change ${isUp ? 'up' : 'down'}">
-                    ${arrow}
-                    ${Math.abs(change).toFixed(1)}%
-                </span>
+            <div class="relative-row">
+                <span class="rel-name">${coin.symbol.toUpperCase()}</span>
+                <span class="rel-change">${sign}${coinChange.toFixed(1)}%</span>
+                <div class="rel-bar-container">
+                    <div class="rel-baseline"></div>
+                    <div class="rel-bar ${isOutperforming ? 'outperform' : 'underperform'}" 
+                         style="width: ${barWidth}%"></div>
+                </div>
+                <span class="rel-vs ${isOutperforming ? 'positive' : 'negative'}">${relSign}${relativeChange.toFixed(1)}%</span>
             </div>
         `;
     }).join('');
+    
+    // Keep market row, add coin rows after
+    const marketRow = chartContainer.querySelector('.market-row');
+    if (marketRow) {
+        // Remove old coin rows
+        chartContainer.querySelectorAll('.relative-row:not(.market-row)').forEach(el => el.remove());
+        // Add new coin rows
+        marketRow.insertAdjacentHTML('afterend', coinRows);
+    }
 }
 
 // Format coin price (smart decimals)
