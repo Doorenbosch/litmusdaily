@@ -1407,9 +1407,18 @@ function loadUserCoins() {
     }
 }
 
-// Save user coins to localStorage
+// Save user coins to localStorage and Firestore (if signed in)
 function saveUserCoins() {
+    // Always save to localStorage
     localStorage.setItem('litmus_user_coins', JSON.stringify(userCoins));
+    
+    // Sync to Firestore if signed in
+    if (window.LitmusAuth && window.LitmusAuth.isSignedIn()) {
+        window.LitmusAuth.saveUserPreferences({
+            selectedCoins: userCoins,
+            defaultRegion: currentRegion
+        });
+    }
 }
 
 // Initialize settings modal
@@ -1636,3 +1645,15 @@ function formatCoinPrice(price) {
         return price.toFixed(6);
     }
 }
+
+// Export functions for auth module
+window.loadYourCoins = loadYourCoins;
+window.setRegion = function(region) {
+    if (['americas', 'emea', 'apac'].includes(region)) {
+        currentRegion = region;
+        document.querySelectorAll('.edition').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.region === region);
+        });
+        loadBrief();
+    }
+};
