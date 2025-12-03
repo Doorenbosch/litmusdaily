@@ -683,6 +683,7 @@ a {
     gap: 8px;
     margin-bottom: var(--md);
     max-width: 100%;
+    justify-content: center;
 }
 
 .nine-box-y-axis {
@@ -718,15 +719,17 @@ a {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    align-items: center;
 }
 
 .nine-box-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, 1fr));
     gap: 2px;
-    aspect-ratio: 1;
+    aspect-ratio: 1 / 1;
     width: 100%;
+    max-width: 280px;
     position: relative;
     background: var(--white);
     border-radius: 4px;
@@ -739,6 +742,8 @@ a {
     font-size: 0.6rem;
     color: var(--ink-tertiary);
     padding-top: 4px;
+    width: 100%;
+    max-width: 280px;
 }
 
 .nine-box-x-axis span:nth-child(2) {
@@ -752,11 +757,14 @@ a {
     align-items: center;
     justify-content: center;
     font-family: var(--sans);
-    font-size: 0.55rem;
+    font-size: 0.5rem;
     font-weight: 700;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.02em;
     text-align: center;
-    padding: 4px;
+    padding: 2px;
+    overflow: hidden;
+    min-width: 0;
+    line-height: 1.2;
 }
 
 .box-neutral {
