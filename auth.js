@@ -18,11 +18,21 @@ const firebaseConfig = {
     appId: "YOUR_APP_ID"
 };
 
+// Check if Firebase is configured
+const isFirebaseConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY";
+
 // Initialize Firebase
 let app, auth, db;
 let currentUser = null;
 
 function initFirebase() {
+    // Don't initialize if not configured
+    if (!isFirebaseConfigured) {
+        console.log('[Auth] Firebase not configured - sign-in disabled');
+        hideSignInButton();
+        return;
+    }
+    
     try {
         app = firebase.initializeApp(firebaseConfig);
         auth = firebase.auth();
@@ -34,6 +44,15 @@ function initFirebase() {
         console.log('[Auth] Firebase initialized');
     } catch (error) {
         console.error('[Auth] Firebase init error:', error);
+        hideSignInButton();
+    }
+}
+
+// Hide sign-in button when Firebase isn't ready
+function hideSignInButton() {
+    const signinBtn = document.getElementById('signin-btn');
+    if (signinBtn) {
+        signinBtn.style.display = 'none';
     }
 }
 
@@ -83,6 +102,11 @@ async function handleAuthStateChanged(user) {
 
 // Google Sign-In
 async function signInWithGoogle() {
+    if (!isFirebaseConfigured) {
+        console.log('[Auth] Firebase not configured');
+        return;
+    }
+    
     try {
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.setCustomParameters({
@@ -92,17 +116,33 @@ async function signInWithGoogle() {
         const result = await auth.signInWithPopup(provider);
         console.log('[Auth] Google sign-in successful');
         
+        // Track sign-in in GA4
+        if (window.trackEvent) {
+            window.trackEvent('sign_in', { method: 'google' });
+        }
+        
         // Create/update user document
         await createUserDocument(result.user);
         
     } catch (error) {
         console.error('[Auth] Google sign-in error:', error);
+        
+        // Track error
+        if (window.trackEvent) {
+            window.trackEvent('sign_in_error', { method: 'google', error: error.code });
+        }
+        
         showAuthError(error.message);
     }
 }
 
 // Apple Sign-In
 async function signInWithApple() {
+    if (!isFirebaseConfigured) {
+        console.log('[Auth] Firebase not configured');
+        return;
+    }
+    
     try {
         const provider = new firebase.auth.OAuthProvider('apple.com');
         provider.addScope('email');
@@ -111,11 +151,22 @@ async function signInWithApple() {
         const result = await auth.signInWithPopup(provider);
         console.log('[Auth] Apple sign-in successful');
         
+        // Track sign-in in GA4
+        if (window.trackEvent) {
+            window.trackEvent('sign_in', { method: 'apple' });
+        }
+        
         // Create/update user document
         await createUserDocument(result.user);
         
     } catch (error) {
         console.error('[Auth] Apple sign-in error:', error);
+        
+        // Track error
+        if (window.trackEvent) {
+            window.trackEvent('sign_in_error', { method: 'apple', error: error.code });
+        }
+        
         showAuthError(error.message);
     }
 }
@@ -125,6 +176,11 @@ async function signOut() {
     try {
         await auth.signOut();
         console.log('[Auth] Sign out successful');
+        
+        // Track sign-out in GA4
+        if (window.trackEvent) {
+            window.trackEvent('sign_out');
+        }
     } catch (error) {
         console.error('[Auth] Sign out error:', error);
     }
