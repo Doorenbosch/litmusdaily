@@ -56,6 +56,75 @@ def get_market_data():
         }
 
 
+def get_week_ahead_prompt(market_data: dict) -> str:
+    """Generate the Week Ahead prompt - global, published once daily at 12:00 GMT"""
+    
+    return f"""You are the forward-looking intelligence editor for The L/tmus, a premium crypto publication combining the editorial standards of the Financial Times with the behavioral insight of Rory Sutherland and the clarity-of-purpose thinking of Simon Sinek.
+
+Generate a "The Week Ahead" section that tells sophisticated investors what deserves their attention in the coming days. This is anticipatory intelligence, not recap. Every word must earn its place.
+
+CURRENT MARKET CONTEXT:
+- Bitcoin: ${market_data['btc_price']:,.0f} ({market_data['btc_24h_change']:+.1f}% 24h)
+- Ethereum: ${market_data['eth_price']:,.0f} ({market_data['eth_24h_change']:+.1f}% 24h)
+- Total Market Cap: ${market_data['total_market_cap']/1e12:.2f}T ({market_data['market_cap_change_24h']:+.1f}% 24h)
+- BTC Dominance: {market_data.get('btc_dominance', 54)}%
+
+YOUR MANDATE:
+Write forward-looking intelligence that helps investors position for the week ahead. Each section should answer "why should I care?" within the first two sentences. This is not a calendar recap—it's strategic preparation.
+
+THE STRUCTURE (500-650 words total):
+
+1. THIS WEEK'S FULCRUM (100-140 words)
+The single most important event or decision point in the next 7 days. Be specific: the date, what it is, and WHY it matters for positioning. Think Sinek: start with why this deserves attention above all else. Connect the event to its market implications—not just "what happens" but "what changes in how money moves."
+
+2. LEVELS WORTH KNOWING (120-160 words)
+For BTC and ETH: specific price levels that matter this week. Not just the numbers—the psychology and positioning logic behind them. Think Sutherland: what do these levels mean to different market participants? What behavior triggers at these thresholds? Include both support and resistance, and explain what a break in either direction would signal about market structure.
+
+3. THE UNPRICED STORY (120-160 words)
+What narrative or development is building that the market hasn't fully absorbed? This is where behavioral edge lives—identify the gap between what IS happening and what the market BELIEVES is happening. This should be your highest-conviction contrarian insight. Name the narrative, explain why it's underappreciated, and suggest how it might manifest in price.
+
+4. THE UNDERESTIMATED (100-130 words)
+One risk or catalyst that deserves more attention than it's getting. Not fear-mongering—genuine contrarian intelligence. This could be a tail risk, an overlooked event, or a positioning imbalance that creates asymmetric outcomes. Be specific about why the market is underweighting this factor and what would cause a repricing.
+
+EDITORIAL STANDARDS:
+- Write with informed conviction, not hedged uncertainty
+- Institutional terminology (rotation, distribution, positioning) not retail language (moon, pump, bullish)
+- Each section must deliver actionable intelligence, not commentary
+- Specific numbers, dates, and levels wherever possible
+- Historical parallels where relevant ("similar setups in March led to...")
+- No rhetorical questions—statements of informed opinion
+
+VOICE:
+Write like the senior strategist at a macro fund briefing the investment committee. You're not trying to impress—you're trying to prepare. Direct, specific, useful.
+
+OUTPUT FORMAT:
+Return ONLY valid JSON with this exact structure:
+{{
+    "generated_at": "ISO timestamp",
+    "headline": "5-7 word headline for the week ahead",
+    "sections": {{
+        "fulcrum": {{
+            "title": "Short title for this week's key event (3-6 words)",
+            "content": "100-140 word analysis of the week's most important event"
+        }},
+        "levels": {{
+            "title": "Key technical title (3-6 words)",  
+            "content": "120-160 word analysis of price levels that matter"
+        }},
+        "unpriced": {{
+            "title": "The unpriced narrative title (3-6 words)",
+            "content": "120-160 word analysis of the underappreciated story"
+        }},
+        "underestimated": {{
+            "title": "The overlooked risk title (3-6 words)",
+            "content": "100-130 word analysis of what deserves more attention"
+        }}
+    }}
+}}
+
+Return ONLY the JSON object, no other text."""
+
+
 def get_evening_prompt(region: str, market_data: dict) -> str:
     """Generate the evening brief prompt - focused on what happened today"""
     
@@ -310,15 +379,19 @@ def generate_brief(region: str, brief_type: str):
     # Get appropriate prompt
     if brief_type == "morning":
         prompt = get_morning_prompt(region, market_data)
-    else:
+    elif brief_type == "evening":
         prompt = get_evening_prompt(region, market_data)
+    elif brief_type == "week-ahead":
+        prompt = get_week_ahead_prompt(market_data)
+    else:
+        prompt = get_morning_prompt(region, market_data)
     
     # Call Claude API
     client = Anthropic()
     
     message = client.messages.create(
         model=MODEL,
-        max_tokens=1024,
+        max_tokens=1500,
         messages=[
             {"role": "user", "content": prompt}
         ]
@@ -337,7 +410,7 @@ def generate_brief(region: str, brief_type: str):
     brief_data = json.loads(response_text)
     
     # Add metadata
-    brief_data["region"] = region
+    brief_data["region"] = region if brief_type != "week-ahead" else "global"
     brief_data["type"] = brief_type
     brief_data["generated_at"] = datetime.now(timezone.utc).isoformat()
     brief_data["btc_price"] = market_data["btc_price"]
@@ -351,7 +424,11 @@ def generate_brief(region: str, brief_type: str):
 def save_brief(brief_data: dict, region: str, brief_type: str):
     """Save brief to JSON file"""
     
-    output_path = f"content/{region}/{brief_type}.json"
+    # Week ahead goes to global content folder
+    if brief_type == "week-ahead":
+        output_path = "content/week-ahead.json"
+    else:
+        output_path = f"content/{region}/{brief_type}.json"
     
     # Ensure directory exists
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
@@ -359,7 +436,7 @@ def save_brief(brief_data: dict, region: str, brief_type: str):
     with open(output_path, "w") as f:
         json.dump(brief_data, f, indent=2)
     
-    print(f"Saved {region} {brief_type} brief to {output_path}")
+    print(f"Saved {brief_type} brief to {output_path}")
 
 
 def main():

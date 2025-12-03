@@ -199,6 +199,17 @@ function setActiveSection(sectionKey) {
         card.classList.toggle('active', card.dataset.section === sectionKey);
     });
     
+    // Deactivate week cards
+    document.querySelectorAll('.week-card').forEach(card => {
+        card.classList.remove('active');
+    });
+    
+    // Reset label color to burgundy
+    const labelEl = document.getElementById('reading-label');
+    if (labelEl) {
+        labelEl.style.color = 'var(--burgundy)';
+    }
+    
     // Update reading pane
     if (briefData) {
         renderReadingPane(sectionKey);
@@ -225,9 +236,9 @@ async function loadContent(region, briefType = 'morning') {
         renderReadingPane(currentSection);
         renderTimestamp(briefData);
         
-        // Load week ahead (only for morning brief)
+        // Load week ahead (global - same for all editions)
         if (briefType === 'morning') {
-            loadWeekAhead(region);
+            loadWeekAhead();
         }
         
     } catch (error) {
@@ -312,13 +323,18 @@ function updateChangeElement(elementId, change) {
 }
 
 // Load Week Ahead
-async function loadWeekAhead(region) {
+// Week Ahead data store
+let weekAheadData = null;
+
+async function loadWeekAhead() {
     try {
-        const response = await fetch(`${CONFIG.contentPath}/${region}/week-ahead.json`);
+        // Week ahead is global - same for all editions
+        const response = await fetch(`${CONFIG.contentPath}/week-ahead.json`);
         if (!response.ok) return;
         
-        const weekData = await response.json();
-        renderWeekAhead(weekData);
+        weekAheadData = await response.json();
+        renderWeekAhead(weekAheadData);
+        initWeekCards();
         
     } catch (error) {
         console.log('Week ahead not available');
@@ -363,8 +379,12 @@ function renderReadingPane(sectionKey) {
     
     const content = briefData.sections[section.field] || '';
     
-    // Update label
-    setText('reading-label', section.label);
+    // Update label (reset to burgundy)
+    const labelEl = document.getElementById('reading-label');
+    if (labelEl) {
+        labelEl.textContent = section.label;
+        labelEl.style.color = 'var(--burgundy)';
+    }
     
     // Update headline
     // Use main brief headline for first section (lead or session), generate for others
@@ -375,6 +395,12 @@ function renderReadingPane(sectionKey) {
         setText('reading-headline', briefData.headline || (currentBriefType === 'evening' ? 'Evening Brief' : 'Morning Brief'));
     } else {
         setText('reading-headline', generateHeadline(content, section.defaultHeadline));
+    }
+    
+    // Reset byline color
+    const bylineAuthor = document.querySelector('.byline-author');
+    if (bylineAuthor) {
+        bylineAuthor.style.color = 'var(--burgundy)';
     }
     
     // Update body - split into paragraphs for better reading
@@ -390,20 +416,87 @@ function renderReadingPane(sectionKey) {
 function renderWeekAhead(data) {
     if (!data.sections) return;
     
-    const items = [
-        { id: 'week-1', content: data.sections.fulcrum },
-        { id: 'week-2', content: data.sections.levels },
-        { id: 'week-3', content: data.sections.unpriced },
-        { id: 'week-4', content: data.sections.wildcard }
-    ];
+    // Update date
+    if (data.generated_at) {
+        const date = new Date(data.generated_at);
+        setText('week-ahead-date', `Week of ${formatShortDate(date)}`);
+    }
     
-    items.forEach((item, i) => {
-        if (item.content) {
-            const headline = generateHeadline(item.content, `Watch Point ${i + 1}`);
-            setText(`${item.id}-headline`, headline);
-            setText(`${item.id}-excerpt`, truncate(item.content, 60));
+    // Render each section
+    const sections = ['fulcrum', 'levels', 'unpriced', 'underestimated'];
+    
+    sections.forEach(key => {
+        const section = data.sections[key];
+        if (section) {
+            setText(`week-${key}-headline`, section.title || key);
+            setText(`week-${key}-excerpt`, truncate(section.content, 80));
         }
     });
+}
+
+// Initialize Week Card Clicks
+function initWeekCards() {
+    const cards = document.querySelectorAll('.week-card');
+    
+    cards.forEach(card => {
+        card.addEventListener('click', () => {
+            const sectionKey = card.dataset.weekSection;
+            
+            // Update active state
+            cards.forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+            
+            // Also deactivate brief cards
+            document.querySelectorAll('.index-card').forEach(c => c.classList.remove('active'));
+            
+            // Show in reading pane
+            renderWeekAheadPane(sectionKey);
+        });
+    });
+}
+
+// Render Week Ahead in Reading Pane
+function renderWeekAheadPane(sectionKey) {
+    if (!weekAheadData || !weekAheadData.sections) return;
+    
+    const section = weekAheadData.sections[sectionKey];
+    if (!section) return;
+    
+    const labelMap = {
+        fulcrum: "THIS WEEK'S FULCRUM",
+        levels: "LEVELS WORTH KNOWING",
+        unpriced: "THE UNPRICED STORY",
+        underestimated: "THE UNDERESTIMATED"
+    };
+    
+    // Update label with teal color indicator
+    const labelEl = document.getElementById('reading-label');
+    if (labelEl) {
+        labelEl.textContent = labelMap[sectionKey] || sectionKey.toUpperCase();
+        labelEl.style.color = 'var(--teal)';
+    }
+    
+    // Update headline
+    setText('reading-headline', section.title);
+    
+    // Update byline
+    const byline = document.querySelector('.reading-byline');
+    if (byline) {
+        const date = weekAheadData.generated_at ? new Date(weekAheadData.generated_at) : new Date();
+        byline.innerHTML = `<span class="byline-author" style="color: var(--teal)">L/tmus Intelligence</span><time class="byline-time" id="reading-timestamp">${formatDate(date)} · 12:00 GMT</time>`;
+    }
+    
+    // Update body
+    const bodyEl = document.getElementById('reading-body');
+    if (bodyEl) {
+        const paragraphs = splitIntoParagraphs(section.content);
+        bodyEl.innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
+    }
+}
+
+// Helper: Format short date
+function formatShortDate(date) {
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 // Render Timestamp

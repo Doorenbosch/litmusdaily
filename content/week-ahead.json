@@ -1,0 +1,28 @@
+{
+    "region": "global",
+    "type": "week-ahead",
+    "generated_at": "2025-12-02T12:00:00Z",
+    "headline": "The Fed's Last Word Before Year-End",
+    "sections": {
+        "fulcrum": {
+            "title": "Friday's Jobs Report Is Everything",
+            "content": "December 6th's non-farm payrolls release will determine whether the Fed has cover to cut rates at its December 18th meeting—and by extension, whether risk assets finish the year with momentum or caution. The market is pricing 65% odds of a 25bp cut, but that probability is fragile. A strong print (above 200K) likely kills the cut and strengthens the dollar, creating headwinds for crypto that could persist into January. A weak print (below 150K) confirms the soft-landing narrative and removes the last macro obstacle to year-end positioning. For Bitcoin specifically, rate cut expectations have been the invisible hand supporting prices above $90K. Without that support, the $87K-$85K zone becomes the next battleground."
+        },
+        "levels": {
+            "title": "The Lines That Matter This Week",
+            "content": "Bitcoin's critical range is $87,000-$95,000. The lower bound represents the convergence of the 50-day moving average and significant options open interest—a break below triggers gamma hedging that could accelerate selling toward $82,000. The upper bound has been resistance three times since mid-November; a close above $95,000 would signal distribution is complete and accumulation has begun. For ETH, watch $3,000 as the psychological floor and $3,400 as the breakout trigger. The ETH/BTC ratio at 0.034 is approaching March lows—historically, this level has marked rotation points. If ETH holds this ratio while BTC consolidates, expect capital to flow down the risk curve in the week following."
+        },
+        "unpriced": {
+            "title": "Stablecoin Supply Divergence",
+            "content": "Here's what the market is missing: USDT market cap hit $119 billion this week—an all-time high—while prices have been falling. This divergence between growing stablecoin liquidity and declining crypto prices has historically preceded major accumulation phases. The last time we saw this pattern was October 2023, just before the rally that took BTC from $27K to $73K. The narrative is that institutions are exiting, but the plumbing tells a different story: someone is building dry powder. The question isn't whether this capital will be deployed, but at what price level the deployment begins. My read: the smart money is waiting for a flush below $85K to begin meaningful accumulation."
+        },
+        "underestimated": {
+            "title": "December Liquidity Vacuum",
+            "content": "The market is underpricing the liquidity vacuum that begins December 15th. As trading desks go on holiday and institutional mandates freeze for year-end, thin order books will amplify any move. This cuts both ways: a positive catalyst could produce outsized gains, but a negative shock could cascade further than normal market conditions would allow. The December 2017 blow-off top and December 2018 capitulation both occurred in this low-liquidity window. Add the FOMC meeting on December 18th—the last monetary policy event of the year—and you have a setup for volatility that current implied vol isn't capturing."
+        }
+    },
+    "btc_price": 91245,
+    "eth_price": 3125,
+    "total_market_cap": 3180000000000,
+    "btc_24h_change": 0.8
+}
