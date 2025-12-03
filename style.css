@@ -62,39 +62,36 @@ a {
 /* ========== MASTHEAD ========== */
 .masthead {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     padding-bottom: var(--md);
     border-bottom: 1px solid var(--rule);
+    position: relative;
 }
 
-.logo {
+.masthead-brand {
     display: flex;
     align-items: center;
     gap: var(--sm);
 }
 
-.logo-mark {
-    width: 28px;
-    height: 28px;
-    background: var(--burgundy);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--serif);
-    font-size: 1.1rem;
-    border-radius: 3px;
+.logo-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
 }
 
-.logo-type {
-    font-family: var(--sans);
-    font-weight: 600;
-    font-size: 1rem;
-    letter-spacing: 0.04em;
+.brand-name {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: var(--burgundy);
+    letter-spacing: -0.01em;
 }
 
 .edition-picker {
+    position: absolute;
+    right: 0;
     display: flex;
     gap: var(--xs);
 }
@@ -618,7 +615,7 @@ a {
 .article-headline {
     font-family: var(--serif);
     font-size: 2.25rem;
-    font-weight: 400;
+    font-weight: 600;
     line-height: 1.15;
     color: var(--ink);
     margin-bottom: var(--md);
