@@ -1,0 +1,422 @@
+/* ========== WEEKEND MAGAZINE STYLES ========== */
+
+/* Magazine Hero */
+.magazine-hero {
+    margin-bottom: var(--xl);
+}
+
+.hero-image {
+    position: relative;
+    width: 100%;
+    height: 420px;
+    overflow: hidden;
+    border-radius: 0;
+}
+
+.hero-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hero-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 100px 48px 40px 48px;
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 0.4) 40%,
+        rgba(0, 0, 0, 0.85) 100%
+    );
+}
+
+.hero-label {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--white);
+    background: var(--burgundy);
+    padding: 6px 14px;
+    border-radius: 2px;
+    display: inline-block;
+    margin-bottom: var(--md);
+}
+
+.hero-headline {
+    font-family: var(--serif);
+    font-size: 2.5rem;
+    font-weight: 600;
+    line-height: 1.15;
+    color: var(--white);
+    margin: 0 0 var(--sm) 0;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    max-width: 800px;
+}
+
+.hero-subtitle {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    font-weight: 400;
+    line-height: 1.4;
+    color: rgba(255,255,255,0.9);
+    margin: 0;
+    max-width: 600px;
+}
+
+/* Weekend Grid - Same 3-column but different proportions */
+.weekend-grid {
+    grid-template-columns: 280px 1fr 260px;
+}
+
+/* Key Dates Section */
+.index-section {
+    margin-bottom: var(--xl);
+}
+
+.index-section .index-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: var(--sm);
+    border-bottom: 2px solid var(--burgundy);
+    margin-bottom: var(--md);
+}
+
+.index-title {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--burgundy);
+    margin: 0;
+}
+
+.index-subtitle {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--ink-tertiary);
+}
+
+/* Key Dates List */
+.key-dates-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sm);
+}
+
+.key-date {
+    display: flex;
+    gap: var(--md);
+    padding: var(--sm) 0;
+    border-bottom: 1px solid var(--rule);
+}
+
+.key-date:last-child {
+    border-bottom: none;
+}
+
+.date-day {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--teal);
+    min-width: 50px;
+}
+
+.date-event {
+    font-family: var(--serif);
+    font-size: 0.9rem;
+    color: var(--ink);
+    line-height: 1.3;
+}
+
+/* Regional Labels */
+.card-label.region-apac {
+    color: #D4A017;
+}
+
+.card-label.region-emea {
+    color: #2E7D32;
+}
+
+.card-label.region-americas {
+    color: #1565C0;
+}
+
+/* Magazine Article Styling */
+.magazine-article {
+    max-width: 720px;
+}
+
+/* Section Image */
+.section-image {
+    position: relative;
+    width: 100%;
+    max-width: 720px;
+    margin-bottom: var(--lg);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.section-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.image-caption {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    color: var(--ink-tertiary);
+    padding: var(--sm) 0;
+    display: block;
+    font-style: italic;
+}
+
+/* Article Figure (inline images) */
+.article-figure {
+    margin: var(--xl) 0;
+    max-width: 720px;
+}
+
+.article-figure img {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.article-figure figcaption {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    color: var(--ink-tertiary);
+    padding: var(--sm) 0;
+    font-style: italic;
+}
+
+/* Segments List */
+.segments-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--md);
+}
+
+.segment-item {
+    padding: var(--sm) 0;
+    border-bottom: 1px solid var(--rule);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.segment-item:hover {
+    background: var(--paper-dark);
+    margin: 0 calc(var(--sm) * -1);
+    padding-left: var(--sm);
+    padding-right: var(--sm);
+}
+
+.segment-item:last-child {
+    border-bottom: none;
+}
+
+.segment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.segment-name {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.segment-change {
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.segment-change.positive {
+    color: var(--green);
+}
+
+.segment-change.negative {
+    color: var(--red);
+}
+
+.segment-change.neutral {
+    color: var(--ink-tertiary);
+}
+
+.segment-tokens {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    color: var(--ink-tertiary);
+    margin-bottom: 6px;
+}
+
+.segment-bar {
+    height: 4px;
+    background: var(--rule);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.segment-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.segment-fill.positive {
+    background: var(--teal);
+}
+
+.segment-fill.negative {
+    background: var(--red);
+}
+
+.segment-fill.neutral {
+    background: var(--ink-tertiary);
+}
+
+/* Mood Legend */
+.mood-legend {
+    display: flex;
+    justify-content: center;
+    gap: var(--lg);
+    margin-top: var(--sm);
+    font-family: var(--sans);
+    font-size: 0.65rem;
+    color: var(--ink-tertiary);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-line {
+    width: 16px;
+    height: 2px;
+    background: var(--teal);
+    opacity: 0.6;
+}
+
+.legend-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--teal);
+    border-radius: 50%;
+}
+
+/* Weekend Mood Trail */
+.mood-trail-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.mood-trail-path {
+    fill: none;
+    stroke: var(--teal);
+    stroke-width: 2;
+    stroke-opacity: 0.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.mood-dot.current {
+    width: 14px;
+    height: 14px;
+    background: var(--teal);
+    border: 3px solid var(--white);
+    border-radius: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    z-index: 10;
+}
+
+/* Site Footer */
+.site-footer {
+    margin-top: var(--xl);
+    padding: var(--xl) 0;
+    border-top: 1px solid var(--rule);
+    text-align: center;
+}
+
+.site-footer p {
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    color: var(--ink-tertiary);
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .weekend-grid {
+        grid-template-columns: 260px 1fr;
+    }
+    
+    .context-sidebar {
+        display: none;
+    }
+    
+    .hero-headline {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 900px) {
+    .weekend-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .article-index {
+        border-right: none;
+        border-bottom: 1px solid var(--rule);
+        padding-right: 0;
+        padding-bottom: var(--xl);
+        margin-bottom: var(--xl);
+    }
+    
+    .hero-image {
+        height: 300px;
+    }
+    
+    .hero-headline {
+        font-size: 1.75rem;
+    }
+    
+    .hero-overlay {
+        padding: 60px 24px 24px 24px;
+    }
+}
+
+@media (max-width: 600px) {
+    .hero-image {
+        height: 250px;
+    }
+    
+    .hero-headline {
+        font-size: 1.4rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+}

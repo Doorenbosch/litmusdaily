@@ -1,0 +1,40 @@
+{
+  "generated_at": "2025-12-07T07:00:00+08:00",
+  "segments": {
+    "payment": {
+      "change": 8.2,
+      "coins": ["BTC", "LTC", "XMR"],
+      "description": "Payment-focused cryptocurrencies"
+    },
+    "stablecoin": {
+      "change": 0.1,
+      "coins": ["USDT", "USDC"],
+      "description": "Price-stable cryptocurrencies"
+    },
+    "infrastructure": {
+      "change": 12.4,
+      "coins": ["ETH", "SOL", "AVAX"],
+      "description": "Smart contract platforms"
+    },
+    "defi": {
+      "change": 6.8,
+      "coins": ["AAVE", "UNI", "COMP"],
+      "description": "Decentralized finance protocols"
+    },
+    "utility": {
+      "change": 4.2,
+      "coins": ["LINK", "FIL", "RENDER"],
+      "description": "Service and utility tokens"
+    },
+    "entertainment": {
+      "change": -2.1,
+      "coins": ["APE", "MANA", "SAND"],
+      "description": "Gaming and metaverse tokens"
+    },
+    "ai": {
+      "change": 18.5,
+      "coins": ["RNDR", "AKT", "TAO"],
+      "description": "AI and compute tokens"
+    }
+  }
+}
