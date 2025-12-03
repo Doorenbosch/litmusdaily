@@ -817,7 +817,7 @@ function renderIndexCards(data) {
         if (excerptEl) {
             if (key === firstSectionKey) {
                 excerptEl.style.display = 'block';
-                excerptEl.textContent = truncate(content, 150);
+                excerptEl.textContent = truncate(content, 100);
             } else {
                 excerptEl.style.display = 'none';
             }
@@ -1012,23 +1012,25 @@ function formatShortDate(date) {
 function renderTimestamp(data) {
     if (data.generated_at) {
         const isoString = data.generated_at;
-        const date = new Date(isoString);
         
-        // Extract timezone abbreviation from the ISO string
-        const tzAbbrev = getTimezoneAbbrev(isoString);
-        
-        // Format date
-        const dateStr = date.toLocaleDateString('en-US', {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric'
-        });
-        
-        // Format time with the original timezone (not converted to local)
-        const timeStr = formatBriefTime(isoString);
-        
-        setText('brief-date', dateStr);
-        setText('reading-timestamp', `${dateStr} · ${timeStr}`);
+        // Parse date components directly from ISO string to avoid timezone conversion
+        // Format: "2025-12-03T06:00:00+08:00"
+        const dateMatch = isoString.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+        if (dateMatch) {
+            const [, year, month, day, hour, minute] = dateMatch;
+            
+            // Format date manually (month names)
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                               'July', 'August', 'September', 'October', 'November', 'December'];
+            const dateStr = `${monthNames[parseInt(month) - 1]} ${parseInt(day)}, ${year}`;
+            
+            // Format time with timezone
+            const tzAbbrev = getTimezoneAbbrev(isoString);
+            const timeStr = `${hour}:${minute} ${tzAbbrev}`;
+            
+            setText('brief-date', dateStr);
+            setText('reading-timestamp', `${dateStr} · ${timeStr}`);
+        }
     }
 }
 
