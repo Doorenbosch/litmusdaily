@@ -86,7 +86,7 @@ a {
     font-weight: 700;
     font-size: 2rem;
     color: var(--burgundy);
-    letter-spacing: 0.02em;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
 }
 
