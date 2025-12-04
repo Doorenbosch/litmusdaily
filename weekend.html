@@ -189,6 +189,42 @@
             <!-- Right: Context Sidebar -->
             <aside class="context-sidebar">
                 
+                <!-- THE GRAPH: Dry Powder on Sidelines -->
+                <section class="the-graph" id="the-graph">
+                    <header class="graph-header">
+                        <span class="graph-label">THE GRAPH</span>
+                        <span class="graph-subtitle">Dry Powder on Sidelines</span>
+                    </header>
+                    
+                    <div class="graph-chart">
+                        <svg class="graph-svg" id="graph-svg" viewBox="0 0 220 80" preserveAspectRatio="none">
+                            <!-- Grid lines -->
+                            <line class="graph-grid" x1="0" y1="20" x2="220" y2="20" />
+                            <line class="graph-grid" x1="0" y1="40" x2="220" y2="40" />
+                            <line class="graph-grid" x1="0" y1="60" x2="220" y2="60" />
+                            <!-- Area fill -->
+                            <path id="graph-area" class="graph-area" d="" />
+                            <!-- Line -->
+                            <path id="graph-line" class="graph-line" d="" />
+                            <!-- Current dot -->
+                            <circle id="graph-dot" class="graph-dot" cx="220" cy="40" r="4" />
+                        </svg>
+                        <div class="graph-y-labels">
+                            <span id="graph-y-max">10%</span>
+                            <span id="graph-y-min">3%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="graph-current">
+                        <span class="graph-value" id="graph-value">---%</span>
+                        <span class="graph-range" id="graph-range">12-month range: --% – --%</span>
+                    </div>
+                    
+                    <p class="graph-insight" id="graph-insight">Loading...</p>
+                </section>
+
+                <div class="sidebar-divider"></div>
+                
                 <!-- Market Mood with 7-Day Trail -->
                 <section class="market-mood">
                     <header class="mood-header">

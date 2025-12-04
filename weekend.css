@@ -323,6 +323,114 @@
     background: var(--ink-tertiary);
 }
 
+/* ===== THE GRAPH: Dry Powder on Sidelines ===== */
+.the-graph {
+    margin-bottom: var(--md);
+}
+
+.graph-header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: var(--md);
+    padding-bottom: var(--sm);
+    border-bottom: 2px solid var(--teal);
+}
+
+.graph-label {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--teal);
+}
+
+.graph-subtitle {
+    font-family: var(--serif);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-top: 2px;
+}
+
+.graph-chart {
+    position: relative;
+    height: 80px;
+    margin-bottom: var(--sm);
+}
+
+.graph-svg {
+    width: 100%;
+    height: 100%;
+}
+
+.graph-grid {
+    stroke: var(--rule);
+    stroke-width: 1;
+    stroke-dasharray: 2, 4;
+}
+
+.graph-area {
+    fill: rgba(0, 128, 128, 0.1);
+}
+
+.graph-line {
+    fill: none;
+    stroke: var(--teal);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.graph-dot {
+    fill: var(--teal);
+}
+
+.graph-y-labels {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-family: var(--sans);
+    font-size: 0.65rem;
+    color: var(--ink-tertiary);
+    padding: 2px 0;
+    pointer-events: none;
+}
+
+.graph-current {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sm);
+    margin-bottom: var(--xs);
+}
+
+.graph-value {
+    font-family: var(--serif);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--teal);
+    line-height: 1;
+}
+
+.graph-range {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    color: var(--ink-tertiary);
+}
+
+.graph-insight {
+    font-family: var(--serif);
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--ink-secondary);
+    line-height: 1.4;
+    margin: 0;
+}
+
 /* ===== Sectors Section (Clickable) ===== */
 .sectors-section {
     margin-top: var(--lg);
