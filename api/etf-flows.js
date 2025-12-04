@@ -1,13 +1,9 @@
 // ETF Flows API - Uses SoSoValue API
 // Add SOSOVALUE_API_KEY to your Vercel environment variables
 //
-// SoSoValue API:
-// Base URL: https://api.sosovalue.xyz
-// Auth: x-soso-api-key header
-// Endpoints: POST /openapi/v2/etf/currentEtfDataMetrics
-//            POST /openapi/v2/etf/historicalInflowChart
-
-const SOSOVALUE_BASE_URL = 'https://api.sosovalue.xyz';
+// SoSoValue API docs show two URLs:
+// - https://api.sosovalue.xyz (from examples)
+// - https://openapi.sosovalue.com (from auth page)
 
 export default async function handler(req, res) {
     // CORS headers
@@ -20,57 +16,72 @@ export default async function handler(req, res) {
     
     if (!apiKey) {
         console.log('No SoSoValue API key configured');
-        return res.status(200).json(getMockData());
-    }
-    
-    try {
-        const headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'x-soso-api-key': apiKey
-        };
-        
-        // Get historical data for 5-day chart
-        const historyResponse = await fetch(
-            `${SOSOVALUE_BASE_URL}/openapi/v2/etf/historicalInflowChart`,
-            {
-                method: 'POST',
-                headers,
-                body: JSON.stringify({ type: 'us-btc-spot' })
-            }
-        );
-        
-        if (!historyResponse.ok) {
-            const errorText = await historyResponse.text();
-            console.error('SoSoValue history API error:', historyResponse.status, errorText);
-            return res.status(200).json({
-                ...getMockData(),
-                debug: { error: `${historyResponse.status}: ${errorText}` }
-            });
-        }
-        
-        const historyData = await historyResponse.json();
-        
-        if (historyData.code !== 0) {
-            console.error('SoSoValue API returned error code:', historyData.code, historyData.msg);
-            return res.status(200).json({
-                ...getMockData(),
-                debug: { error: historyData.msg || 'API error' }
-            });
-        }
-        
-        // Transform to our format
-        const transformed = transformSoSoValueData(historyData);
-        
-        return res.status(200).json(transformed);
-        
-    } catch (error) {
-        console.error('ETF Flows API error:', error);
         return res.status(200).json({
             ...getMockData(),
-            debug: { error: error.message }
+            debug: { error: 'No API key configured' }
         });
     }
+    
+    // Try both base URLs from their documentation
+    const baseUrls = [
+        'https://api.sosovalue.xyz',
+        'https://openapi.sosovalue.com'
+    ];
+    
+    const endpoint = '/openapi/v2/etf/historicalInflowChart';
+    const errors = [];
+    
+    for (const baseUrl of baseUrls) {
+        try {
+            const url = `${baseUrl}${endpoint}`;
+            console.log('Trying SoSoValue URL:', url);
+            
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'x-soso-api-key': apiKey
+                },
+                body: JSON.stringify({ type: 'us-btc-spot' })
+            });
+            
+            console.log('Response status:', response.status);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                errors.push(`${baseUrl}: ${response.status} - ${errorText}`);
+                continue;
+            }
+            
+            const data = await response.json();
+            
+            if (data.code !== 0) {
+                errors.push(`${baseUrl}: API code ${data.code} - ${data.msg}`);
+                continue;
+            }
+            
+            // Success!
+            const transformed = transformSoSoValueData(data);
+            transformed.apiUrl = baseUrl;
+            return res.status(200).json(transformed);
+            
+        } catch (error) {
+            errors.push(`${baseUrl}: ${error.name} - ${error.message}`);
+            console.error('Fetch error for', baseUrl, error);
+        }
+    }
+    
+    // All attempts failed
+    console.error('All SoSoValue endpoints failed:', errors);
+    return res.status(200).json({
+        ...getMockData(),
+        debug: { 
+            errors: errors,
+            apiKeyPresent: !!apiKey,
+            apiKeyLength: apiKey ? apiKey.length : 0
+        }
+    });
 }
 
 function transformSoSoValueData(data) {
