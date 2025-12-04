@@ -2,7 +2,6 @@
 // Self-executing on page load
 
 (function() {
-    // Run when DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', loadTheGraph);
     } else {
@@ -88,7 +87,7 @@ function renderGraph(data) {
     const valueEl = document.getElementById('graph-value');
     if (valueEl) valueEl.textContent = `${current.ratio.toFixed(1)}%`;
     
-    // Update range text
+    // Update range text - compact format
     const rangeEl = document.getElementById('graph-range');
     if (rangeEl) {
         rangeEl.textContent = `12M L-H: ${minRatio.toFixed(1)}% – ${maxRatio.toFixed(1)}%`;
