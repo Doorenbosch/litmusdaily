@@ -115,6 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load live market data
     loadMarketData();
     loadMarketMood();
+    loadETFFlows();
+    loadTheNumber();
     loadYourCoins();
     
     // Update market data every minute
@@ -782,6 +784,172 @@ function updateMarketActivity(mvRatio, mvRange) {
     if (stickyEl) {
         stickyEl.textContent = activity;
         stickyEl.className = 'sticky-activity ' + cssClass;
+    }
+}
+
+// ===== ETF Flows Section =====
+async function loadETFFlows() {
+    try {
+        // Try live API first (SoSoValue)
+        const apiResponse = await fetch('/api/etf-flows');
+        
+        if (apiResponse.ok) {
+            const data = await apiResponse.json();
+            renderETFFlows(data);
+            
+            // Show data source indicator if using live data
+            if (data.source === 'sosovalue') {
+                console.log('ETF Flows: Live data from SoSoValue');
+            }
+            return;
+        }
+        
+        // Fallback to brief data
+        const region = currentRegion || 'emea';
+        const briefResponse = await fetch(`./content/${region}/morning.json`);
+        
+        if (briefResponse.ok) {
+            const brief = await briefResponse.json();
+            if (brief.etf_flows) {
+                renderETFFlows(brief.etf_flows);
+                return;
+            }
+        }
+        
+        // Final fallback to mock data
+        renderETFFlows(getMockETFFlows());
+        
+    } catch (error) {
+        console.log('ETF flows not available, using mock data');
+        renderETFFlows(getMockETFFlows());
+    }
+}
+
+function getMockETFFlows() {
+    // Mock data - will be replaced with real data source
+    return {
+        yesterday: {
+            amount: 438,
+            date: 'Yesterday'
+        },
+        week: [
+            { day: 'Mon', amount: 215 },
+            { day: 'Tue', amount: 380 },
+            { day: 'Wed', amount: -120 },
+            { day: 'Thu', amount: 290 },
+            { day: 'Fri', amount: 438 }
+        ],
+        insight: 'Third consecutive day of net inflows'
+    };
+}
+
+function renderETFFlows(data) {
+    if (!data) return;
+    
+    const { yesterday, week, insight } = data;
+    
+    // Update yesterday's flow
+    const amountEl = document.getElementById('etf-amount');
+    const barEl = document.getElementById('etf-bar');
+    const insightEl = document.getElementById('etf-insight');
+    const dateEl = document.getElementById('etf-date');
+    
+    if (amountEl && yesterday) {
+        const isInflow = yesterday.amount >= 0;
+        const sign = isInflow ? '+' : '';
+        amountEl.textContent = `${sign}$${Math.abs(yesterday.amount)}M`;
+        amountEl.className = `etf-amount ${isInflow ? 'positive' : 'negative'}`;
+    }
+    
+    if (barEl && yesterday) {
+        // Scale bar: $500M = 100%
+        const maxFlow = 500;
+        const width = Math.min(Math.abs(yesterday.amount) / maxFlow * 100, 100);
+        barEl.style.width = `${width}%`;
+        barEl.className = `etf-bar ${yesterday.amount >= 0 ? 'etf-inflow' : 'etf-outflow'}`;
+    }
+    
+    if (dateEl && yesterday.date) {
+        dateEl.textContent = yesterday.date;
+    }
+    
+    // Update week bars
+    if (week && week.length > 0) {
+        const weekContainer = document.getElementById('etf-week');
+        if (weekContainer) {
+            weekContainer.innerHTML = week.map(day => {
+                const isInflow = day.amount >= 0;
+                const isStrong = Math.abs(day.amount) > 300;
+                const sign = isInflow ? '+' : '';
+                return `<div class="etf-day ${isInflow ? 'inflow' : 'outflow'}${isStrong ? ' strong' : ''}" 
+                             data-day="${day.day.toLowerCase()}" 
+                             title="${day.day}: ${sign}$${Math.abs(day.amount)}M"></div>`;
+            }).join('');
+        }
+    }
+    
+    if (insightEl && insight) {
+        insightEl.textContent = `→ ${insight}`;
+    }
+}
+
+// ===== The Number Section =====
+async function loadTheNumber() {
+    try {
+        // Try live API first (CoinGecko stablecoin data)
+        const apiResponse = await fetch('/api/the-number');
+        
+        if (apiResponse.ok) {
+            const data = await apiResponse.json();
+            renderTheNumber(data);
+            
+            if (data.source === 'coingecko') {
+                console.log('The Number: Live data from CoinGecko');
+            }
+            return;
+        }
+        
+        // Fallback to brief data
+        const region = currentRegion || 'emea';
+        const briefResponse = await fetch(`./content/${region}/morning.json`);
+        
+        if (briefResponse.ok) {
+            const brief = await briefResponse.json();
+            if (brief.the_number) {
+                renderTheNumber(brief.the_number);
+                return;
+            }
+        }
+        
+        // Final fallback to mock data
+        renderTheNumber(getMockTheNumber());
+        
+    } catch (error) {
+        console.log('The Number not available, using mock data');
+        renderTheNumber(getMockTheNumber());
+    }
+}
+
+function getMockTheNumber() {
+    // Mock data - will be AI-generated
+    return {
+        value: '$311B',
+        context: 'Stablecoin market cap—dry powder waiting on sidelines'
+    };
+}
+
+function renderTheNumber(data) {
+    if (!data) return;
+    
+    const valueEl = document.getElementById('number-value');
+    const contextEl = document.getElementById('number-context');
+    
+    if (valueEl && data.value) {
+        valueEl.textContent = data.value;
+    }
+    
+    if (contextEl && data.context) {
+        contextEl.textContent = data.context;
     }
 }
 
