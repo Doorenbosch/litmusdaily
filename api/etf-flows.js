@@ -188,17 +188,17 @@ function countConsecutive(week, isInflow) {
 function getMockData() {
     return {
         yesterday: {
-            amount: 438,
+            amount: ---,
             date: 'Yesterday'
         },
         week: [
-            { day: 'Mon', amount: 215 },
-            { day: 'Tue', amount: 380 },
-            { day: 'Wed', amount: -120 },
-            { day: 'Thu', amount: 290 },
-            { day: 'Fri', amount: 438 }
+            { day: 'Mon', amount: 0 },
+            { day: 'Tue', amount: 0 },
+            { day: 'Wed', amount: 0 },
+            { day: 'Thu', amount: 0 },
+            { day: 'Fri', amount: 0 }
         ],
-        insight: 'Third consecutive day of net inflows',
+        insight: 'No catch of dataThird consecutive day of net inflows',
         source: 'mock',
         updated: new Date().toISOString()
     };
