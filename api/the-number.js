@@ -8,9 +8,9 @@ export default async function handler(req, res) {
     res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=1200'); // 10 min cache
     
     try {
-        // CoinGecko global endpoint includes stablecoin market cap
+        // Use categories endpoint for stablecoin market cap
         const response = await fetch(
-            'https://api.coingecko.com/api/v3/global',
+            'https://api.coingecko.com/api/v3/coins/categories',
             {
                 headers: {
                     'Accept': 'application/json'
@@ -23,41 +23,27 @@ export default async function handler(req, res) {
             return res.status(200).json(getFallbackNumber());
         }
         
-        const data = await response.json();
+        const categories = await response.json();
         
-        // Extract stablecoin market cap
-        const stablecoinCap = data.data?.total_market_cap?.usd || 0;
-        const totalCap = data.data?.total_market_cap?.usd || 0;
-        const btcDominance = data.data?.market_cap_percentage?.btc || 0;
-        
-        // Also get stablecoin-specific data
-        const stablecoinResponse = await fetch(
-            'https://api.coingecko.com/api/v3/global/decentralized_finance_defi',
-            {
-                headers: { 'Accept': 'application/json' }
-            }
+        // Find stablecoins category
+        const stablecoinCategory = categories.find(c => 
+            c.id === 'stablecoins' || 
+            c.name?.toLowerCase() === 'stablecoins'
         );
         
-        // Get stablecoins category for more accurate data
-        const categoryResponse = await fetch(
-            'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&category=stablecoins&order=market_cap_desc&per_page=10&sparkline=false',
-            {
-                headers: { 'Accept': 'application/json' }
-            }
-        );
+        let stablecoinMarketCap = stablecoinCategory?.market_cap || 0;
         
-        let stablecoinMarketCap = 0;
-        
-        if (categoryResponse.ok) {
-            const stablecoins = await categoryResponse.json();
-            stablecoinMarketCap = stablecoins.reduce((sum, coin) => sum + (coin.market_cap || 0), 0);
+        // If category not found, use fallback
+        if (!stablecoinMarketCap) {
+            console.log('Stablecoin category not found, using fallback');
+            return res.status(200).json(getFallbackNumber());
         }
         
         // Format the number
         const formatted = formatMarketCap(stablecoinMarketCap);
         
         // Generate contextual insight
-        const insight = generateStablecoinInsight(stablecoinMarketCap, totalCap, btcDominance);
+        const insight = generateStablecoinInsight(stablecoinMarketCap);
         
         return res.status(200).json({
             value: formatted.value,
@@ -84,32 +70,16 @@ function formatMarketCap(value) {
     return { value: `$${value.toLocaleString()}`, unit: '' };
 }
 
-function generateStablecoinInsight(stableCap, totalCap, btcDom) {
-    const stableRatio = (stableCap / totalCap) * 100;
-    
-    // Various insight options based on market conditions
-    const insights = [];
-    
-    if (stableCap > 300e9) {
-        insights.push('Stablecoin supply at all-time high—dry powder waiting on sidelines');
+function generateStablecoinInsight(stableCap) {
+    if (stableCap > 310e9) {
+        return 'Stablecoin supply at all-time high—dry powder on sidelines';
+    } else if (stableCap > 280e9) {
+        return 'Elevated stablecoin reserves signal potential buying pressure';
     } else if (stableCap > 250e9) {
-        insights.push('Elevated stablecoin reserves signal potential buying pressure');
+        return 'Strong stablecoin liquidity available for deployment';
+    } else {
+        return 'Stablecoin liquidity remains robust for market activity';
     }
-    
-    if (stableRatio > 10) {
-        insights.push('High stablecoin ratio suggests cautious positioning');
-    } else if (stableRatio < 6) {
-        insights.push('Low stablecoin ratio—most capital already deployed');
-    }
-    
-    if (btcDom > 60) {
-        insights.push('Bitcoin dominance elevated—altcoin rotation may follow');
-    } else if (btcDom < 45) {
-        insights.push('Low BTC dominance signals altcoin season conditions');
-    }
-    
-    // Return the most relevant insight
-    return insights[0] || 'Stablecoin liquidity remains robust for potential deployment';
 }
 
 function getFallbackNumber() {
