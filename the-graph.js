@@ -1,5 +1,14 @@
 // ===== THE GRAPH: Dry Powder on Sidelines =====
-// Add this function to weekend.js and call it on page load
+// Self-executing on page load
+
+(function() {
+    // Run when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadTheGraph);
+    } else {
+        loadTheGraph();
+    }
+})();
 
 async function loadTheGraph() {
     try {
@@ -26,7 +35,6 @@ function renderGraph(data) {
     const ratios = points.map(p => p.ratio);
     const minRatio = Math.min(...ratios);
     const maxRatio = Math.max(...ratios);
-    const range = maxRatio - minRatio || 1;
     
     // Add padding to range
     const paddedMin = Math.floor(minRatio - 0.5);
@@ -92,7 +100,3 @@ function renderGraph(data) {
         insightEl.textContent = data.insight;
     }
 }
-
-// Call on page load - add this to your existing DOMContentLoaded or init function
-// document.addEventListener('DOMContentLoaded', loadTheGraph);
-// OR if you have an existing init: add loadTheGraph(); to it
