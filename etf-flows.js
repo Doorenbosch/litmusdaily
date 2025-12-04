@@ -1,10 +1,9 @@
 // ETF Flows API - Uses SoSoValue API
 // Add SOSOVALUE_API_KEY to your Vercel environment variables
 // 
-// CONFIGURATION - Update these based on SoSoValue API docs:
-const SOSOVALUE_BASE_URL = 'https://api.sosovalue.com';  // Update if different
-const ETF_ENDPOINT = '/etf/v1/us-btc-spot';              // Update based on docs
-const AUTH_TYPE = 'bearer';                               // 'bearer' or 'header'
+// SoSoValue API Configuration:
+const SOSOVALUE_BASE_URL = 'https://openapi.sosovalue.com';
+const AUTH_HEADER = 'x-soso-api-key';
 
 export default async function handler(req, res) {
     // CORS headers
@@ -20,46 +19,64 @@ export default async function handler(req, res) {
     }
     
     try {
-        // Build headers based on auth type
+        // Build headers with SoSoValue auth
         const headers = {
             'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            [AUTH_HEADER]: apiKey
         };
         
-        if (AUTH_TYPE === 'bearer') {
-            headers['Authorization'] = `Bearer ${apiKey}`;
-        } else {
-            headers['X-API-Key'] = apiKey;
-        }
-        
-        // Try multiple potential endpoint patterns
+        // Try potential ETF endpoint patterns based on SoSoValue structure
         const endpoints = [
-            `${SOSOVALUE_BASE_URL}${ETF_ENDPOINT}`,
-            `${SOSOVALUE_BASE_URL}/api/v1/etf/btc/flows`,
-            `${SOSOVALUE_BASE_URL}/v1/etf/us-btc-spot/flows`,
-            `${SOSOVALUE_BASE_URL}/etf/bitcoin/daily`
+            '/etf/us-btc-spot',
+            '/etf/btc',
+            '/api/etf/us-btc-spot',
+            '/v1/etf/us-btc-spot',
+            '/etf/bitcoin-spot',
+            '/etf/flow/btc'
         ];
         
         let data = null;
         let successEndpoint = null;
+        let lastError = null;
         
         for (const endpoint of endpoints) {
+            const url = `${SOSOVALUE_BASE_URL}${endpoint}`;
             try {
-                const response = await fetch(endpoint, { headers });
+                console.log('Trying SoSoValue endpoint:', url);
+                const response = await fetch(url, { 
+                    headers,
+                    method: 'GET'
+                });
+                
+                console.log('Response status:', response.status);
+                
                 if (response.ok) {
                     data = await response.json();
                     successEndpoint = endpoint;
                     console.log('SoSoValue API success:', endpoint);
                     break;
+                } else {
+                    const errorText = await response.text();
+                    lastError = `${response.status}: ${errorText}`;
+                    console.log('Endpoint failed:', endpoint, lastError);
                 }
             } catch (e) {
+                lastError = e.message;
+                console.log('Endpoint error:', endpoint, e.message);
                 continue;
             }
         }
         
         if (!data) {
-            console.log('All SoSoValue endpoints failed, using mock data');
-            return res.status(200).json(getMockData());
+            console.log('All SoSoValue endpoints failed. Last error:', lastError);
+            return res.status(200).json({
+                ...getMockData(),
+                debug: {
+                    error: lastError,
+                    triedEndpoints: endpoints.map(e => `${SOSOVALUE_BASE_URL}${e}`)
+                }
+            });
         }
         
         // Transform SoSoValue response to our format
@@ -70,39 +87,50 @@ export default async function handler(req, res) {
         
     } catch (error) {
         console.error('ETF Flows API error:', error);
-        return res.status(200).json(getMockData());
+        return res.status(200).json({
+            ...getMockData(),
+            debug: { error: error.message }
+        });
     }
 }
 
 // Transform SoSoValue data to our app format
-// Adjust field names based on actual API response
 function transformSoSoValueData(data) {
     try {
-        // Common field patterns from ETF APIs:
-        // - data.dailyNetInflow / data.daily_net_inflow / data.netFlow
-        // - data.flows / data.historicalFlows / data.history
+        console.log('Raw SoSoValue data:', JSON.stringify(data).substring(0, 500));
         
         const rawData = data.data || data;
         
-        // Extract yesterday's flow
+        // Extract yesterday's flow - try various field names
         let yesterdayAmount = 0;
-        if (rawData.dailyNetInflow !== undefined) {
-            yesterdayAmount = rawData.dailyNetInflow;
-        } else if (rawData.daily_net_inflow !== undefined) {
-            yesterdayAmount = rawData.daily_net_inflow;
-        } else if (rawData.netFlow !== undefined) {
-            yesterdayAmount = rawData.netFlow;
-        } else if (rawData.totalDailyNetflow !== undefined) {
-            yesterdayAmount = rawData.totalDailyNetflow;
-        } else if (Array.isArray(rawData) && rawData.length > 0) {
-            // If array, get most recent
+        const flowFields = [
+            'dailyNetInflow', 'daily_net_inflow', 'netFlow', 'net_flow',
+            'totalDailyNetflow', 'total_daily_netflow', 'dailyFlow', 'daily_flow',
+            'netInflow', 'net_inflow', 'inflow', 'flow'
+        ];
+        
+        for (const field of flowFields) {
+            if (rawData[field] !== undefined) {
+                yesterdayAmount = rawData[field];
+                console.log('Found flow field:', field, yesterdayAmount);
+                break;
+            }
+        }
+        
+        // If data is array, get most recent entry
+        if (Array.isArray(rawData) && rawData.length > 0) {
             const latest = rawData[rawData.length - 1];
-            yesterdayAmount = latest.netInflow || latest.net_inflow || latest.flow || 0;
+            for (const field of flowFields) {
+                if (latest[field] !== undefined) {
+                    yesterdayAmount = latest[field];
+                    break;
+                }
+            }
         }
         
         // Extract weekly data
         let weekData = [];
-        const historyFields = ['flows', 'historicalFlows', 'history', 'dailyFlows'];
+        const historyFields = ['flows', 'historicalFlows', 'history', 'dailyFlows', 'data', 'list'];
         for (const field of historyFields) {
             if (rawData[field] && Array.isArray(rawData[field])) {
                 weekData = rawData[field].slice(-5);
@@ -110,20 +138,36 @@ function transformSoSoValueData(data) {
             }
         }
         
-        // If rawData is already an array
+        // If rawData is already an array, use it
         if (Array.isArray(rawData)) {
             weekData = rawData.slice(-5);
         }
         
         // Format week data
         const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-        const week = weekData.map((day, i) => ({
-            day: days[i] || `Day ${i + 1}`,
-            amount: Math.round((day.netInflow || day.net_inflow || day.flow || day.amount || 0) / 1000000)
-        }));
+        const week = weekData.map((day, i) => {
+            let amount = 0;
+            for (const field of flowFields) {
+                if (day[field] !== undefined) {
+                    amount = day[field];
+                    break;
+                }
+            }
+            // Convert to millions if needed (if value > 10000, assume it's in dollars)
+            if (Math.abs(amount) > 10000) {
+                amount = Math.round(amount / 1000000);
+            }
+            return {
+                day: days[i] || `Day ${i + 1}`,
+                amount: amount
+            };
+        });
         
-        // Convert to millions
-        const yesterdayMillions = Math.round(yesterdayAmount / 1000000);
+        // Convert yesterday to millions if needed
+        let yesterdayMillions = yesterdayAmount;
+        if (Math.abs(yesterdayAmount) > 10000) {
+            yesterdayMillions = Math.round(yesterdayAmount / 1000000);
+        }
         
         // Generate insight
         const insight = generateInsight(yesterdayMillions, week);
