@@ -606,15 +606,99 @@ color: var(--ink-tertiary);
 margin: 0;
 }
 
-/* Weekend Market Mood - 7-day burgundy trail */
-.market-mood .mood-trail #trail-path-7day {
+/* Weekend Market Mood - 9-box grid positioning */
+.nine-box-wrapper {
+position: relative;
+}
+
+.nine-box-grid {
+position: relative;
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+grid-template-rows: repeat(3, 1fr);
+aspect-ratio: 1;
+}
+
+/* Mood dot positioning */
+.mood-dot {
+position: absolute;
+width: 14px;
+height: 14px;
+border-radius: 50%;
+transform: translate(-50%, 50%);
+z-index: 10;
+box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+display: none;
+}
+
+.mood-dot-teal {
+background: var(--teal);
+border: 2px solid white;
+}
+
+.mood-dot-burgundy {
+background: var(--burgundy);
+border: 2px solid white;
+}
+
+/* 7-day trail SVG overlay */
+.mood-trail {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+pointer-events: none;
+z-index: 5;
+}
+
+.mood-trail .trail-line {
+stroke-width: 3;
+fill: none;
+stroke-linecap: round;
+stroke-linejoin: round;
+}
+
+#trail-path-7day {
 stroke-width: 3;
 fill: none;
 }
 
-/* Legend dot for burgundy */
+/* Current zone highlight */
+.box.current-zone {
+outline: 3px solid var(--ink);
+outline-offset: -3px;
+z-index: 2;
+}
+
+/* Legend dots */
+.mood-legend {
+display: flex;
+gap: var(--lg);
+margin-top: var(--md);
+}
+
+.legend-item {
+display: flex;
+align-items: center;
+gap: var(--xs);
+font-family: var(--sans);
+font-size: 0.75rem;
+color: var(--ink-secondary);
+}
+
+.legend-dot {
+width: 10px;
+height: 10px;
+border-radius: 50%;
+}
+
 .legend-dot-burgundy {
 background: var(--burgundy);
+}
+
+.legend-dot-teal {
+background: var(--teal);
 }
 
 /* Site Footer */

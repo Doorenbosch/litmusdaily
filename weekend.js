@@ -111,6 +111,11 @@ async function loadMagazineContent() {
             updateSectorPercentages(magazineData.segments);
         }
         
+        // Render market mood with 7-day trail
+        if (magazineData.market_mood) {
+            renderMarketMood(magazineData.market_mood);
+        }
+        
     } catch (error) {
         console.error('[Weekend] Error loading magazine:', error);
     }
@@ -403,6 +408,101 @@ function setupSectorToggle() {
             }
         });
     });
+}
+
+/**
+ * Render Market Mood 9-box grid with current position and 7-day trail
+ */
+function renderMarketMood(moodData) {
+    if (!moodData) return;
+    
+    const { current, trail, title, description } = moodData;
+    
+    // Update title
+    const titleEl = document.getElementById('mood-title-weekend');
+    if (titleEl && title) {
+        titleEl.textContent = title;
+    }
+    
+    // Update description
+    const descEl = document.getElementById('mood-description-weekend');
+    if (descEl && description) {
+        descEl.textContent = description;
+    }
+    
+    // Update breadth text
+    const breadthEl = document.getElementById('breadth-value-weekend');
+    if (breadthEl && current) {
+        breadthEl.textContent = `${Math.round(current.breadth)}% of coins are green`;
+    }
+    
+    // Position the current dot (teal)
+    const dotEl = document.getElementById('mood-dot-weekend');
+    const gridEl = document.getElementById('nine-box-grid-weekend');
+    
+    if (dotEl && gridEl && current) {
+        // Convert breadth (0-100) and volume_ratio (0-100) to grid position
+        // Grid is 3x3, each cell is ~33.3%
+        const leftPct = current.breadth;
+        const bottomPct = current.volume_ratio;
+        
+        // Position dot (invert Y because CSS top is opposite of volume)
+        dotEl.style.left = `${leftPct}%`;
+        dotEl.style.bottom = `${bottomPct}%`;
+        dotEl.style.display = 'block';
+    }
+    
+    // Draw 7-day trail (burgundy)
+    const trailPath = document.getElementById('trail-path-7day');
+    if (trailPath && trail && trail.length > 0) {
+        // Build SVG path from trail points
+        // SVG viewBox is 0 0 100 100
+        let pathD = '';
+        
+        trail.forEach((point, i) => {
+            const x = point.breadth;
+            const y = 100 - point.volume_ratio; // Invert Y for SVG
+            
+            if (i === 0) {
+                pathD += `M ${x} ${y}`;
+            } else {
+                pathD += ` L ${x} ${y}`;
+            }
+        });
+        
+        // Connect to current position
+        if (current) {
+            const currentX = current.breadth;
+            const currentY = 100 - current.volume_ratio;
+            pathD += ` L ${currentX} ${currentY}`;
+        }
+        
+        trailPath.setAttribute('d', pathD);
+    }
+    
+    // Highlight current zone
+    highlightCurrentZone(current?.zone);
+}
+
+/**
+ * Highlight the current zone box
+ */
+function highlightCurrentZone(zone) {
+    if (!zone) return;
+    
+    const gridEl = document.getElementById('nine-box-grid-weekend');
+    if (!gridEl) return;
+    
+    // Remove previous highlights
+    gridEl.querySelectorAll('.box').forEach(box => {
+        box.classList.remove('current-zone');
+    });
+    
+    // Add highlight to current zone
+    const currentBox = gridEl.querySelector(`[data-zone="${zone}"]`);
+    if (currentBox) {
+        currentBox.classList.add('current-zone');
+    }
 }
 
 async function loadRelativePerformance() {
