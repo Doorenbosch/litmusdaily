@@ -1,193 +1,432 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekend Magazine - The Litmus</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="weekend.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekend Magazine | The Litmus</title>
+
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RL4ZYLE5G9"></script>
+<script src="weekend.js"></script>
+<script src="the-graph.js"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-RL4ZYLE5G9');
+</script>
+
+<link rel="icon" type="image/png" href="litmuslogo.png">
+<link rel="apple-touch-icon" href="litmuslogo.png">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="weekend.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Libre+Baskerville:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
-<body class="weekend-edition">
-    
-    <!-- Header -->
-    <header class="masthead">
-        <div class="masthead-center">
-            <a href="index.html" class="brand-link">
-                <img src="assets/litmus-logo.png" alt="The Litmus" class="brand-logo">
-                <div class="brand-text">
-                    <span class="brand-name">Litmus</span>
-                    <span class="edition-label">Weekend</span>
-                </div>
-            </a>
-        </div>
-        <div class="masthead-right">
-            <span class="publication-date" id="pub-date">December 7, 2024</span>
-        </div>
-    </header>
+<body>
+<div class="container">
+<!-- Header -->
+<header class="masthead">
+<div class="masthead-left">
+<span class="edition-label">WEEKEND EDITION</span>
+</div>
 
-    <!-- Main Content -->
-    <main class="magazine-layout">
-        
-        <!-- Left Column: Navigation & Key Dates -->
-        <aside class="magazine-sidebar-left">
-            
-            <!-- Key Dates -->
-            <section class="sidebar-section key-dates">
-                <h3 class="sidebar-title">Key Dates</h3>
-                <ul class="dates-list" id="key-dates-list">
-                    <li><span class="date-day">Mon</span><span class="date-event">Fed Decision</span></li>
-                    <li><span class="date-day">Wed</span><span class="date-event">CPI Data</span></li>
-                </ul>
-            </section>
+<div class="masthead-center">
+<a href="index.html" class="brand-link">
+<img src="litmuslogo.png" alt="The Litmus" class="brand-logo">
+<h1 class="brand-name">Litmus <em>Weekend</em></h1>
+</a>
+</div>
 
-            <!-- Section Navigation -->
-            <nav class="section-nav">
-                <h3 class="sidebar-title">This Edition</h3>
-                <ul class="nav-list">
-                    <li><a href="#week-review" class="nav-link active">Week in Review</a></li>
-                    <li><a href="#apac" class="nav-link">Asia-Pacific</a></li>
-                    <li><a href="#emea" class="nav-link">Europe & ME</a></li>
-                    <li><a href="#americas" class="nav-link">Americas</a></li>
-                    <li><a href="#flows" class="nav-link">Capital Flows</a></li>
-                    <li><a href="#corporate" class="nav-link">Corporate</a></li>
-                    <li><a href="#week-ahead" class="nav-link">Week Ahead</a></li>
-                    <li><a href="#mechanism" class="nav-link mechanism-nav">The Mechanism</a></li>
-                </ul>
-            </nav>
+<div class="masthead-right">
+<span class="publication-date" id="magazine-date">December 7, 2025</span>
+</div>
+</header>
 
-            <!-- Market Snapshot -->
-            <section class="sidebar-section market-snapshot">
-                <h3 class="sidebar-title">Market Snapshot</h3>
-                <div class="snapshot-item">
-                    <span class="snapshot-label">BTC</span>
-                    <span class="snapshot-value" id="btc-price">$97,500</span>
-                </div>
-                <div class="snapshot-item">
-                    <span class="snapshot-label">ETH</span>
-                    <span class="snapshot-value" id="eth-price">$3,650</span>
-                </div>
-                <div class="snapshot-item">
-                    <span class="snapshot-label">Dominance</span>
-                    <span class="snapshot-value" id="btc-dom">54.2%</span>
-                </div>
-            </section>
+<!-- Navigation -->
+<nav class="section-nav">
+<a href="index.html" class="section-link">Today</a>
+<a href="weekend.html" class="section-link active">Weekend Magazine</a>
+</nav>
 
-        </aside>
+<!-- Magazine Hero -->
+<section class="magazine-hero" id="magazine-hero">
+<div class="hero-image">
+<img id="hero-image-src" src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1400&h=500&fit=crop" alt="Weekly feature">
+<div class="hero-overlay">
+<span class="hero-label">THE WEEK IN REVIEW</span>
+<h1 class="hero-headline" id="hero-headline">Markets Test New Highs as Institutional Conviction Grows</h1>
+<p class="hero-subtitle" id="hero-subtitle">Bitcoin approaches $100k while regulatory clarity emerges across three continents</p>
+</div>
+</div>
+</section>
 
-        <!-- Center: Reading Pane -->
-        <article class="magazine-reading-pane">
-            
-            <!-- Hero -->
-            <header class="magazine-hero" id="hero-section">
-                <span class="hero-label">Weekend Magazine</span>
-                <h1 class="hero-headline" id="hero-headline">Loading...</h1>
-                <p class="hero-subtitle" id="hero-subtitle"></p>
-                <div class="hero-meta">
-                    <span class="hero-author" id="hero-author">The Litmus Editorial</span>
-                    <span class="hero-date" id="hero-date"></span>
-                </div>
-            </header>
+<!-- Main Editorial Grid -->
+<div class="editorial-grid weekend-grid">
 
-            <!-- Week in Review -->
-            <section class="magazine-section" id="week-review">
-                <h2 class="section-heading">The Week in Review</h2>
-                <div class="section-content" id="week-review-content">
-                    <p>Loading content...</p>
-                </div>
-            </section>
+<!-- Left: Index Column -->
+<aside class="article-index">
 
-            <!-- Regional Sections -->
-            <section class="magazine-section" id="apac">
-                <h2 class="section-heading">Asia-Pacific</h2>
-                <div class="section-content" id="apac-content">
-                    <p>Loading content...</p>
-                </div>
-            </section>
+<!-- Key Dates Section -->
+<section class="index-section">
+<div class="index-header">
+<h2 class="index-title">Key Dates</h2>
+<span class="index-subtitle">Week of <span id="key-dates-week">Dec 9-13</span></span>
+</div>
+<div class="key-dates-list" id="key-dates-list">
+<div class="key-date">
+<span class="date-day">Mon 9</span>
+<span class="date-event">China CPI Release</span>
+</div>
+<div class="key-date">
+<span class="date-day">Wed 11</span>
+<span class="date-event">US CPI Inflation Data</span>
+</div>
+<div class="key-date">
+<span class="date-day">Wed 11</span>
+<span class="date-event">Fed Interest Rate Decision</span>
+</div>
+<div class="key-date">
+<span class="date-day">Thu 12</span>
+<span class="date-event">ECB Rate Decision</span>
+</div>
+<div class="key-date">
+<span class="date-day">Fri 13</span>
+<span class="date-event">US PPI Data</span>
+</div>
+</div>
+</section>
 
-            <section class="magazine-section" id="emea">
-                <h2 class="section-heading">Europe & Middle East</h2>
-                <div class="section-content" id="emea-content">
-                    <p>Loading content...</p>
-                </div>
-            </section>
+<!-- Story Index -->
+<section class="index-section">
+<div class="index-header">
+<h2 class="index-title">In This Issue</h2>
+</div>
+<div class="index-list" id="magazine-index">
+<!-- Lead story with excerpt -->
+<div class="index-card active" data-section="week_review">
+<span class="card-label">THE WEEK IN REVIEW</span>
+<h3 class="card-headline" id="card-week-review">Where the Money Went</h3>
+<p class="card-excerpt">Bitcoin's push toward $100,000 masked a more complex rotation beneath the surface...</p>
+</div>
 
-            <section class="magazine-section" id="americas">
-                <h2 class="section-heading">Americas</h2>
-                <div class="section-content" id="americas-content">
-                    <p>Loading content...</p>
-                </div>
-            </section>
+<!-- Regional stories -->
+<div class="index-card" data-section="apac">
+<span class="card-label region-apac">ASIA-PACIFIC</span>
+<h3 class="card-headline" id="card-apac">Hong Kong's Quiet Revolution</h3>
+</div>
 
-            <!-- Capital Flows -->
-            <section class="magazine-section" id="flows">
-                <h2 class="section-heading">Capital Flows</h2>
-                <div class="section-content" id="flows-content">
-                    <p>Loading content...</p>
-                </div>
-            </section>
+<div class="index-card" data-section="emea">
+<span class="card-label region-emea">EUROPE & MIDDLE EAST</span>
+<h3 class="card-headline" id="card-emea">MiCA Takes Effect</h3>
+</div>
 
-            <!-- Corporate -->
-            <section class="magazine-section" id="corporate">
-                <h2 class="section-heading">Corporate Moves</h2>
-                <div class="section-content" id="corporate-content">
-                    <p>Loading content...</p>
-                </div>
-            </section>
+<div class="index-card" data-section="americas">
+<span class="card-label region-americas">AMERICAS</span>
+<h3 class="card-headline" id="card-americas">The ETF Effect Continues</h3>
+</div>
 
-            <!-- Week Ahead -->
-            <section class="magazine-section" id="week-ahead">
-                <h2 class="section-heading">The Week Ahead</h2>
-                <div class="section-content" id="week-ahead-content">
-                    <p>Loading content...</p>
-                </div>
-            </section>
+<!-- Market & Company stories -->
+<div class="index-card" data-section="flows">
+<span class="card-label">CAPITAL FLOWS</span>
+<h3 class="card-headline" id="card-flows">Following the Smart Money</h3>
+</div>
 
-            <!-- THE MECHANISM - Educational Deep Dive -->
-            <section class="mechanism-section" id="mechanism">
-                <div class="mechanism-header">
-                    <span class="mechanism-icon">📐</span>
-                    <div class="mechanism-titles">
-                        <h2 class="mechanism-label">THE MECHANISM</h2>
-                        <span class="mechanism-subtitle">How It Actually Works</span>
-                    </div>
-                </div>
-                <h3 class="mechanism-topic" id="mechanism-topic">Loading...</h3>
-                <p class="mechanism-timing" id="mechanism-timing"></p>
-                <div class="mechanism-content" id="mechanism-content">
-                    <p>Loading content...</p>
-                </div>
-            </section>
+<div class="index-card" data-section="corporate">
+<span class="card-label">CORPORATE MOVES</span>
+<h3 class="card-headline" id="card-corporate">MicroStrategy's Next Chapter</h3>
+</div>
 
-        </article>
+<div class="index-card" data-section="outlook">
+<span class="card-label">THE WEEK AHEAD</span>
+<h3 class="card-headline" id="card-outlook">What to Watch</h3>
+</div>
+</div>
+</section>
 
-        <!-- Right Column: Segment Performance -->
-        <aside class="magazine-sidebar-right">
-            
-            <!-- Segment Performance -->
-            <section class="sidebar-section segment-performance">
-                <h3 class="sidebar-title">7-Day Performance</h3>
-                <div class="segments-list" id="segments-list">
-                    <!-- Populated by JS -->
-                </div>
-            </section>
+<!-- 7-Day Relative Performance -->
+<section class="relative-performance-7d" id="relative-performance-7d">
+<header class="relative-header">
+<span class="relative-label">YOUR COINS VS MARKET · 7D</span>
+</header>
+<div class="relative-chart" id="relative-chart-7d">
+<!-- Market baseline row -->
+<div class="relative-row market-row">
+<span class="rel-name">Market</span>
+<span class="rel-change" id="market-7d-change">---</span>
+<div class="rel-bar-container">
+<div class="rel-baseline"></div>
+</div>
+<span class="rel-vs baseline">baseline</span>
+</div>
+<!-- Dynamic coin rows inserted here -->
+</div>
+</section>
+</aside>
 
-            <!-- Back to Today -->
-            <section class="sidebar-section">
-                <a href="index.html" class="back-link">← Back to Today</a>
-            </section>
+<!-- Center: Reading Pane -->
+<section class="reading-pane">
+<article class="article-content magazine-article">
 
-        </aside>
+<header class="article-header">
+<span class="article-label" id="reading-label">THE WEEK IN REVIEW</span>
+<h1 class="article-headline" id="reading-headline">Where the Money Went</h1>
+<div class="article-meta">
+<span class="article-byline">Litmus Intelligence</span>
+<span class="article-timestamp" id="reading-timestamp">December 7, 2025</span>
+</div>
+</header>
 
-    </main>
+<div class="article-body" id="reading-body">
+<p>Bitcoin's push toward $100,000 this week masked a more complex rotation beneath the surface. While headlines celebrated the milestone approach, the real story unfolded in the distribution of capital across the broader market—a story that reveals as much about institutional strategy as it does about price action.</p>
 
-    <!-- Footer -->
-    <footer class="magazine-footer">
-        <p>&copy; 2024 The Litmus. Premium crypto intelligence.</p>
-    </footer>
+<p>The week began with ETF inflows accelerating past $500 million daily, but the character of that capital has shifted. Early ETF buyers were largely retail-adjacent: financial advisors accessing Bitcoin for the first time, small allocations from self-directed portfolios. This week's flows carry different signatures—larger average transaction sizes, more sophisticated timing around macro announcements, and notably, increased activity in options markets suggesting hedged positions rather than directional bets.</p>
 
-    <script src="weekend.js"></script>
+<p>This maturation matters. Markets driven by conviction behave differently than markets driven by allocation mandates. The former can reverse quickly on sentiment shifts; the latter tends to be stickier, with rebalancing occurring on predetermined schedules rather than in response to price movements.</p>
+</div>
+</article>
+</section>
+
+<!-- Right: Context Sidebar -->
+<aside class="context-sidebar">
+
+<!-- THE GRAPH: Dry Powder on Sidelines -->
+<section class="the-graph" id="the-graph">
+<header class="graph-header">
+<span class="graph-label">THE GRAPH</span>
+                        <span class="graph-subtitle">Stablecoin % of Market • 12M</span>
+                        <span class="graph-subtitle">Stablecoin Share • 12M</span>
+</header>
+
+<div class="graph-chart">
+<svg class="graph-svg" id="graph-svg" viewBox="0 0 220 80" preserveAspectRatio="none">
+<!-- Grid lines -->
+<line class="graph-grid" x1="0" y1="20" x2="220" y2="20" />
+<line class="graph-grid" x1="0" y1="40" x2="220" y2="40" />
+<line class="graph-grid" x1="0" y1="60" x2="220" y2="60" />
+<!-- Area fill -->
+<path id="graph-area" class="graph-area" d="" />
+<!-- Line -->
+<path id="graph-line" class="graph-line" d="" />
+<!-- Current dot -->
+<circle id="graph-dot" class="graph-dot" cx="220" cy="40" r="4" />
+</svg>
+<div class="graph-y-labels">
+<span id="graph-y-max">10%</span>
+<span id="graph-y-min">3%</span>
+</div>
+</div>
+
+<div class="graph-current">
+<span class="graph-value" id="graph-value">---%</span>
+<span class="graph-range" id="graph-range">12M L-H: --% – --%</span>
+</div>
+
+<p class="graph-insight" id="graph-insight">Loading...</p>
+</section>
+
+<div class="sidebar-divider"></div>
+
+<!-- Market Mood with 7-Day Trail -->
+<section class="market-mood">
+<header class="mood-header">
+<span class="mood-label">MARKET MOOD</span>
+<h3 class="mood-title" id="mood-title-weekend">Strong Rally</h3>
+</header>
+
+<div class="nine-box-container">
+<div class="nine-box-y-axis">
+<span class="y-label-top">Frenzied</span>
+<span class="y-label-mid">M/V ratio</span>
+<span class="y-label-bottom">Quiet</span>
+</div>
+<div class="nine-box-wrapper">
+<div class="nine-box-grid" id="nine-box-grid-weekend">
+<!-- Row 1: Frenzied (top) -->
+<div class="box box-neutral" data-zone="concentration">CONCENTRATION</div>
+<div class="box box-positive" data-zone="leadership">LEADERSHIP</div>
+<div class="box box-positive-strong" data-zone="strong-rally">STRONG RALLY</div>
+<!-- Row 2: Normal -->
+<div class="box box-negative" data-zone="rotation">ROTATION</div>
+<div class="box box-neutral" data-zone="consolidation">CONSOLIDATION</div>
+<div class="box box-positive" data-zone="steady-advance">STEADY ADVANCE</div>
+<!-- Row 3: Quiet (bottom) -->
+<div class="box box-negative-strong" data-zone="capitulation">CAPITULATION</div>
+<div class="box box-negative" data-zone="drift">DRIFT</div>
+<div class="box box-neutral" data-zone="weak-rally">WEAK RALLY</div>
+
+<!-- 7-Day Trail path (SVG overlay) - Burgundy -->
+<svg class="mood-trail" id="mood-trail-7day" viewBox="0 0 100 100" preserveAspectRatio="none">
+<defs>
+<linearGradient id="trailGradient7day" x1="0%" y1="0%" x2="100%" y2="0%">
+<stop offset="0%" style="stop-color:#8A123C;stop-opacity:0.2" />
+<stop offset="50%" style="stop-color:#8A123C;stop-opacity:0.5" />
+<stop offset="100%" style="stop-color:#8A123C;stop-opacity:1" />
+</linearGradient>
+</defs>
+<path id="trail-path-7day" class="trail-line" d="" stroke="url(#trailGradient7day)" />
+</svg>
+
+<!-- Current position dot (teal) -->
+<div class="mood-dot mood-dot-teal" id="mood-dot-weekend"></div>
+</div>
+<div class="nine-box-x-axis">
+<span>0%</span>
+<span id="breadth-value-weekend">71% of coins are green</span>
+<span>100%</span>
+</div>
+</div>
+</div>
+
+<p class="mood-description" id="mood-description-weekend">
+Broad participation with high conviction. The market is moving decisively higher with strong volume confirmation.
+</p>
+
+<div class="mood-legend">
+<div class="legend-item">
+<span class="legend-dot legend-dot-burgundy"></span>
+<span>7-day trail</span>
+</div>
+<div class="legend-item">
+<span class="legend-dot legend-dot-teal"></span>
+<span>Current</span>
+</div>
+</div>
+</section>
+
+<div class="sidebar-divider"></div>
+
+<!-- Crypto Sectors Performance -->
+<section class="sectors-section">
+<header class="sectors-header">
+<span class="sectors-label">SECTORS · 7D</span>
+</header>
+<div class="sectors-list" id="sectors-list">
+
+<div class="sector-item" data-sector="payment">
+<div class="sector-summary">
+<span class="sector-name">Payment</span>
+<span class="sector-change positive" id="sector-payment-change">+8.2%</span>
+</div>
+<div class="sector-tokens" id="sector-payment-tokens">BTC, LTC, XMR</div>
+<div class="sector-bar">
+<div class="sector-fill positive" id="sector-payment-bar" style="width: 82%"></div>
+</div>
+<div class="sector-detail" id="sector-payment-detail">
+<p class="sector-about">Digital currencies designed primarily for peer-to-peer transactions and store of value. Bitcoin dominates, with privacy coins and faster alternatives filling niches.</p>
+<p class="sector-drivers"><strong>Key drivers:</strong> Institutional adoption, ETF flows, macro hedging demand, regulatory clarity, halving cycles.</p>
+<p class="sector-weekly" id="sector-payment-weekly"></p>
+</div>
+</div>
+
+<div class="sector-item" data-sector="stablecoin">
+<div class="sector-summary">
+<span class="sector-name">Stablecoins</span>
+<span class="sector-change neutral" id="sector-stablecoin-change">+0.1%</span>
+</div>
+<div class="sector-tokens" id="sector-stablecoin-tokens">USDT, USDC</div>
+<div class="sector-bar">
+<div class="sector-fill neutral" id="sector-stablecoin-bar" style="width: 50%"></div>
+</div>
+<div class="sector-detail" id="sector-stablecoin-detail">
+<p class="sector-about">Tokens pegged to fiat currencies, primarily USD. Essential infrastructure for trading, DeFi, and cross-border payments.</p>
+<p class="sector-drivers"><strong>Key drivers:</strong> Trading volume, DeFi TVL, regulatory developments, yield differentials vs TradFi, reserve transparency.</p>
+<p class="sector-weekly" id="sector-stablecoin-weekly"></p>
+</div>
+</div>
+
+<div class="sector-item" data-sector="infrastructure">
+<div class="sector-summary">
+<span class="sector-name">Infrastructure</span>
+<span class="sector-change positive" id="sector-infrastructure-change">+12.4%</span>
+</div>
+<div class="sector-tokens" id="sector-infrastructure-tokens">ETH, SOL, AVAX</div>
+<div class="sector-bar">
+<div class="sector-fill positive" id="sector-infrastructure-bar" style="width: 90%"></div>
+</div>
+<div class="sector-detail" id="sector-infrastructure-detail">
+<p class="sector-about">Layer 1 blockchains and scaling solutions that power decentralized applications. The foundation layer of crypto's technology stack.</p>
+<p class="sector-drivers"><strong>Key drivers:</strong> Developer activity, TVL growth, transaction throughput, network upgrades, ecosystem expansion.</p>
+<p class="sector-weekly" id="sector-infrastructure-weekly"></p>
+</div>
+</div>
+
+<div class="sector-item" data-sector="defi">
+<div class="sector-summary">
+<span class="sector-name">DeFi</span>
+<span class="sector-change positive" id="sector-defi-change">+6.8%</span>
+</div>
+<div class="sector-tokens" id="sector-defi-tokens">AAVE, UNI, COMP</div>
+<div class="sector-bar">
+<div class="sector-fill positive" id="sector-defi-bar" style="width: 68%"></div>
+</div>
+<div class="sector-detail" id="sector-defi-detail">
+<p class="sector-about">Decentralized lending, trading, and yield protocols. Recreates traditional financial services without intermediaries.</p>
+<p class="sector-drivers"><strong>Key drivers:</strong> TVL trends, yield opportunities, protocol revenue, institutional DeFi adoption, regulatory signals.</p>
+<p class="sector-weekly" id="sector-defi-weekly"></p>
+</div>
+</div>
+
+<div class="sector-item" data-sector="utility">
+<div class="sector-summary">
+<span class="sector-name">Utility</span>
+<span class="sector-change positive" id="sector-utility-change">+4.2%</span>
+</div>
+<div class="sector-tokens" id="sector-utility-tokens">LINK, FIL, RNDR</div>
+<div class="sector-bar">
+<div class="sector-fill positive" id="sector-utility-bar" style="width: 58%"></div>
+</div>
+<div class="sector-detail" id="sector-utility-detail">
+<p class="sector-about">Tokens powering specific services: oracles, storage, compute. Value tied to actual network usage and demand for services.</p>
+<p class="sector-drivers"><strong>Key drivers:</strong> Enterprise adoption, network usage metrics, partnership announcements, real-world integration.</p>
+<p class="sector-weekly" id="sector-utility-weekly"></p>
+</div>
+</div>
+
+<div class="sector-item" data-sector="entertainment">
+<div class="sector-summary">
+<span class="sector-name">Entertainment</span>
+<span class="sector-change negative" id="sector-entertainment-change">-2.1%</span>
+</div>
+<div class="sector-tokens" id="sector-entertainment-tokens">APE, MANA, SAND</div>
+<div class="sector-bar">
+<div class="sector-fill negative" id="sector-entertainment-bar" style="width: 35%"></div>
+</div>
+<div class="sector-detail" id="sector-entertainment-detail">
+<p class="sector-about">Gaming, metaverse, and NFT-adjacent tokens. High beta to risk sentiment, driven by user engagement and speculation.</p>
+<p class="sector-drivers"><strong>Key drivers:</strong> Game launches, user metrics, NFT market sentiment, celebrity/brand partnerships, retail speculation cycles.</p>
+<p class="sector-weekly" id="sector-entertainment-weekly"></p>
+</div>
+</div>
+
+<div class="sector-item" data-sector="ai">
+<div class="sector-summary">
+<span class="sector-name">AI & Compute</span>
+<span class="sector-change positive" id="sector-ai-change">+18.5%</span>
+</div>
+<div class="sector-tokens" id="sector-ai-tokens">RNDR, AKT, TAO</div>
+<div class="sector-bar">
+<div class="sector-fill positive" id="sector-ai-bar" style="width: 95%"></div>
+</div>
+<div class="sector-detail" id="sector-ai-detail">
+<p class="sector-about">Decentralized GPU networks and AI-focused protocols. Benefiting from the broader AI investment theme and compute demand.</p>
+<p class="sector-drivers"><strong>Key drivers:</strong> AI industry momentum, GPU demand, decentralized compute adoption, NVIDIA correlation, model training costs.</p>
+<p class="sector-weekly" id="sector-ai-weekly"></p>
+</div>
+</div>
+
+</div>
+</section>
+</aside>
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+<p>&copy; 2025 The Litmus. Crypto intelligence for the informed investor.</p>
+</footer>
+</div>
+
+<script src="weekend.js"></script>
 </body>
 </html>
