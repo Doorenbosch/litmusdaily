@@ -478,23 +478,109 @@ function setupSectorDetailPanel() {
 
 /**
  * Render Market Mood 9-box grid with current position and 7-day trail
+ * Fetches from /api/market-mood for real trail data
  */
-function renderMarketMood(moodData) {
+async function renderMarketMood(fallbackData) {
+    try {
+        // Fetch real mood data from API
+        const response = await fetch('/api/market-mood');
+        const moodData = response.ok ? await response.json() : null;
+        
+        if (moodData && moodData.success !== false) {
+            // Use API data
+            const breadth = moodData.breadth || 50;
+            const mvRatio = moodData.mvRatio7d || moodData.mvRatio24h || 25;
+            const trail7d = moodData.trail7d || [];
+            const mvRange = moodData.mvRange || { low: 10, high: 45 };
+            
+            // Convert M/V ratio to 0-100 scale for grid positioning
+            const volumeRatio = ((mvRatio - mvRange.low) / (mvRange.high - mvRange.low)) * 100;
+            const clampedVolume = Math.max(5, Math.min(95, volumeRatio));
+            
+            // Determine zone
+            const zone = determineZone(breadth, clampedVolume);
+            const zoneInfo = getZoneInfo(zone, breadth);
+            
+            // Update title
+            const titleEl = document.getElementById('mood-title-weekend');
+            if (titleEl) titleEl.textContent = zoneInfo.title;
+            
+            // Update description
+            const descEl = document.getElementById('mood-description-weekend');
+            if (descEl) descEl.textContent = zoneInfo.description;
+            
+            // Update breadth text
+            const breadthEl = document.getElementById('breadth-value-weekend');
+            if (breadthEl) breadthEl.textContent = `${Math.round(breadth)}% of coins are green`;
+            
+            // Position current dot (teal)
+            const dotEl = document.getElementById('mood-dot-weekend');
+            if (dotEl) {
+                dotEl.style.left = `${breadth}%`;
+                dotEl.style.bottom = `${clampedVolume}%`;
+                dotEl.style.display = 'block';
+            }
+            
+            // Draw 7-day trail (burgundy)
+            if (trail7d.length > 0) {
+                drawTrail7d(trail7d, mvRange, breadth, clampedVolume);
+            }
+            
+            // Highlight current zone
+            highlightCurrentZone(zone);
+            
+        } else if (fallbackData) {
+            // Use fallback data from magazine.json
+            renderMarketMoodFromFallback(fallbackData);
+        }
+        
+    } catch (error) {
+        console.warn('[Weekend] Market mood API error:', error);
+        if (fallbackData) {
+            renderMarketMoodFromFallback(fallbackData);
+        }
+    }
+}
+
+function drawTrail7d(trail7d, mvRange, currentBreadth, currentVolume) {
+    const trailPath = document.getElementById('trail-path-7day');
+    if (!trailPath || trail7d.length === 0) return;
+    
+    let pathD = '';
+    
+    trail7d.forEach((point, i) => {
+        const x = point.breadth || 50;
+        // Convert M/V to percentage
+        const mv = point.mv || 25;
+        const yRatio = ((mv - mvRange.low) / (mvRange.high - mvRange.low)) * 100;
+        const y = 100 - Math.max(5, Math.min(95, yRatio)); // Invert for SVG
+        
+        if (i === 0) {
+            pathD += `M ${x} ${y}`;
+        } else {
+            pathD += ` L ${x} ${y}`;
+        }
+    });
+    
+    // Connect to current position
+    const currentY = 100 - currentVolume;
+    pathD += ` L ${currentBreadth} ${currentY}`;
+    
+    trailPath.setAttribute('d', pathD);
+}
+
+function renderMarketMoodFromFallback(moodData) {
     if (!moodData) return;
     
     const { current, trail, title, description } = moodData;
     
     // Update title
     const titleEl = document.getElementById('mood-title-weekend');
-    if (titleEl && title) {
-        titleEl.textContent = title;
-    }
+    if (titleEl && title) titleEl.textContent = title;
     
     // Update description
     const descEl = document.getElementById('mood-description-weekend');
-    if (descEl && description) {
-        descEl.textContent = description;
-    }
+    if (descEl && description) descEl.textContent = description;
     
     // Update breadth text
     const breadthEl = document.getElementById('breadth-value-weekend');
@@ -502,52 +588,61 @@ function renderMarketMood(moodData) {
         breadthEl.textContent = `${Math.round(current.breadth)}% of coins are green`;
     }
     
-    // Position the current dot (teal)
+    // Position dot
     const dotEl = document.getElementById('mood-dot-weekend');
-    const gridEl = document.getElementById('nine-box-grid-weekend');
-    
-    if (dotEl && gridEl && current) {
-        // Convert breadth (0-100) and volume_ratio (0-100) to grid position
-        // Grid is 3x3, each cell is ~33.3%
-        const leftPct = current.breadth;
-        const bottomPct = current.volume_ratio;
-        
-        // Position dot (invert Y because CSS top is opposite of volume)
-        dotEl.style.left = `${leftPct}%`;
-        dotEl.style.bottom = `${bottomPct}%`;
+    if (dotEl && current) {
+        dotEl.style.left = `${current.breadth}%`;
+        dotEl.style.bottom = `${current.volume_ratio}%`;
         dotEl.style.display = 'block';
     }
     
-    // Draw 7-day trail (burgundy)
+    // Draw trail from fallback
     const trailPath = document.getElementById('trail-path-7day');
     if (trailPath && trail && trail.length > 0) {
-        // Build SVG path from trail points
-        // SVG viewBox is 0 0 100 100
         let pathD = '';
-        
         trail.forEach((point, i) => {
             const x = point.breadth;
-            const y = 100 - point.volume_ratio; // Invert Y for SVG
-            
-            if (i === 0) {
-                pathD += `M ${x} ${y}`;
-            } else {
-                pathD += ` L ${x} ${y}`;
-            }
+            const y = 100 - point.volume_ratio;
+            pathD += i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`;
         });
-        
-        // Connect to current position
         if (current) {
-            const currentX = current.breadth;
-            const currentY = 100 - current.volume_ratio;
-            pathD += ` L ${currentX} ${currentY}`;
+            pathD += ` L ${current.breadth} ${100 - current.volume_ratio}`;
         }
-        
         trailPath.setAttribute('d', pathD);
     }
     
-    // Highlight current zone
     highlightCurrentZone(current?.zone);
+}
+
+function determineZone(breadth, volumeRatio) {
+    if (volumeRatio >= 66) {
+        if (breadth < 33) return 'concentration';
+        if (breadth < 66) return 'leadership';
+        return 'strong-rally';
+    } else if (volumeRatio >= 33) {
+        if (breadth < 33) return 'rotation';
+        if (breadth < 66) return 'consolidation';
+        return 'steady-advance';
+    } else {
+        if (breadth < 33) return 'capitulation';
+        if (breadth < 66) return 'drift';
+        return 'weak-rally';
+    }
+}
+
+function getZoneInfo(zone, breadth) {
+    const descriptions = {
+        'strong-rally': { title: 'Strong Rally', description: 'Broad participation with high conviction. The market is moving decisively higher with strong volume confirmation.' },
+        'leadership': { title: 'Leadership', description: `Large caps leading with elevated activity. ${Math.round(breadth)}% of coins positive, suggesting selective but powerful momentum.` },
+        'concentration': { title: 'Concentration', description: 'High volume but narrow participation. Capital is concentrating in select assets.' },
+        'steady-advance': { title: 'Steady Advance', description: `Healthy breadth at ${Math.round(breadth)}% with measured volume. Sustainable advance.` },
+        'consolidation': { title: 'Consolidation', description: 'Mixed signals with moderate activity. Market digesting recent moves.' },
+        'rotation': { title: 'Rotation', description: 'Sector rotation underway with elevated volume. Capital is moving, but direction unclear.' },
+        'weak-rally': { title: 'Weak Rally', description: `Broad but unconvincing. ${Math.round(breadth)}% green but low volume suggests lack of conviction.` },
+        'drift': { title: 'Drift', description: 'Quiet market with no clear direction. Low participation and activity.' },
+        'capitulation': { title: 'Capitulation', description: 'Broad weakness with elevated selling pressure. Risk-off sentiment dominates.' }
+    };
+    return descriptions[zone] || { title: 'Unknown', description: 'Market conditions unclear.' };
 }
 
 /**
