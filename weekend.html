@@ -309,126 +309,102 @@ Broad participation with high conviction. The market is moving decisively higher
 
 <div class="sidebar-divider"></div>
 
-<!-- Crypto Sectors Performance -->
+<!-- Crypto Sectors Performance - Compact Bar Style -->
 <section class="sectors-section">
-<header class="sectors-header">
+<header class="sectors-header-compact">
 <span class="sectors-label">SECTORS · 7D</span>
+<span class="sectors-market" id="sectors-market-change">MARKET ---</span>
 </header>
-<div class="sectors-list" id="sectors-list">
 
-<div class="sector-item" data-sector="payment">
-<div class="sector-summary">
+<div class="sectors-chart" id="sectors-chart">
+<!-- Market baseline row -->
+<div class="sector-row market-row">
+<span class="sector-name">Market</span>
+<span class="sector-change" id="sector-market-value">---</span>
+<div class="sector-bar-container">
+<div class="sector-baseline"></div>
+</div>
+<span class="sector-vs baseline">baseline</span>
+</div>
+
+<!-- Payment -->
+<div class="sector-row" data-sector="payment">
 <span class="sector-name">Payment</span>
-<span class="sector-change positive" id="sector-payment-change">+8.2%</span>
+<span class="sector-change" id="sector-payment-change">---</span>
+<div class="sector-bar-container">
+<div class="sector-baseline"></div>
+<div class="sector-bar" id="sector-payment-bar"></div>
 </div>
-<div class="sector-tokens" id="sector-payment-tokens">BTC, LTC, XMR</div>
-<div class="sector-bar">
-<div class="sector-fill positive" id="sector-payment-bar" style="width: 82%"></div>
-</div>
-<div class="sector-detail" id="sector-payment-detail">
-<p class="sector-weekly" id="sector-payment-weekly"></p>
-<p class="sector-drivers"><strong>Key drivers:</strong> Institutional adoption, ETF flows, macro hedging demand, regulatory clarity, halving cycles.</p>
-<p class="sector-about">Digital currencies designed primarily for peer-to-peer transactions and store of value. Bitcoin dominates, with privacy coins and faster alternatives filling niches.</p>
-</div>
+<span class="sector-vs" id="sector-payment-vs">---</span>
 </div>
 
-<div class="sector-item" data-sector="stablecoin">
-<div class="sector-summary">
-<span class="sector-name">Stablecoins</span>
-<span class="sector-change neutral" id="sector-stablecoin-change">+0.1%</span>
-</div>
-<div class="sector-tokens" id="sector-stablecoin-tokens">USDT, USDC</div>
-<div class="sector-bar">
-<div class="sector-fill neutral" id="sector-stablecoin-bar" style="width: 50%"></div>
-</div>
-<div class="sector-detail" id="sector-stablecoin-detail">
-<p class="sector-weekly" id="sector-stablecoin-weekly"></p>
-<p class="sector-drivers"><strong>Key drivers:</strong> Trading volume, DeFi TVL, regulatory developments, yield differentials vs TradFi, reserve transparency.</p>
-<p class="sector-about">Tokens pegged to fiat currencies, primarily USD. Essential infrastructure for trading, DeFi, and cross-border payments.</p>
-</div>
-</div>
-
-<div class="sector-item" data-sector="infrastructure">
-<div class="sector-summary">
+<!-- Infrastructure -->
+<div class="sector-row" data-sector="infrastructure">
 <span class="sector-name">Infrastructure</span>
-<span class="sector-change positive" id="sector-infrastructure-change">+12.4%</span>
+<span class="sector-change" id="sector-infrastructure-change">---</span>
+<div class="sector-bar-container">
+<div class="sector-baseline"></div>
+<div class="sector-bar" id="sector-infrastructure-bar"></div>
 </div>
-<div class="sector-tokens" id="sector-infrastructure-tokens">ETH, SOL, AVAX</div>
-<div class="sector-bar">
-<div class="sector-fill positive" id="sector-infrastructure-bar" style="width: 90%"></div>
-</div>
-<div class="sector-detail" id="sector-infrastructure-detail">
-<p class="sector-weekly" id="sector-infrastructure-weekly"></p>
-<p class="sector-drivers"><strong>Key drivers:</strong> Developer activity, TVL growth, transaction throughput, network upgrades, ecosystem expansion.</p>
-<p class="sector-about">Layer 1 blockchains and scaling solutions that power decentralized applications. The foundation layer of crypto's technology stack.</p>
-</div>
+<span class="sector-vs" id="sector-infrastructure-vs">---</span>
 </div>
 
-<div class="sector-item" data-sector="defi">
-<div class="sector-summary">
+<!-- DeFi -->
+<div class="sector-row" data-sector="defi">
 <span class="sector-name">DeFi</span>
-<span class="sector-change positive" id="sector-defi-change">+6.8%</span>
+<span class="sector-change" id="sector-defi-change">---</span>
+<div class="sector-bar-container">
+<div class="sector-baseline"></div>
+<div class="sector-bar" id="sector-defi-bar"></div>
 </div>
-<div class="sector-tokens" id="sector-defi-tokens">AAVE, UNI, COMP</div>
-<div class="sector-bar">
-<div class="sector-fill positive" id="sector-defi-bar" style="width: 68%"></div>
-</div>
-<div class="sector-detail" id="sector-defi-detail">
-<p class="sector-weekly" id="sector-defi-weekly"></p>
-<p class="sector-drivers"><strong>Key drivers:</strong> TVL trends, yield opportunities, protocol revenue, institutional DeFi adoption, regulatory signals.</p>
-<p class="sector-about">Decentralized lending, trading, and yield protocols. Recreates traditional financial services without intermediaries.</p>
-</div>
+<span class="sector-vs" id="sector-defi-vs">---</span>
 </div>
 
-<div class="sector-item" data-sector="utility">
-<div class="sector-summary">
+<!-- Utility -->
+<div class="sector-row" data-sector="utility">
 <span class="sector-name">Utility</span>
-<span class="sector-change positive" id="sector-utility-change">+4.2%</span>
+<span class="sector-change" id="sector-utility-change">---</span>
+<div class="sector-bar-container">
+<div class="sector-baseline"></div>
+<div class="sector-bar" id="sector-utility-bar"></div>
 </div>
-<div class="sector-tokens" id="sector-utility-tokens">LINK, FIL, RNDR</div>
-<div class="sector-bar">
-<div class="sector-fill positive" id="sector-utility-bar" style="width: 58%"></div>
-</div>
-<div class="sector-detail" id="sector-utility-detail">
-<p class="sector-weekly" id="sector-utility-weekly"></p>
-<p class="sector-drivers"><strong>Key drivers:</strong> Enterprise adoption, network usage metrics, partnership announcements, real-world integration.</p>
-<p class="sector-about">Tokens powering specific services: oracles, storage, compute. Value tied to actual network usage and demand for services.</p>
-</div>
+<span class="sector-vs" id="sector-utility-vs">---</span>
 </div>
 
-<div class="sector-item" data-sector="entertainment">
-<div class="sector-summary">
+<!-- Entertainment -->
+<div class="sector-row" data-sector="entertainment">
 <span class="sector-name">Entertainment</span>
-<span class="sector-change negative" id="sector-entertainment-change">-2.1%</span>
+<span class="sector-change" id="sector-entertainment-change">---</span>
+<div class="sector-bar-container">
+<div class="sector-baseline"></div>
+<div class="sector-bar" id="sector-entertainment-bar"></div>
 </div>
-<div class="sector-tokens" id="sector-entertainment-tokens">APE, MANA, SAND</div>
-<div class="sector-bar">
-<div class="sector-fill negative" id="sector-entertainment-bar" style="width: 35%"></div>
-</div>
-<div class="sector-detail" id="sector-entertainment-detail">
-<p class="sector-weekly" id="sector-entertainment-weekly"></p>
-<p class="sector-drivers"><strong>Key drivers:</strong> Game launches, user metrics, NFT market sentiment, celebrity/brand partnerships, retail speculation cycles.</p>
-<p class="sector-about">Gaming, metaverse, and NFT-adjacent tokens. High beta to risk sentiment, driven by user engagement and speculation.</p>
-</div>
+<span class="sector-vs" id="sector-entertainment-vs">---</span>
 </div>
 
-<div class="sector-item" data-sector="ai">
-<div class="sector-summary">
+<!-- AI & Compute -->
+<div class="sector-row" data-sector="ai">
 <span class="sector-name">AI & Compute</span>
-<span class="sector-change positive" id="sector-ai-change">+18.5%</span>
+<span class="sector-change" id="sector-ai-change">---</span>
+<div class="sector-bar-container">
+<div class="sector-baseline"></div>
+<div class="sector-bar" id="sector-ai-bar"></div>
 </div>
-<div class="sector-tokens" id="sector-ai-tokens">RNDR, AKT, TAO</div>
-<div class="sector-bar">
-<div class="sector-fill positive" id="sector-ai-bar" style="width: 95%"></div>
-</div>
-<div class="sector-detail" id="sector-ai-detail">
-<p class="sector-weekly" id="sector-ai-weekly"></p>
-<p class="sector-drivers"><strong>Key drivers:</strong> AI industry momentum, GPU demand, decentralized compute adoption, NVIDIA correlation, model training costs.</p>
-<p class="sector-about">Decentralized GPU networks and AI-focused protocols. Benefiting from the broader AI investment theme and compute demand.</p>
+<span class="sector-vs" id="sector-ai-vs">---</span>
 </div>
 </div>
 
+<!-- Expandable sector details (shown on click) -->
+<div class="sector-detail-panel" id="sector-detail-panel" style="display: none;">
+<div class="sector-detail-header">
+<span class="sector-detail-name" id="sector-detail-name">Payment</span>
+<span class="sector-detail-close">&times;</span>
 </div>
+<p class="sector-weekly" id="sector-detail-weekly"></p>
+<p class="sector-drivers" id="sector-detail-drivers"></p>
+<p class="sector-about" id="sector-detail-about"></p>
+</div>
+
 </section>
 </aside>
 </div>

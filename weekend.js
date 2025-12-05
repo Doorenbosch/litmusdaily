@@ -22,9 +22,6 @@ async function init() {
     // Setup index card navigation
     setupIndexNavigation();
     
-    // Setup sector expand/collapse
-    setupSectorToggle();
-    
     // Load relative performance
     loadRelativePerformance();
 }
@@ -322,44 +319,40 @@ function renderKeyDates(dates) {
 }
 
 function renderSectors(sectors) {
-    if (!sectors) return;
-    
-    // Maps JSON keys to HTML element IDs
-    const sectorMap = {
-        'payment': 'payment',
-        'stablecoin': 'stablecoin',
-        'infrastructure': 'infrastructure',
-        'defi': 'defi',
-        'utility': 'utility',
-        'entertainment': 'entertainment',
-        'ai': 'ai'
-    };
-    
-    for (const [key, value] of Object.entries(sectors)) {
-        const htmlKey = sectorMap[key] || key;
-        const weeklyEl = document.getElementById(`sector-${htmlKey}-weekly`);
-        
-        if (weeklyEl) {
-            // Handle AI commentary (string)
-            const commentary = typeof value === 'string' ? value : (value.weekly || '');
-            if (commentary) {
-                weeklyEl.innerHTML = `<span class="sector-weekly-label">THIS WEEK</span>${escapeHtml(commentary)}`;
-                weeklyEl.style.display = 'block';
-            }
-        }
-    }
+    // AI commentary is now shown in the detail panel when clicked
+    // Store it for later use
+    window.sectorCommentary = sectors || {};
 }
 
 /**
- * Update sector percentages from API market data
- * Called separately from renderSectors because data comes from different JSON paths
+ * Update sector display with bar-vs-baseline style
+ * Uses market average as baseline
  */
 function updateSectorPercentages(segments) {
     if (!segments) return;
     
+    // Calculate market average from all segments
+    const segmentValues = Object.values(segments).filter(s => typeof s === 'object' && s.change !== undefined);
+    const marketAvg = segmentValues.length > 0 
+        ? segmentValues.reduce((sum, s) => sum + s.change, 0) / segmentValues.length 
+        : 0;
+    
+    // Update market baseline display
+    const marketValueEl = document.getElementById('sector-market-value');
+    const marketHeaderEl = document.getElementById('sectors-market-change');
+    
+    if (marketValueEl) {
+        const sign = marketAvg >= 0 ? '+' : '';
+        marketValueEl.textContent = `${sign}${marketAvg.toFixed(1)}%`;
+    }
+    
+    if (marketHeaderEl) {
+        const sign = marketAvg >= 0 ? '+' : '';
+        marketHeaderEl.textContent = `MARKET ${sign}${marketAvg.toFixed(1)}%`;
+    }
+    
     const sectorMap = {
         'payment': 'payment',
-        'stablecoin': 'stablecoin', 
         'infrastructure': 'infrastructure',
         'defi': 'defi',
         'utility': 'utility',
@@ -371,43 +364,116 @@ function updateSectorPercentages(segments) {
         const htmlKey = sectorMap[key] || key;
         
         if (typeof data === 'object' && data.change !== undefined) {
-            const changeEl = document.getElementById(`sector-${htmlKey}-change`);
-            const barEl = document.getElementById(`sector-${htmlKey}-bar`);
+            const change = data.change;
+            const relative = change - marketAvg;
+            const isOutperform = relative >= 0;
             
+            // Update change percentage
+            const changeEl = document.getElementById(`sector-${htmlKey}-change`);
             if (changeEl) {
-                const change = data.change;
                 const sign = change >= 0 ? '+' : '';
                 changeEl.textContent = `${sign}${change.toFixed(1)}%`;
-                changeEl.className = 'sector-change ' + (change > 0.5 ? 'positive' : change < -0.5 ? 'negative' : 'neutral');
             }
             
-            // Update bar width (scale: -20% to +20% maps to 0% to 100%)
+            // Update bar
+            const barEl = document.getElementById(`sector-${htmlKey}-bar`);
             if (barEl) {
-                const barWidth = Math.min(Math.max((data.change + 20) * 2.5, 5), 100);
+                // Calculate bar width (max 50% of container for each direction)
+                const barWidth = Math.min(Math.abs(relative) * 3, 50);
                 barEl.style.width = `${barWidth}%`;
-                barEl.className = 'sector-fill ' + (data.change > 0.5 ? 'positive' : data.change < -0.5 ? 'negative' : 'neutral');
+                barEl.className = `sector-bar ${isOutperform ? 'outperform' : 'underperform'}`;
+            }
+            
+            // Update relative to market
+            const vsEl = document.getElementById(`sector-${htmlKey}-vs`);
+            if (vsEl) {
+                const relSign = relative >= 0 ? '+' : '';
+                vsEl.textContent = `${relSign}${relative.toFixed(1)}%`;
+                vsEl.className = `sector-vs ${isOutperform ? 'positive' : 'negative'}`;
             }
         }
     }
+    
+    // Setup click handlers for detail panel
+    setupSectorDetailPanel();
 }
 
-function setupSectorToggle() {
-    const sectorItems = document.querySelectorAll('.sector-item');
+/**
+ * Setup sector row click handlers to show detail panel
+ */
+function setupSectorDetailPanel() {
+    const sectorRows = document.querySelectorAll('.sector-row:not(.market-row)');
+    const detailPanel = document.getElementById('sector-detail-panel');
+    const closeBtn = detailPanel?.querySelector('.sector-detail-close');
     
-    sectorItems.forEach(item => {
-        item.addEventListener('click', () => {
-            // Toggle expanded state
-            const wasExpanded = item.classList.contains('expanded');
+    // Sector info for detail panel
+    const sectorInfo = {
+        'payment': {
+            name: 'Payment',
+            drivers: 'Institutional adoption, ETF flows, macro hedging demand, regulatory clarity, halving cycles.',
+            about: 'Digital currencies designed primarily for peer-to-peer transactions and store of value.'
+        },
+        'infrastructure': {
+            name: 'Infrastructure', 
+            drivers: 'Developer activity, TVL growth, transaction throughput, network upgrades, ecosystem expansion.',
+            about: 'Layer 1 blockchains and scaling solutions that power decentralized applications.'
+        },
+        'defi': {
+            name: 'DeFi',
+            drivers: 'TVL trends, yield opportunities, protocol revenue, institutional DeFi adoption, regulatory signals.',
+            about: 'Decentralized lending, trading, and yield protocols.'
+        },
+        'utility': {
+            name: 'Utility',
+            drivers: 'Enterprise adoption, network usage metrics, partnership announcements, real-world integration.',
+            about: 'Tokens powering specific services: oracles, storage, compute.'
+        },
+        'entertainment': {
+            name: 'Entertainment',
+            drivers: 'Game launches, user metrics, NFT market sentiment, celebrity/brand partnerships.',
+            about: 'Gaming, metaverse, and NFT-adjacent tokens.'
+        },
+        'ai': {
+            name: 'AI & Compute',
+            drivers: 'AI industry momentum, GPU demand, decentralized compute adoption, NVIDIA correlation.',
+            about: 'Decentralized GPU networks and AI-focused protocols.'
+        }
+    };
+    
+    sectorRows.forEach(row => {
+        row.addEventListener('click', () => {
+            const sector = row.dataset.sector;
+            const info = sectorInfo[sector];
             
-            // Close all others
-            sectorItems.forEach(s => s.classList.remove('expanded'));
-            
-            // Toggle clicked one
-            if (!wasExpanded) {
-                item.classList.add('expanded');
+            if (detailPanel && info) {
+                document.getElementById('sector-detail-name').textContent = info.name;
+                document.getElementById('sector-detail-drivers').innerHTML = `<strong>Key drivers:</strong> ${info.drivers}`;
+                document.getElementById('sector-detail-about').textContent = info.about;
+                
+                // Add AI commentary if available
+                const weeklyEl = document.getElementById('sector-detail-weekly');
+                const commentary = window.sectorCommentary?.[sector];
+                if (weeklyEl) {
+                    if (commentary) {
+                        weeklyEl.innerHTML = `<span style="display:block;font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--burgundy);margin-bottom:6px;font-style:normal;">THIS WEEK</span>${escapeHtml(typeof commentary === 'string' ? commentary : commentary.weekly || '')}`;
+                        weeklyEl.style.display = 'block';
+                    } else {
+                        weeklyEl.style.display = 'none';
+                    }
+                }
+                
+                detailPanel.style.display = 'block';
             }
         });
     });
+    
+    // Close button
+    if (closeBtn) {
+        closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            detailPanel.style.display = 'none';
+        });
+    }
 }
 
 /**
@@ -512,33 +578,52 @@ async function loadRelativePerformance() {
     if (!chartEl) return;
     
     try {
-        // Fetch market data
-        const response = await fetch('/api/market-data');
-        if (!response.ok) return;
+        // Use magazine data if available, otherwise fetch market API
+        let marketChange7d = 0;
+        let coins = [];
         
-        const data = await response.json();
+        if (magazineData && magazineData.market_data) {
+            // Calculate market change from BTC dominance shift or use stored value
+            marketChange7d = magazineData.market_data.market_change_7d || 0;
+        }
+        
+        // Try to get coin data from API
+        try {
+            const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&sparkline=false&price_change_percentage=7d');
+            if (response.ok) {
+                const apiCoins = await response.json();
+                coins = apiCoins.map(c => ({
+                    id: c.id,
+                    symbol: c.symbol,
+                    price_change_7d: c.price_change_percentage_7d_in_currency || 0
+                }));
+                
+                // Calculate market average from top 10
+                const top10 = coins.slice(0, 10);
+                marketChange7d = top10.reduce((sum, c) => sum + (c.price_change_7d || 0), 0) / top10.length;
+            }
+        } catch (apiError) {
+            console.warn('[Weekend] CoinGecko API unavailable, using stored data');
+        }
         
         // Update market baseline
-        if (marketChangeEl && data.market_change_7d !== undefined) {
-            const change = data.market_change_7d;
-            const sign = change >= 0 ? '+' : '';
-            marketChangeEl.textContent = `${sign}${change.toFixed(1)}%`;
+        if (marketChangeEl) {
+            const sign = marketChange7d >= 0 ? '+' : '';
+            marketChangeEl.textContent = `${sign}${marketChange7d.toFixed(1)}%`;
         }
         
         // Get user's focus coins from localStorage
-        const focusCoins = JSON.parse(localStorage.getItem('focusCoins') || '["bitcoin","ethereum"]');
+        const focusCoins = JSON.parse(localStorage.getItem('focusCoins') || '["bitcoin","ethereum","cardano","vechain","chiliz"]');
         
         // Render coin rows
-        if (data.coins && focusCoins.length > 0) {
+        if (coins.length > 0 && focusCoins.length > 0) {
             const existingRows = chartEl.querySelectorAll('.relative-row:not(.market-row)');
             existingRows.forEach(row => row.remove());
             
-            const marketChange = data.market_change_7d || 0;
-            
             focusCoins.forEach(coinId => {
-                const coin = data.coins.find(c => c.id === coinId);
+                const coin = coins.find(c => c.id === coinId);
                 if (coin) {
-                    const row = createRelativeRow(coin, marketChange);
+                    const row = createRelativeRow(coin, marketChange7d);
                     chartEl.appendChild(row);
                 }
             });
