@@ -101,9 +101,14 @@ async function loadMagazineContent() {
             renderKeyDates(magazineData.key_dates);
         }
         
-        // Populate sectors if available
+        // Populate sector AI commentary
         if (magazineData.sectors) {
             renderSectors(magazineData.sectors);
+        }
+        
+        // Update sector percentages from API market data
+        if (magazineData.segments) {
+            updateSectorPercentages(magazineData.segments);
         }
         
     } catch (error) {
@@ -314,7 +319,6 @@ function renderKeyDates(dates) {
 function renderSectors(sectors) {
     if (!sectors) return;
     
-    // Handle new structure where sectors contain AI commentary strings
     // Maps JSON keys to HTML element IDs
     const sectorMap = {
         'payment': 'payment',
@@ -331,23 +335,52 @@ function renderSectors(sectors) {
         const weeklyEl = document.getElementById(`sector-${htmlKey}-weekly`);
         
         if (weeklyEl) {
-            // Handle both old structure {weekly: "..."} and new structure "..."
+            // Handle AI commentary (string)
             const commentary = typeof value === 'string' ? value : (value.weekly || '');
             if (commentary) {
-                // Add "THIS WEEK" header before commentary
                 weeklyEl.innerHTML = `<span class="sector-weekly-label">THIS WEEK</span>${escapeHtml(commentary)}`;
                 weeklyEl.style.display = 'block';
             }
         }
+    }
+}
+
+/**
+ * Update sector percentages from API market data
+ * Called separately from renderSectors because data comes from different JSON paths
+ */
+function updateSectorPercentages(segments) {
+    if (!segments) return;
+    
+    const sectorMap = {
+        'payment': 'payment',
+        'stablecoin': 'stablecoin', 
+        'infrastructure': 'infrastructure',
+        'defi': 'defi',
+        'utility': 'utility',
+        'entertainment': 'entertainment',
+        'ai': 'ai'
+    };
+    
+    for (const [key, data] of Object.entries(segments)) {
+        const htmlKey = sectorMap[key] || key;
         
-        // Also handle change if provided in old format
-        if (typeof value === 'object' && value.change !== undefined) {
+        if (typeof data === 'object' && data.change !== undefined) {
             const changeEl = document.getElementById(`sector-${htmlKey}-change`);
+            const barEl = document.getElementById(`sector-${htmlKey}-bar`);
+            
             if (changeEl) {
-                const change = value.change;
+                const change = data.change;
                 const sign = change >= 0 ? '+' : '';
                 changeEl.textContent = `${sign}${change.toFixed(1)}%`;
                 changeEl.className = 'sector-change ' + (change > 0.5 ? 'positive' : change < -0.5 ? 'negative' : 'neutral');
+            }
+            
+            // Update bar width (scale: -20% to +20% maps to 0% to 100%)
+            if (barEl) {
+                const barWidth = Math.min(Math.max((data.change + 20) * 2.5, 5), 100);
+                barEl.style.width = `${barWidth}%`;
+                barEl.className = 'sector-fill ' + (data.change > 0.5 ? 'positive' : data.change < -0.5 ? 'negative' : 'neutral');
             }
         }
     }
