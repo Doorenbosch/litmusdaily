@@ -1,0 +1,38 @@
+name: Weekend Magazine
+
+on:
+  schedule:
+    # Saturday 07:00 SGT (23:00 UTC Friday)
+    - cron: '0 23 * * 5'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  generate-weekend:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+          
+      - name: Generate Weekend Magazine
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python scripts/generate_weekend.py
+        
+      - name: Commit and push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add content/weekend/magazine.json
+          git diff --staged --quiet || git commit -m "Generate Weekend Magazine - $(date +'%Y-%m-%d')"
+          git push
