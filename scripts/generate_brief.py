@@ -49,6 +49,8 @@ BAD_KEYWORDS = {"crypto", "bitcoin", "trading", "chart", "graph", "money", "coin
 
 def build_image_url(keywords: str, fallback: str = "default") -> str:
     """Build Unsplash URL from AI-generated keywords"""
+    from urllib.parse import quote
+    
     if not keywords:
         photo_id = FALLBACK_IMAGES.get(fallback, FALLBACK_IMAGES["default"])
         return f"https://images.unsplash.com/{photo_id}?w=1400&h=500&fit=crop&q=80"
@@ -61,9 +63,10 @@ def build_image_url(keywords: str, fallback: str = "default") -> str:
         photo_id = FALLBACK_IMAGES.get(fallback, FALLBACK_IMAGES["default"])
         return f"https://images.unsplash.com/{photo_id}?w=1400&h=500&fit=crop&q=80"
     
-    # Build Unsplash source URL
+    # Build Unsplash source URL with proper encoding
     query = ",".join(filtered[:4])  # Max 4 keywords
-    return f"https://source.unsplash.com/1400x500/?{query}"
+    encoded_query = quote(query, safe=',')  # Keep commas, encode spaces
+    return f"https://source.unsplash.com/1400x500/?{encoded_query}"
 
 
 def fetch_market_data() -> dict:

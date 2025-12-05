@@ -39,6 +39,8 @@ BAD_KEYWORDS = {"crypto", "bitcoin", "trading", "chart", "graph", "money", "coin
 
 def build_image_url(keywords: str, fallback: str = "default") -> str:
     """Build Unsplash URL from AI-generated keywords"""
+    from urllib.parse import quote
+    
     if not keywords:
         photo_id = FALLBACK_IMAGES.get(fallback, FALLBACK_IMAGES["default"])
         return f"https://images.unsplash.com/{photo_id}?w=1400&h=500&fit=crop&q=80"
@@ -51,9 +53,10 @@ def build_image_url(keywords: str, fallback: str = "default") -> str:
         photo_id = FALLBACK_IMAGES.get(fallback, FALLBACK_IMAGES["default"])
         return f"https://images.unsplash.com/{photo_id}?w=1400&h=500&fit=crop&q=80"
     
-    # Build Unsplash source URL
+    # Build Unsplash source URL with proper encoding
     query = ",".join(filtered[:4])  # Max 4 keywords
-    return f"https://source.unsplash.com/1400x500/?{query}"
+    encoded_query = quote(query, safe=',')  # Keep commas, encode spaces
+    return f"https://source.unsplash.com/1400x500/?{encoded_query}"
 
 
 # ============================================
@@ -337,6 +340,19 @@ Structure your explanation:
 
 Tone: Authoritative but accessible. Think FT Alphaville explaining bond market plumbing. No hype, no predictions—just clear explanation of how things work.
 
+9. SECTOR COMMENTARY (1-2 sentences each)
+For each sector, write a brief weekly insight explaining what drove performance:
+- Payment (BTC, LTC, XMR): What moved Bitcoin and payment rails this week?
+- Stablecoins (USDT, USDC): Any notable flows, regulatory news, or supply changes?
+- Infrastructure (ETH, SOL, AVAX): L1 performance, network activity, developer trends?
+- DeFi (AAVE, UNI, COMP): TVL changes, yield dynamics, protocol developments?
+- Utility (LINK, FIL, RNDR): Oracle demand, storage adoption, real-world usage?
+- Entertainment (APE, MANA, SAND): Gaming/metaverse sentiment, user metrics?
+- AI & Compute (RNDR, AKT, TAO): AI narrative momentum, compute demand?
+
+10. KEY DATES
+Provide 5 specific market-moving events for the upcoming week (Mon-Fri). Include actual dates and specific events like "FOMC Decision 2pm ET", "US CPI Release", "Options Expiry", etc.
+
 ---
 
 EDITORIAL STANDARDS:
@@ -400,7 +416,23 @@ Return as JSON with this structure:
         "topic": "{mechanism['topic']}",
         "timing": "{mechanism['timing']}",
         "content": "Full educational content here..."
-    }}
+    }},
+    "sectors": {{
+        "payment": "1-2 sentence commentary on BTC, LTC performance this week",
+        "stablecoin": "1-2 sentence commentary on stablecoin dynamics",
+        "infrastructure": "1-2 sentence commentary on ETH, SOL, L1s",
+        "defi": "1-2 sentence commentary on DeFi protocols",
+        "utility": "1-2 sentence commentary on LINK, FIL, utility tokens",
+        "entertainment": "1-2 sentence commentary on gaming/metaverse tokens",
+        "ai": "1-2 sentence commentary on AI/compute tokens"
+    }},
+    "key_dates": [
+        {{"day": "Mon 9", "event": "Specific event"}},
+        {{"day": "Tue 10", "event": "Specific event"}},
+        {{"day": "Wed 11", "event": "Specific event"}},
+        {{"day": "Thu 12", "event": "Specific event"}},
+        {{"day": "Fri 13", "event": "Specific event"}}
+    ]
 }}
 """
 
