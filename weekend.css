@@ -559,39 +559,51 @@ border-top: 1px solid var(--rule);
 display: block;
 }
 
-.sector-about {
+.sector-weekly {
 font-family: var(--serif);
-font-size: 0.8rem;
+font-size: 0.9rem;
+font-style: italic;
 line-height: 1.5;
-color: var(--ink-secondary);
-margin: 0 0 var(--xs) 0;
+color: var(--ink);
+margin: 0 0 var(--sm) 0;
+padding-bottom: var(--sm);
+border-bottom: 1px solid var(--rule);
+}
+
+.sector-weekly:empty {
+display: none;
+}
+
+.sector-weekly-label {
+display: block;
+font-family: var(--sans);
+font-size: 0.65rem;
+font-weight: 700;
+letter-spacing: 0.08em;
+text-transform: uppercase;
+color: var(--burgundy);
+margin-bottom: 6px;
+font-style: normal;
 }
 
 .sector-drivers {
 font-family: var(--sans);
 font-size: 0.75rem;
 line-height: 1.4;
-color: var(--ink-tertiary);
-margin: 0 0 var(--xs) 0;
+color: var(--ink-secondary);
+margin: 0 0 var(--sm) 0;
 }
 
 .sector-drivers strong {
-color: var(--ink-secondary);
+color: var(--ink);
 }
 
-.sector-weekly {
+.sector-about {
 font-family: var(--serif);
 font-size: 0.8rem;
-font-style: italic;
 line-height: 1.5;
-color: var(--ink);
-margin: var(--sm) 0 0 0;
-padding-top: var(--xs);
-border-top: 1px dashed var(--rule);
-}
-
-.sector-weekly:empty {
-display: none;
+color: var(--ink-tertiary);
+margin: 0;
 }
 
 /* Weekend Market Mood - 7-day burgundy trail */
