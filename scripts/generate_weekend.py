@@ -569,9 +569,12 @@ def generate_weekend_magazine():
     magazine_content["hero"]["image_url"] = hero_image_url
     print(f"\n🖼️  Hero image keywords: {hero_keywords}")
     
-    # Add key dates
-    print("\n📅 Adding key dates...")
-    magazine_content["key_dates"] = get_key_dates_for_week()
+    # Use AI-generated key dates (with fallback)
+    if not magazine_content.get("key_dates"):
+        print("\n📅 No AI key dates, using fallback...")
+        magazine_content["key_dates"] = get_key_dates_for_week()
+    else:
+        print(f"\n📅 Using AI-generated key dates ({len(magazine_content['key_dates'])} events)")
     
     # Add segment data
     magazine_content["segments"] = market_data.get("segments", {})
