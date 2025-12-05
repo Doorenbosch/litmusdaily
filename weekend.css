@@ -789,3 +789,97 @@ color: var(--ink-tertiary);
 color: var(--ink-tertiary);
 font-style: italic;
 }
+/* ===== THE MECHANISM ===== */
+/* Add this to the END of your weekend.css file */
+
+.card-label.mechanism-label {
+    color: var(--teal);
+}
+
+.mechanism-section {
+    margin-top: var(--xl);
+    padding: var(--lg);
+    background: linear-gradient(135deg, #f8f5f0 0%, #f0ebe3 100%);
+    border-left: 4px solid var(--teal);
+    border-radius: 0 8px 8px 0;
+}
+
+.mechanism-header {
+    display: flex;
+    align-items: center;
+    gap: var(--sm);
+    margin-bottom: var(--md);
+}
+
+.mechanism-icon {
+    font-size: 1.5rem;
+}
+
+.mechanism-header .mechanism-label {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--teal);
+}
+
+.mechanism-subtitle {
+    font-family: var(--serif);
+    font-size: 0.85rem;
+    color: var(--ink-tertiary);
+    font-style: italic;
+}
+
+.mechanism-topic {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0 0 var(--xs) 0;
+    line-height: 1.3;
+}
+
+.mechanism-timing {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    color: var(--burgundy);
+    margin: 0 0 var(--lg) 0;
+    font-weight: 500;
+}
+
+.mechanism-content {
+    font-family: var(--serif);
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--ink);
+}
+
+.mechanism-content p {
+    margin-bottom: var(--md);
+}
+
+.mechanism-content h4 {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin: var(--lg) 0 var(--sm) 0;
+}
+
+.mechanism-content .watch-box {
+    background: rgba(26, 95, 90, 0.08);
+    padding: var(--md);
+    border-radius: 6px;
+    margin-top: var(--lg);
+}
+
+.mechanism-content .watch-box h4 {
+    color: var(--teal);
+    margin-top: 0;
+}
+
+.mechanism-intro {
+    font-style: italic;
+    color: var(--ink-secondary);
+}
