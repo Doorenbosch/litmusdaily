@@ -334,7 +334,8 @@ function renderSectors(sectors) {
             // Handle both old structure {weekly: "..."} and new structure "..."
             const commentary = typeof value === 'string' ? value : (value.weekly || '');
             if (commentary) {
-                weeklyEl.textContent = commentary;
+                // Add "THIS WEEK" header before commentary
+                weeklyEl.innerHTML = `<span class="sector-weekly-label">THIS WEEK</span>${escapeHtml(commentary)}`;
                 weeklyEl.style.display = 'block';
             }
         }
