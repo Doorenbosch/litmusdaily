@@ -578,18 +578,17 @@ async function loadRelativePerformance() {
     if (!chartEl) return;
     
     try {
-        // Use magazine data if available, otherwise fetch market API
+        // Get user's focus coins from localStorage
+        const focusCoins = JSON.parse(localStorage.getItem('focusCoins') || '["bitcoin","ethereum","cardano","vechain","chiliz"]');
+        
         let marketChange7d = 0;
         let coins = [];
         
-        if (magazineData && magazineData.market_data) {
-            // Calculate market change from BTC dominance shift or use stored value
-            marketChange7d = magazineData.market_data.market_change_7d || 0;
-        }
+        // Fetch specific coins + top 10 for market average
+        const coinIds = [...new Set([...focusCoins, 'bitcoin', 'ethereum', 'tether', 'binancecoin', 'solana', 'ripple', 'usd-coin', 'cardano', 'avalanche-2', 'dogecoin'])];
         
-        // Try to get coin data from API
         try {
-            const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&sparkline=false&price_change_percentage=7d');
+            const response = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${coinIds.join(',')}&sparkline=false&price_change_percentage=7d`);
             if (response.ok) {
                 const apiCoins = await response.json();
                 coins = apiCoins.map(c => ({
@@ -598,12 +597,19 @@ async function loadRelativePerformance() {
                     price_change_7d: c.price_change_percentage_7d_in_currency || 0
                 }));
                 
-                // Calculate market average from top 10
-                const top10 = coins.slice(0, 10);
-                marketChange7d = top10.reduce((sum, c) => sum + (c.price_change_7d || 0), 0) / top10.length;
+                // Calculate market average from top 10 by market cap (excluding user's specific picks)
+                const top10Ids = ['bitcoin', 'ethereum', 'tether', 'binancecoin', 'solana', 'ripple', 'usd-coin', 'cardano', 'avalanche-2', 'dogecoin'];
+                const marketCoins = coins.filter(c => top10Ids.includes(c.id));
+                marketChange7d = marketCoins.length > 0
+                    ? marketCoins.reduce((sum, c) => sum + (c.price_change_7d || 0), 0) / marketCoins.length
+                    : 0;
             }
         } catch (apiError) {
-            console.warn('[Weekend] CoinGecko API unavailable, using stored data');
+            console.warn('[Weekend] CoinGecko API unavailable:', apiError);
+            // Use magazine data as fallback
+            if (magazineData?.market_data?.market_change_7d !== undefined) {
+                marketChange7d = magazineData.market_data.market_change_7d;
+            }
         }
         
         // Update market baseline
@@ -611,9 +617,6 @@ async function loadRelativePerformance() {
             const sign = marketChange7d >= 0 ? '+' : '';
             marketChangeEl.textContent = `${sign}${marketChange7d.toFixed(1)}%`;
         }
-        
-        // Get user's focus coins from localStorage
-        const focusCoins = JSON.parse(localStorage.getItem('focusCoins') || '["bitcoin","ethereum","cardano","vechain","chiliz"]');
         
         // Render coin rows
         if (coins.length > 0 && focusCoins.length > 0) {
