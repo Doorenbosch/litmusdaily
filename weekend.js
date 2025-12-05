@@ -348,7 +348,7 @@ function updateSectorPercentages(segments) {
     
     if (marketHeaderEl) {
         const sign = marketAvg >= 0 ? '+' : '';
-        marketHeaderEl.textContent = `MARKET ${sign}${marketAvg.toFixed(1)}%`;
+        marketHeaderEl.textContent = `${sign}${marketAvg.toFixed(1)}%`;
     }
     
     const sectorMap = {

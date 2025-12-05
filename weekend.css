@@ -104,7 +104,7 @@ max-width: 600px;
 
 /* Weekend Grid - Same 3-column but different proportions */
 .weekend-grid {
-grid-template-columns: 280px 1fr 260px;
+grid-template-columns: 280px 1fr 320px;
 }
 
 /* Key Dates Section */
@@ -438,7 +438,7 @@ margin-top: var(--lg);
 
 .sectors-header-compact {
 display: flex;
-justify-content: space-between;
+justify-content: flex-start;
 align-items: center;
 margin-bottom: var(--md);
 padding-bottom: var(--sm);
@@ -454,11 +454,8 @@ letter-spacing: 0.08em;
 color: var(--burgundy);
 }
 
-.sectors-market {
-font-family: var(--sans);
-font-size: 0.75rem;
-font-weight: 600;
-color: var(--ink-secondary);
+.sectors-label span {
+color: var(--ink);
 }
 
 .sectors-chart {
