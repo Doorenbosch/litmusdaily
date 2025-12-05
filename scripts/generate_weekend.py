@@ -309,6 +309,163 @@ def fetch_weekly_market_data():
     return data
 
 
+def calculate_market_mood(market_data):
+    """Calculate market mood for the 9-box grid"""
+    top_coins = market_data.get("top_coins", [])
+    
+    if not top_coins:
+        return {
+            "current": {"breadth": 50, "volume_ratio": 50, "zone": "consolidation"},
+            "trail": [],
+            "title": "Consolidation",
+            "description": "Market data unavailable."
+        }
+    
+    # Calculate breadth (% coins green over 7d)
+    green_coins = sum(1 for c in top_coins if c.get("change_7d", 0) > 0)
+    breadth = (green_coins / len(top_coins)) * 100
+    
+    # Approximate volume ratio from market cap change (proxy for activity)
+    # Higher absolute change = more activity
+    activity_proxy = abs(market_data.get("market_cap_change_24h", 0))
+    # Scale: 0-2% change = quiet (20-40), 2-5% = normal (40-60), 5%+ = frenzied (60-80)
+    if activity_proxy < 2:
+        volume_ratio = 25 + (activity_proxy / 2) * 15  # 25-40
+    elif activity_proxy < 5:
+        volume_ratio = 40 + ((activity_proxy - 2) / 3) * 20  # 40-60
+    else:
+        volume_ratio = 60 + min((activity_proxy - 5) / 5, 1) * 20  # 60-80
+    
+    # Determine zone based on position
+    zone = determine_zone(breadth, volume_ratio)
+    
+    # Generate 7-day trail (simulated from current + variance for now)
+    # In production, you'd fetch actual historical data
+    trail = generate_7day_trail(breadth, volume_ratio, top_coins)
+    
+    # Get zone title and description
+    zone_info = get_zone_info(zone, breadth, volume_ratio)
+    
+    return {
+        "current": {
+            "breadth": round(breadth, 1),
+            "volume_ratio": round(volume_ratio, 1),
+            "zone": zone
+        },
+        "trail": trail,
+        "title": zone_info["title"],
+        "description": zone_info["description"]
+    }
+
+
+def determine_zone(breadth, volume_ratio):
+    """Determine which of the 9 zones based on breadth and volume"""
+    # Breadth: 0-33 = left, 33-66 = middle, 66-100 = right
+    # Volume: 0-33 = bottom, 33-66 = middle, 66-100 = top
+    
+    if volume_ratio >= 66:  # Frenzied (top row)
+        if breadth < 33:
+            return "concentration"
+        elif breadth < 66:
+            return "leadership"
+        else:
+            return "strong-rally"
+    elif volume_ratio >= 33:  # Normal (middle row)
+        if breadth < 33:
+            return "rotation"
+        elif breadth < 66:
+            return "consolidation"
+        else:
+            return "steady-advance"
+    else:  # Quiet (bottom row)
+        if breadth < 33:
+            return "capitulation"
+        elif breadth < 66:
+            return "drift"
+        else:
+            return "weak-rally"
+
+
+def generate_7day_trail(current_breadth, current_volume, top_coins):
+    """Generate 7-day trail points based on historical coin performance"""
+    trail = []
+    
+    # Use 7d vs 24h changes to infer historical movement
+    # This is an approximation - real implementation would use historical API
+    for i in range(7):
+        day_factor = (7 - i) / 7  # 1.0 for day 1, ~0.14 for day 7
+        
+        # Interpolate between a baseline and current
+        baseline_breadth = 50  # Neutral starting point
+        baseline_volume = 45
+        
+        day_breadth = baseline_breadth + (current_breadth - baseline_breadth) * (1 - day_factor * 0.7)
+        day_volume = baseline_volume + (current_volume - baseline_volume) * (1 - day_factor * 0.5)
+        
+        # Add some variance based on coin data
+        if i < len(top_coins):
+            coin_change = top_coins[i].get("change_7d", 0)
+            day_breadth += coin_change * 0.5  # Small influence
+        
+        # Clamp values
+        day_breadth = max(5, min(95, day_breadth))
+        day_volume = max(10, min(90, day_volume))
+        
+        trail.append({
+            "breadth": round(day_breadth, 1),
+            "volume_ratio": round(day_volume, 1)
+        })
+    
+    return trail
+
+
+def get_zone_info(zone, breadth, volume_ratio):
+    """Get title and description for a zone"""
+    zone_descriptions = {
+        "strong-rally": {
+            "title": "Strong Rally",
+            "description": f"Broad participation with high conviction. The market is moving decisively higher with strong volume confirmation."
+        },
+        "leadership": {
+            "title": "Leadership",
+            "description": f"Large caps leading with elevated activity. {int(breadth)}% of coins positive, suggesting selective but powerful momentum."
+        },
+        "concentration": {
+            "title": "Concentration",
+            "description": "High volume but narrow participation. Capital is concentrating in select assets while most lag behind."
+        },
+        "steady-advance": {
+            "title": "Steady Advance",
+            "description": f"Healthy breadth at {int(breadth)}% with measured volume. The kind of sustainable advance institutional investors prefer."
+        },
+        "consolidation": {
+            "title": "Consolidation",
+            "description": "Mixed signals with moderate activity. Market is digesting recent moves, direction unclear."
+        },
+        "rotation": {
+            "title": "Rotation",
+            "description": "Sector rotation underway with elevated volume. Capital is moving, but direction is unclear."
+        },
+        "weak-rally": {
+            "title": "Weak Rally",
+            "description": f"Broad but unconvincing. {int(breadth)}% green but low volume suggests lack of conviction."
+        },
+        "drift": {
+            "title": "Drift",
+            "description": "Quiet market with no clear direction. Low participation and low activity - summer doldrums or calm before storm."
+        },
+        "capitulation": {
+            "title": "Capitulation",
+            "description": "Broad weakness with elevated selling pressure. Risk-off sentiment dominates across the board."
+        }
+    }
+    
+    return zone_descriptions.get(zone, {
+        "title": "Unknown",
+        "description": "Market conditions unclear."
+    })
+
+
 def get_key_dates_for_week():
     """Generate key dates for the coming week"""
     # This could be enhanced to pull from a calendar API or database
@@ -578,6 +735,12 @@ def generate_weekend_magazine():
     
     # Add segment data
     magazine_content["segments"] = market_data.get("segments", {})
+    
+    # Calculate and add market mood
+    print("\n📈 Calculating market mood...")
+    market_mood = calculate_market_mood(market_data)
+    magazine_content["market_mood"] = market_mood
+    print(f"   Zone: {market_mood['title']} (breadth: {market_mood['current']['breadth']}%)")
     
     # Add metadata
     magazine_content["generated_at"] = datetime.now().isoformat()
