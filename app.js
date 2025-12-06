@@ -1128,14 +1128,17 @@ function renderReadingPane(sectionKey) {
                 'https://images.unsplash.com/photo-1559526324-593bc073d938?w=1200&h=600&fit=crop', // Abstract data
             ];
             
-            // Choose image source
+            // Choose image source - priority: image_url > image_keywords > fallback
             let imageUrl;
-            if (briefData.image_keywords) {
-                // Use Unsplash search if keywords provided
+            if (briefData.image_url) {
+                // Use pre-computed URL from brief generator (curated images)
+                imageUrl = briefData.image_url;
+            } else if (briefData.image_keywords) {
+                // Fallback: Use Unsplash search if only keywords provided
                 const keywords = encodeURIComponent(briefData.image_keywords);
                 imageUrl = `https://source.unsplash.com/1200x600/?${keywords}`;
             } else {
-                // Use random fallback based on headline hash for consistency
+                // Final fallback: Use random based on headline hash for consistency
                 const hash = headline.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
                 imageUrl = unsplashFallbacks[hash % unsplashFallbacks.length];
             }
