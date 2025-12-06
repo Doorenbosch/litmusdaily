@@ -1827,6 +1827,9 @@ a {
 }
 
 .number-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: var(--sm);
 }
 
@@ -1839,21 +1842,66 @@ a {
     color: var(--burgundy);
 }
 
+.number-day {
+    font-family: var(--sans);
+    font-size: 0.65rem;
+    color: var(--ink-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.number-main {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 4px;
+    margin-bottom: var(--xs);
+}
+
 .number-value {
     font-family: var(--serif);
-    font-size: 2.2rem;
+    font-size: 2.4rem;
     font-weight: 700;
     color: var(--ink);
-    line-height: 1.1;
-    margin-bottom: var(--xs);
+    line-height: 1;
+}
+
+.number-unit {
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--ink-tertiary);
+}
+
+.number-subtitle {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    color: var(--ink-tertiary);
+    margin: 0 0 var(--sm) 0;
 }
 
 .number-context {
     font-family: var(--serif);
     font-size: 0.85rem;
     color: var(--ink-secondary);
-    line-height: 1.4;
-    margin: 0;
+    line-height: 1.5;
+    margin: 0 0 var(--xs) 0;
+    font-style: italic;
+}
+
+.number-change {
+    display: inline-block;
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    color: var(--ink-tertiary);
+}
+
+.number-change.positive {
+    color: var(--teal);
+}
+
+.number-change.negative {
+    color: var(--burgundy);
 }
 
 /* Sidebar Divider */

@@ -969,26 +969,139 @@ async function loadTheNumber() {
 }
 
 function getMockTheNumber() {
-    // Mock data - will be AI-generated
-    return {
-        value: '$311B',
-        context: 'Stablecoin market cap—dry powder waiting on sidelines'
+    // Day-based mock data
+    const dayOfWeek = new Date().getDay();
+    
+    const mockData = {
+        1: { // Monday - Fear & Greed
+            metric: 'fear_greed',
+            label: 'FEAR & GREED',
+            value: '65',
+            unit: '/100',
+            subtitle: 'Greed',
+            context: 'Greed is building - momentum favors bulls, but watch for overextension',
+            interpretation: 'optimistic',
+            change: '+8 vs 30d ago',
+            source: 'mock'
+        },
+        2: { // Tuesday - BTC Dominance
+            metric: 'btc_dominance',
+            label: 'BTC DOMINANCE',
+            value: '52.1',
+            unit: '%',
+            subtitle: 'ETH: 18.5%',
+            context: 'Healthy Bitcoin leadership - alts following, not leading',
+            interpretation: 'balanced',
+            source: 'mock'
+        },
+        3: { // Wednesday - Funding Rates
+            metric: 'funding_rates',
+            label: 'FUNDING RATE',
+            value: '0.0100',
+            unit: '%',
+            subtitle: '≈ 11% APR',
+            context: 'Modest long bias - healthy bullish positioning',
+            interpretation: 'bullish-bias',
+            source: 'mock'
+        },
+        4: { // Thursday - Open Interest
+            metric: 'open_interest',
+            label: 'OPEN INTEREST',
+            value: '18.5',
+            unit: 'B',
+            subtitle: '+2.3% 24h',
+            context: 'Healthy leverage levels - normal market structure',
+            interpretation: 'normal',
+            source: 'mock'
+        },
+        // Friday, Saturday, Sunday - Stablecoin Supply
+        5: {
+            metric: 'stablecoin_supply',
+            label: 'STABLECOIN SUPPLY',
+            value: '150',
+            unit: 'B',
+            subtitle: 'USDT: $83B · USDC: $42B',
+            context: 'Dry powder stable - capital waiting on sidelines for opportunity',
+            interpretation: 'neutral',
+            source: 'mock'
+        }
     };
+    
+    // Weekend defaults to stablecoin (same as Friday)
+    return mockData[dayOfWeek] || mockData[5];
 }
 
 function renderTheNumber(data) {
     if (!data) return;
     
+    const labelEl = document.getElementById('number-label');
+    const dayEl = document.getElementById('number-day');
     const valueEl = document.getElementById('number-value');
+    const unitEl = document.getElementById('number-unit');
+    const subtitleEl = document.getElementById('number-subtitle');
     const contextEl = document.getElementById('number-context');
+    const changeEl = document.getElementById('number-change');
     
-    if (valueEl && data.value) {
-        valueEl.textContent = data.value;
+    // Update label (e.g., "FEAR & GREED" or "BTC DOMINANCE")
+    if (labelEl && data.label) {
+        labelEl.textContent = data.label;
     }
     
+    // Show day of week for context
+    if (dayEl) {
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const today = new Date().getDay();
+        dayEl.textContent = days[today];
+    }
+    
+    // Update main value
+    if (valueEl) {
+        // Handle different formats
+        if (data.value !== undefined) {
+            // Add $ for stablecoin supply
+            const prefix = data.metric === 'stablecoin_supply' ? '$' : '';
+            valueEl.textContent = prefix + data.value;
+        }
+    }
+    
+    // Update unit
+    if (unitEl) {
+        unitEl.textContent = data.unit || '';
+    }
+    
+    // Update subtitle (e.g., "USDT: $83B · USDC: $42B")
+    if (subtitleEl) {
+        if (data.subtitle) {
+            subtitleEl.textContent = data.subtitle;
+            subtitleEl.style.display = 'block';
+        } else {
+            subtitleEl.style.display = 'none';
+        }
+    }
+    
+    // Update context/interpretation
     if (contextEl && data.context) {
         contextEl.textContent = data.context;
     }
+    
+    // Update change indicator
+    if (changeEl) {
+        if (data.change) {
+            changeEl.textContent = data.change;
+            changeEl.style.display = 'inline-block';
+            // Color based on positive/negative
+            changeEl.classList.remove('positive', 'negative');
+            if (data.change.includes('+')) {
+                changeEl.classList.add('positive');
+            } else if (data.change.includes('-')) {
+                changeEl.classList.add('negative');
+            }
+        } else {
+            changeEl.style.display = 'none';
+        }
+    }
+    
+    console.log(`[The Number] ${data.label}: ${data.value}${data.unit || ''} (${data.source})`);
 }
 
 // Load Week Ahead
