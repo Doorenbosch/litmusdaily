@@ -890,7 +890,7 @@ function renderETFFlows(data) {
         const amount = latestFlow.amount || 0;
         const isInflow = amount >= 0;
         const sign = isInflow ? '+' : '';
-        amountEl.textContent = `${sign}$${Math.abs(amount)}M`;
+        amountEl.textContent = `$${Math.abs(amount)}M`;
         amountEl.className = `etf-amount ${isInflow ? 'positive' : 'negative'}`;
     }
     
@@ -907,17 +907,21 @@ function renderETFFlows(data) {
         dateEl.textContent = latestFlow.date || 'Latest';
     }
     
-    // Update week bars
+    // Update week bars with values underneath
     if (week && week.length > 0) {
         const weekContainer = document.getElementById('etf-week');
         if (weekContainer) {
             weekContainer.innerHTML = week.map(day => {
                 const isInflow = day.amount >= 0;
                 const isStrong = Math.abs(day.amount) > 300;
-                const sign = isInflow ? '+' : '';
-                return `<div class="etf-day ${isInflow ? 'inflow' : 'outflow'}${isStrong ? ' strong' : ''}" 
-                             data-day="${day.day.toLowerCase()}" 
-                             title="${day.day}: ${sign}$${Math.abs(day.amount)}M"></div>`;
+                const valueClass = isInflow ? 'positive' : 'negative';
+                const displayValue = Math.abs(day.amount);
+                
+                return `<div class="etf-day-column">
+                    <div class="etf-day ${isInflow ? 'inflow' : 'outflow'}${isStrong ? ' strong' : ''}" 
+                         title="${day.day}: ${isInflow ? '+' : '-'}$${displayValue}M"></div>
+                    <span class="etf-day-value ${valueClass}">${isInflow ? '' : '-'}${displayValue}</span>
+                </div>`;
             }).join('');
         }
     }

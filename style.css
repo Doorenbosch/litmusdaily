@@ -1750,11 +1750,19 @@ a {
 .etf-week {
     display: flex;
     gap: 4px;
-    margin-bottom: var(--xs);
+    margin-bottom: var(--md);
+}
+
+.etf-day-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
 }
 
 .etf-day {
-    flex: 1;
+    width: 100%;
     height: 6px;
     border-radius: 2px;
     background: var(--surface);
@@ -1784,12 +1792,29 @@ a {
     opacity: 1;
 }
 
+.etf-day-value {
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    color: var(--ink-tertiary);
+    white-space: nowrap;
+}
+
+.etf-day-value.positive {
+    color: var(--teal);
+}
+
+.etf-day-value.negative {
+    color: var(--burgundy);
+}
+
 .etf-insight {
     font-family: var(--serif);
     font-size: 0.8rem;
     font-style: italic;
     color: var(--ink-secondary);
     margin: 0;
+    margin-top: var(--md);
+    padding-top: var(--sm);
     line-height: 1.4;
 }
 
