@@ -1,21 +1,13 @@
 {
-  "functions": {
-    "api/breakdown.js": {
-      "memory": 256,
-      "maxDuration": 10
-    },
-    "api/market-mood.js": {
-      "memory": 256,
-      "maxDuration": 10
-    }
-  },
-  "headers": [
+  "crons": [
     {
-      "source": "/api/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET, OPTIONS" }
-      ]
+      "path": "/api/breaking-news-check",
+      "schedule": "*/5 * * * *"
     }
-  ]
+  ],
+  "functions": {
+    "api/breaking-news-check.js": {
+      "maxDuration": 30
+    }
+  }
 }

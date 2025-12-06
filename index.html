@@ -303,6 +303,21 @@
             <section class="reading-pane">
                 <button class="mobile-back-btn" id="mobile-back-btn">Back to list</button>
                 
+                <!-- Breaking News Banner (hidden by default) -->
+                <div class="breaking-news-banner" id="breaking-news-banner" style="display: none;">
+                    <div class="breaking-header">
+                        <span class="breaking-label">BREAKING</span>
+                        <button class="breaking-dismiss" id="breaking-dismiss" aria-label="Dismiss">×</button>
+                    </div>
+                    <h2 class="breaking-headline" id="breaking-headline"></h2>
+                    <p class="breaking-summary" id="breaking-summary"></p>
+                    <p class="breaking-implication" id="breaking-implication"></p>
+                    <div class="breaking-footer">
+                        <a class="breaking-source" id="breaking-source" href="#" target="_blank" rel="noopener"></a>
+                        <span class="breaking-time" id="breaking-time"></span>
+                    </div>
+                </div>
+                
                 <!-- Article Content -->
                 <article class="article-content">
                     <!-- Lead Image (shown for lead section only) -->

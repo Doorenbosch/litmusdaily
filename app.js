@@ -103,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initAudioPlayer();
     initSettings();
     initStickyHeader();
+    initBreakingNews();
     loadUserCoins();
     
     // Check brief availability first, then load content
@@ -2016,6 +2017,188 @@ function trackEvent(eventName, params = {}) {
         console.log('[GA4] Event:', eventName, params);
     }
 }
+
+// ============================================
+// BREAKING NEWS
+// ============================================
+
+const BREAKING_CONFIG = {
+    pollInterval: 60000,        // Check every 60 seconds
+    apiEndpoint: '/api/breaking-news',
+    dismissedKey: 'litmus-breaking-dismissed',
+    maxDismissedAge: 4 * 3600 * 1000  // Remember dismissals for 4 hours
+};
+
+let breakingNewsInterval = null;
+
+function initBreakingNews() {
+    console.log('[Breaking] Initializing breaking news monitor');
+    
+    // Setup dismiss button
+    const dismissBtn = document.getElementById('breaking-dismiss');
+    if (dismissBtn) {
+        dismissBtn.addEventListener('click', dismissBreakingNews);
+    }
+    
+    // Check immediately on load
+    checkBreakingNews();
+    
+    // Then poll periodically
+    breakingNewsInterval = setInterval(checkBreakingNews, BREAKING_CONFIG.pollInterval);
+}
+
+async function checkBreakingNews() {
+    try {
+        const response = await fetch(BREAKING_CONFIG.apiEndpoint);
+        
+        if (!response.ok) {
+            console.log('[Breaking] API not available');
+            return;
+        }
+        
+        const data = await response.json();
+        
+        if (data.breaking) {
+            // Check if user dismissed this story
+            if (isBreakingDismissed(data.breaking.id)) {
+                console.log('[Breaking] Story already dismissed by user');
+                hideBreakingNews();
+                return;
+            }
+            
+            displayBreakingNews(data.breaking);
+        } else {
+            hideBreakingNews();
+        }
+        
+    } catch (error) {
+        console.log('[Breaking] Check failed:', error.message);
+        // Silently fail - don't show error to user
+    }
+}
+
+function displayBreakingNews(breaking) {
+    const banner = document.getElementById('breaking-news-banner');
+    const headline = document.getElementById('breaking-headline');
+    const summary = document.getElementById('breaking-summary');
+    const implication = document.getElementById('breaking-implication');
+    const source = document.getElementById('breaking-source');
+    const time = document.getElementById('breaking-time');
+    
+    if (!banner) return;
+    
+    // Populate content
+    if (headline) headline.textContent = breaking.headline;
+    if (summary) summary.textContent = breaking.summary;
+    if (implication) implication.textContent = breaking.implication;
+    
+    if (source && breaking.source) {
+        source.textContent = `Source: ${breaking.source.name}`;
+        source.href = breaking.source.url;
+    }
+    
+    if (time && breaking.published_at) {
+        time.textContent = formatBreakingTime(breaking.published_at);
+    }
+    
+    // Apply severity class
+    banner.classList.remove('severity-high', 'severity-medium');
+    if (breaking.severity) {
+        banner.classList.add(`severity-${breaking.severity}`);
+    }
+    
+    // Store the current breaking ID for dismiss tracking
+    banner.dataset.breakingId = breaking.id;
+    
+    // Show the banner
+    banner.style.display = 'block';
+    
+    console.log('[Breaking] Displaying:', breaking.headline);
+}
+
+function hideBreakingNews() {
+    const banner = document.getElementById('breaking-news-banner');
+    if (banner) {
+        banner.style.display = 'none';
+    }
+}
+
+function dismissBreakingNews() {
+    const banner = document.getElementById('breaking-news-banner');
+    if (!banner) return;
+    
+    const breakingId = banner.dataset.breakingId;
+    
+    // Save dismissal to localStorage
+    if (breakingId) {
+        saveDismissed(breakingId);
+    }
+    
+    // Hide the banner
+    hideBreakingNews();
+    
+    console.log('[Breaking] User dismissed:', breakingId);
+}
+
+function saveDismissed(breakingId) {
+    try {
+        const dismissed = getDismissedList();
+        dismissed[breakingId] = Date.now();
+        
+        // Clean up old dismissals
+        const cutoff = Date.now() - BREAKING_CONFIG.maxDismissedAge;
+        for (const id in dismissed) {
+            if (dismissed[id] < cutoff) {
+                delete dismissed[id];
+            }
+        }
+        
+        localStorage.setItem(BREAKING_CONFIG.dismissedKey, JSON.stringify(dismissed));
+    } catch (e) {
+        // localStorage not available
+    }
+}
+
+function getDismissedList() {
+    try {
+        const stored = localStorage.getItem(BREAKING_CONFIG.dismissedKey);
+        return stored ? JSON.parse(stored) : {};
+    } catch (e) {
+        return {};
+    }
+}
+
+function isBreakingDismissed(breakingId) {
+    const dismissed = getDismissedList();
+    const dismissedAt = dismissed[breakingId];
+    
+    if (!dismissedAt) return false;
+    
+    // Check if dismissal is still valid (within max age)
+    const age = Date.now() - dismissedAt;
+    return age < BREAKING_CONFIG.maxDismissedAge;
+}
+
+function formatBreakingTime(isoString) {
+    const date = new Date(isoString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    
+    return date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit'
+    });
+}
+
 
 // Track initial page load with region
 document.addEventListener('DOMContentLoaded', () => {
