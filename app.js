@@ -128,16 +128,16 @@ document.addEventListener('DOMContentLoaded', () => {
 // Initialize Sticky Header
 function initStickyHeader() {
     const stickyHeader = document.getElementById('sticky-header');
-    const sectionNav = document.querySelector('.section-nav');
+    const masthead = document.querySelector('.masthead');
     
-    if (!stickyHeader || !sectionNav) return;
+    if (!stickyHeader) return;
     
-    // Get the bottom of section nav as threshold
-    let threshold = sectionNav.offsetTop + sectionNav.offsetHeight;
+    // Use masthead bottom as threshold - shows as soon as masthead scrolls out
+    let threshold = masthead ? masthead.offsetTop + masthead.offsetHeight : 80;
     
     // Update threshold on resize
     window.addEventListener('resize', () => {
-        threshold = sectionNav.offsetTop + sectionNav.offsetHeight;
+        threshold = masthead ? masthead.offsetTop + masthead.offsetHeight : 80;
     });
     
     // Show/hide on scroll
@@ -148,6 +148,10 @@ function initStickyHeader() {
             stickyHeader.classList.remove('visible');
         }
     });
+    
+    // Update region display
+    updateStickyRegion();
+}
     
     // Update region display
     updateStickyRegion();
