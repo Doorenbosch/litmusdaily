@@ -852,51 +852,58 @@ async function loadETFFlows() {
 }
 
 function getMockETFFlows() {
-    // Mock data - will be replaced with real data source
+    // Mock data - will be replaced with real data from /api/etf-flows
     return {
-        yesterday: {
-            amount: 438,
-            date: 'Yesterday'
+        latest: {
+            amount: 127,
+            date: 'Dec 5'
         },
         week: [
-            { day: 'Mon', amount: 215 },
-            { day: 'Tue', amount: 380 },
-            { day: 'Wed', amount: -120 },
-            { day: 'Thu', amount: 290 },
-            { day: 'Fri', amount: 438 }
+            { day: 'Mon', amount: 116 },
+            { day: 'Tue', amount: -45 },
+            { day: 'Wed', amount: 57 },
+            { day: 'Thu', amount: -15 },
+            { day: 'Fri', amount: 127 }
         ],
-        insight: 'Third consecutive day of net inflows'
+        weekTotal: 240,
+        insight: 'Net positive week: +$240M total',
+        source: 'mock'
     };
 }
 
 function renderETFFlows(data) {
     if (!data) return;
     
-    const { yesterday, week, insight } = data;
+    // Handle both API format (latest) and legacy format (yesterday)
+    const latestFlow = data.latest || data.yesterday;
+    const week = data.week || [];
+    const insight = data.insight;
     
-    // Update yesterday's flow
+    // Update latest flow display
     const amountEl = document.getElementById('etf-amount');
     const barEl = document.getElementById('etf-bar');
     const insightEl = document.getElementById('etf-insight');
     const dateEl = document.getElementById('etf-date');
     
-    if (amountEl && yesterday) {
-        const isInflow = yesterday.amount >= 0;
+    if (amountEl && latestFlow) {
+        const amount = latestFlow.amount || 0;
+        const isInflow = amount >= 0;
         const sign = isInflow ? '+' : '';
-        amountEl.textContent = `${sign}$${Math.abs(yesterday.amount)}M`;
+        amountEl.textContent = `${sign}$${Math.abs(amount)}M`;
         amountEl.className = `etf-amount ${isInflow ? 'positive' : 'negative'}`;
     }
     
-    if (barEl && yesterday) {
+    if (barEl && latestFlow) {
         // Scale bar: $500M = 100%
+        const amount = latestFlow.amount || 0;
         const maxFlow = 500;
-        const width = Math.min(Math.abs(yesterday.amount) / maxFlow * 100, 100);
+        const width = Math.min(Math.abs(amount) / maxFlow * 100, 100);
         barEl.style.width = `${width}%`;
-        barEl.className = `etf-bar ${yesterday.amount >= 0 ? 'etf-inflow' : 'etf-outflow'}`;
+        barEl.className = `etf-bar ${amount >= 0 ? 'etf-inflow' : 'etf-outflow'}`;
     }
     
-    if (dateEl && yesterday.date) {
-        dateEl.textContent = yesterday.date;
+    if (dateEl && latestFlow) {
+        dateEl.textContent = latestFlow.date || 'Latest';
     }
     
     // Update week bars
