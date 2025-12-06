@@ -267,6 +267,26 @@ display: block;
 font-style: italic;
 }
 
+/* Week in Review Video */
+.week-video-container {
+width: 100%;
+max-width: 720px;
+margin-bottom: var(--xl);
+border-radius: 8px;
+overflow: hidden;
+background: var(--ink);
+}
+
+.week-video {
+width: 100%;
+display: block;
+}
+
+/* Video controls styling */
+.week-video::-webkit-media-controls-panel {
+background: linear-gradient(transparent, rgba(0,0,0,0.7));
+}
+
 /* Article Figure (inline images) */
 .article-figure {
 margin: var(--xl) 0;

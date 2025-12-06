@@ -175,10 +175,16 @@ function loadSection(sectionKey) {
     const headlineEl = document.getElementById('reading-headline');
     const bodyEl = document.getElementById('reading-body');
     const mechanismSection = document.getElementById('mechanism-section');
+    const videoContainer = document.getElementById('week-video-container');
     
     // Hide mechanism section by default
     if (mechanismSection) {
         mechanismSection.style.display = 'none';
+    }
+    
+    // Hide video container by default
+    if (videoContainer) {
+        videoContainer.style.display = 'none';
     }
     
     // Map section keys to data and labels
@@ -204,6 +210,11 @@ function loadSection(sectionKey) {
     if (sectionKey === 'mechanism') {
         loadMechanismSection(section.data);
         return;
+    }
+    
+    // Handle Week in Review video
+    if (sectionKey === 'week_review') {
+        loadWeekReviewVideo();
     }
     
     // Update label
@@ -878,4 +889,58 @@ async function loadStickyPrices() {
     } catch (error) {
         console.warn('[Weekend] Could not load sticky prices:', error);
     }
+}
+
+/**
+ * Week in Review Video
+ * Loads video if available for current week (format: WeekReviewWWYY.mp4)
+ */
+function loadWeekReviewVideo() {
+    const videoContainer = document.getElementById('week-video-container');
+    const video = document.getElementById('week-video');
+    const videoSource = document.getElementById('week-video-source');
+    
+    if (!videoContainer || !video || !videoSource) return;
+    
+    // Calculate current ISO week number and year
+    const now = new Date();
+    const weekNumber = getISOWeek(now);
+    const year = now.getFullYear() % 100; // Last 2 digits of year
+    
+    // Build filename: WeekReview2549.mp4 (week 49, year 2025)
+    const filename = `WeekReview${weekNumber}${year}.mp4`;
+    const videoUrl = `/videos/${filename}`;
+    
+    console.log(`[Weekend] Checking for video: ${videoUrl}`);
+    
+    // Check if video exists using HEAD request
+    fetch(videoUrl, { method: 'HEAD' })
+        .then(response => {
+            if (response.ok) {
+                console.log(`[Weekend] Video found: ${filename}`);
+                videoSource.src = videoUrl;
+                video.load();
+                videoContainer.style.display = 'block';
+            } else {
+                console.log(`[Weekend] No video for week ${weekNumber}`);
+                videoContainer.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            // Silently fail - no video available
+            console.log(`[Weekend] Video not available: ${filename}`);
+            videoContainer.style.display = 'none';
+        });
+}
+
+/**
+ * Get ISO week number (1-53)
+ */
+function getISOWeek(date) {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    return weekNo;
 }
