@@ -34,5 +34,8 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add content/weekend/magazine.json
-          git diff --staged --quiet || git commit -m "Generate Weekend Magazine - $(date +'%Y-%m-%d')"
+          git diff --staged --quiet || git commit -m "📰 Generate Weekend Magazine - $(date +'%Y-%m-%d')"
           git push
+
+      - name: Trigger Vercel Deploy
+        run: curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_13sdaqbpH8QogAy6zy3Y4OvAgqUq/MdENtkMTX9"
