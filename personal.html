@@ -52,8 +52,9 @@
         <!-- The Landscape Section -->
         <section class="landscape-section">
             <header class="section-header">
+                <div class="section-label">Your Position</div>
                 <h1 class="section-title">The Landscape</h1>
-                <p class="section-subtitle">Your portfolio mapped against market performance</p>
+                <p class="section-subtitle">Where you stand relative to the market</p>
             </header>
 
             <!-- Empty State -->
@@ -108,8 +109,9 @@
                 <!-- Period selector -->
                 <div class="period-selector">
                     <span class="period-label">Period:</span>
-                    <button class="period-btn active" data-period="30">30 Days</button>
                     <button class="period-btn" data-period="7">7 Days</button>
+                    <button class="period-btn active" data-period="30">30 Days</button>
+                    <button class="period-btn" data-period="90">90 Days</button>
                 </div>
             </div>
         </section>
@@ -117,6 +119,7 @@
         <!-- Portfolio Read Section -->
         <section class="portfolio-read-section" id="portfolio-read" style="display: none;">
             <header class="section-header">
+                <div class="section-label">The Insight</div>
                 <h2 class="section-title">Portfolio Read</h2>
             </header>
             <div class="read-content" id="portfolio-read-content">
@@ -127,8 +130,11 @@
         <!-- Your Coins Section -->
         <section class="coins-section" id="coins-section" style="display: none;">
             <header class="section-header">
+                <div class="section-header-top">
+                    <div class="section-label">Your Holdings</div>
+                    <span class="coin-count" id="coin-count">0 / 5</span>
+                </div>
                 <h2 class="section-title">Your Coins</h2>
-                <span class="coin-count" id="coin-count">0 / 5</span>
             </header>
             <div class="coins-list" id="coins-list">
                 <!-- Coin cards rendered here -->

@@ -72,6 +72,8 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 8px;
+    background: var(--ink);
+    padding: 4px;
 }
 
 .brand-link {
@@ -100,23 +102,34 @@ body {
     padding: var(--xl) 0;
 }
 
-/* ===== Section Headers ===== */
+/* ===== Section Headers - Rory Style ===== */
 .section-header {
     margin-bottom: var(--lg);
 }
 
+.section-label {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--burgundy);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: var(--xs);
+}
+
 .section-title {
     font-family: var(--serif);
-    font-size: 1.75rem;
-    font-weight: 700;
+    font-size: 1.35rem;
+    font-weight: 400;
     color: var(--ink);
     margin-bottom: var(--xs);
 }
 
 .section-subtitle {
     font-family: var(--sans);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--ink-tertiary);
+    font-weight: 400;
 }
 
 /* ===== Empty State ===== */
@@ -214,6 +227,23 @@ body {
     color: var(--ink-secondary);
     text-align: right;
     padding-right: var(--md);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.segment-change {
+    font-size: 0.65rem;
+    font-weight: 600;
+}
+
+.segment-change.positive {
+    color: var(--teal);
+}
+
+.segment-change.negative {
+    color: var(--burgundy);
 }
 
 .chart-area {
@@ -254,16 +284,19 @@ body {
 
 .market-label {
     position: absolute;
-    top: -20px;
+    top: -24px;
     left: 50%;
     transform: translateX(-50%);
     font-family: var(--sans);
-    font-size: 0.65rem;
-    font-weight: 700;
+    font-size: 0.6rem;
+    font-weight: 600;
     color: var(--ink-tertiary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     white-space: nowrap;
+    background: var(--paper);
+    padding: 2px 6px;
+    border-radius: 2px;
 }
 
 /* X-axis */
@@ -438,6 +471,10 @@ body {
 }
 
 .coins-section .section-header {
+    display: block;
+}
+
+.section-header-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -445,7 +482,7 @@ body {
 
 .coin-count {
     font-family: var(--sans);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--ink-tertiary);
 }
 

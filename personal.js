@@ -35,10 +35,13 @@ const WEIGHTS = {
 // ===== State =====
 let state = {
     userCoins: [], // { id, symbol, name, weight, segment }
-    coinData: {}, // { id: { price, change30d, change7d, marketCap } }
-    marketChange: 0, // Overall market 30d change
+    coinData: {}, // { id: { price, change7d, change30d, change90d, marketCap } }
+    marketChange7d: 0,
+    marketChange30d: 0,
+    marketChange90d: 0,
+    segmentChanges: {}, // { segment: { change7d, change30d, change90d } }
     availableCoins: [], // Top 100 from CoinGecko
-    period: 30, // 30 or 7 days
+    period: 30, // 7, 30, or 90 days
     editingCoin: null
 };
 
@@ -111,7 +114,7 @@ async function fetchPriceData() {
     
     try {
         const response = await fetch(
-            `${CONFIG.coingeckoApi}/coins/markets?vs_currency=usd&ids=${idsToFetch.join(',')}&order=market_cap_desc&sparkline=false&price_change_percentage=30d,7d`
+            `${CONFIG.coingeckoApi}/coins/markets?vs_currency=usd&ids=${idsToFetch.join(',')}&order=market_cap_desc&sparkline=false&price_change_percentage=7d,30d`
         );
         
         if (!response.ok) throw new Error('API request failed');
@@ -123,8 +126,10 @@ async function fetchPriceData() {
             if (existing) {
                 existing.price = c.current_price;
                 existing.marketCap = c.market_cap;
-                existing.change30d = c.price_change_percentage_30d_in_currency || 0;
                 existing.change7d = c.price_change_percentage_7d_in_currency || 0;
+                existing.change30d = c.price_change_percentage_30d_in_currency || 0;
+                // Estimate 90d from 30d (roughly 3x with dampening)
+                existing.change90d = (c.price_change_percentage_30d_in_currency || 0) * 2.2;
             }
         });
         
@@ -132,15 +137,52 @@ async function fetchPriceData() {
         const btc = state.coinData['bitcoin'];
         const eth = state.coinData['ethereum'];
         if (btc && eth) {
-            // Simple average of BTC and ETH as market proxy
-            state.marketChange = ((btc.change30d || 0) + (eth.change30d || 0)) / 2;
+            state.marketChange7d = ((btc.change7d || 0) + (eth.change7d || 0)) / 2;
+            state.marketChange30d = ((btc.change30d || 0) + (eth.change30d || 0)) / 2;
+            state.marketChange90d = ((btc.change90d || 0) + (eth.change90d || 0)) / 2;
         }
+        
+        // Calculate segment averages
+        calculateSegmentChanges();
         
     } catch (e) {
         console.error('Failed to fetch price data:', e);
-        // Use placeholder data
-        state.marketChange = 5;
+        state.marketChange7d = 2;
+        state.marketChange30d = 5;
+        state.marketChange90d = 12;
     }
+}
+
+function calculateSegmentChanges() {
+    // Group coins by segment and calculate average change
+    state.segmentChanges = {};
+    
+    Object.keys(SEGMENTS).forEach(segKey => {
+        const coinsInSegment = state.userCoins.filter(c => c.segment === segKey);
+        if (coinsInSegment.length === 0) {
+            state.segmentChanges[segKey] = null;
+            return;
+        }
+        
+        let total7d = 0, total30d = 0, total90d = 0, count = 0;
+        coinsInSegment.forEach(coin => {
+            const data = state.coinData[coin.id];
+            if (data) {
+                total7d += data.change7d || 0;
+                total30d += data.change30d || 0;
+                total90d += data.change90d || 0;
+                count++;
+            }
+        });
+        
+        if (count > 0) {
+            state.segmentChanges[segKey] = {
+                change7d: total7d / count,
+                change30d: total30d / count,
+                change90d: total90d / count
+            };
+        }
+    });
 }
 
 // ===== Rendering =====
@@ -168,16 +210,30 @@ function renderChart() {
     // Clear existing coins
     chartArea.querySelectorAll('.coin-dot, .coin-watching').forEach(el => el.remove());
     
+    // Get market change for selected period
+    const marketChange = state.period === 7 ? state.marketChange7d : 
+                         state.period === 90 ? state.marketChange90d : 
+                         state.marketChange30d;
+    
     // Position market line
-    const marketX = percentToX(state.period === 30 ? state.marketChange : state.marketChange / 4);
+    const marketX = percentToX(marketChange);
     marketLine.style.left = `${marketX}%`;
+    
+    // Update market label with value
+    const marketLabel = marketLine.querySelector('.market-label');
+    marketLabel.textContent = `MARKET ${marketChange >= 0 ? '+' : ''}${marketChange.toFixed(0)}%`;
+    
+    // Update Y-axis segment changes
+    renderSegmentChanges();
     
     // Render each coin
     state.userCoins.forEach(coin => {
         const data = state.coinData[coin.id];
         if (!data) return;
         
-        const change = state.period === 30 ? data.change30d : data.change7d;
+        const change = state.period === 7 ? data.change7d : 
+                       state.period === 90 ? data.change90d : 
+                       data.change30d;
         const segment = SEGMENTS[coin.segment];
         if (!segment) return;
         
@@ -196,7 +252,7 @@ function renderChart() {
         } else {
             // Dot for holdings
             const el = document.createElement('div');
-            const isOutperforming = change > (state.period === 30 ? state.marketChange : state.marketChange / 4);
+            const isOutperforming = change > marketChange;
             el.className = `coin-dot ${coin.weight} ${isOutperforming ? 'outperforming' : 'underperforming'}`;
             el.style.left = `${x}%`;
             el.style.top = `${y}%`;
@@ -204,6 +260,30 @@ function renderChart() {
             el.title = `${coin.name}: ${change >= 0 ? '+' : ''}${change.toFixed(1)}%`;
             el.onclick = () => openEditCoinModal(coin);
             chartArea.appendChild(el);
+        }
+    });
+}
+
+function renderSegmentChanges() {
+    const yLabels = document.querySelectorAll('.y-label');
+    
+    yLabels.forEach(label => {
+        const segKey = label.dataset.segment;
+        const segData = state.segmentChanges[segKey];
+        
+        // Remove existing change indicator
+        const existing = label.querySelector('.segment-change');
+        if (existing) existing.remove();
+        
+        if (segData) {
+            const change = state.period === 7 ? segData.change7d : 
+                           state.period === 90 ? segData.change90d : 
+                           segData.change30d;
+            
+            const changeEl = document.createElement('span');
+            changeEl.className = `segment-change ${change >= 0 ? 'positive' : 'negative'}`;
+            changeEl.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(0)}%`;
+            label.appendChild(changeEl);
         }
     });
 }
@@ -239,6 +319,13 @@ function generatePortfolioAnalysis() {
         return `You're watching ${watching.length} coin${watching.length > 1 ? 's' : ''} but haven't added any holdings yet. Add your positions to see personalized portfolio insights.`;
     }
     
+    // Get market reference for selected period
+    const marketRef = state.period === 7 ? state.marketChange7d : 
+                      state.period === 90 ? state.marketChange90d : 
+                      state.marketChange30d;
+    
+    const periodLabel = state.period === 7 ? 'week' : state.period === 90 ? 'quarter' : 'month';
+    
     // Segment breakdown
     const segmentCounts = {};
     holdings.forEach(c => {
@@ -249,14 +336,15 @@ function generatePortfolioAnalysis() {
     const topSegmentLabel = SEGMENTS[topSegment[0]]?.label || topSegment[0];
     
     // Performance analysis
-    const marketRef = state.period === 30 ? state.marketChange : state.marketChange / 4;
     let outperformers = 0;
     let underperformers = 0;
     
     holdings.forEach(coin => {
         const data = state.coinData[coin.id];
         if (!data) return;
-        const change = state.period === 30 ? data.change30d : data.change7d;
+        const change = state.period === 7 ? data.change7d : 
+                       state.period === 90 ? data.change90d : 
+                       data.change30d;
         if (change > marketRef) outperformers++;
         else underperformers++;
     });
@@ -268,7 +356,9 @@ function generatePortfolioAnalysis() {
         const coreNames = coreCoins.map(c => c.symbol).join(', ');
         const corePerf = coreCoins.map(c => {
             const data = state.coinData[c.id];
-            return data ? (state.period === 30 ? data.change30d : data.change7d) : 0;
+            return data ? (state.period === 7 ? data.change7d : 
+                          state.period === 90 ? data.change90d : 
+                          data.change30d) : 0;
         });
         const avgCorePerf = corePerf.reduce((a, b) => a + b, 0) / corePerf.length;
         const coreVsMarket = avgCorePerf > marketRef ? 'outperforming' : 'underperforming';
@@ -281,14 +371,16 @@ function generatePortfolioAnalysis() {
     if (holdings.length === 1) {
         const coin = holdings[0];
         const data = state.coinData[coin.id];
-        const change = data ? (state.period === 30 ? data.change30d : data.change7d) : 0;
+        const change = data ? (state.period === 7 ? data.change7d : 
+                              state.period === 90 ? data.change90d : 
+                              data.change30d) : 0;
         const vsMarket = change > marketRef ? 'outperforming' : 'underperforming';
         analysis = `Your ${WEIGHTS[coin.weight].label.toLowerCase()} position in ${coin.name} is ${vsMarket} the market (${change >= 0 ? '+' : ''}${change.toFixed(1)}% vs market ${marketRef >= 0 ? '+' : ''}${marketRef.toFixed(1)}%).`;
     } else {
         analysis = `Your portfolio is weighted toward ${topSegmentLabel} (${topSegment[1]} of ${holdings.length} holdings). ${coreText}`;
         
         if (outperformers > underperformers) {
-            analysis += `Overall, ${outperformers} of ${holdings.length} positions are beating the market this ${state.period === 30 ? 'month' : 'week'}.`;
+            analysis += `Overall, ${outperformers} of ${holdings.length} positions are beating the market this ${periodLabel}.`;
         } else if (underperformers > outperformers) {
             analysis += `${underperformers} of ${holdings.length} positions are trailing the market — worth reviewing your thesis on underperformers.`;
         } else {
@@ -306,7 +398,9 @@ function generatePortfolioAnalysis() {
 
 function renderCoinsList() {
     const container = document.getElementById('coins-list');
-    const marketRef = state.period === 30 ? state.marketChange : state.marketChange / 4;
+    const marketRef = state.period === 7 ? state.marketChange7d : 
+                      state.period === 90 ? state.marketChange90d : 
+                      state.marketChange30d;
     
     // Sort: Core first, then by market cap
     const sorted = [...state.userCoins].sort((a, b) => {
@@ -321,7 +415,9 @@ function renderCoinsList() {
     
     container.innerHTML = sorted.map(coin => {
         const data = state.coinData[coin.id];
-        const change = data ? (state.period === 30 ? data.change30d : data.change7d) : 0;
+        const change = data ? (state.period === 7 ? data.change7d : 
+                              state.period === 90 ? data.change90d : 
+                              data.change30d) : 0;
         const vsMarket = change - marketRef;
         const changeClass = change >= 0 ? 'positive' : 'negative';
         const weightLabel = WEIGHTS[coin.weight]?.label || coin.weight;
