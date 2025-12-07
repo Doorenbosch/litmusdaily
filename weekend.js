@@ -320,20 +320,62 @@ function renderKeyDates(dates) {
 }
 
 function renderSectors(sectors) {
-    // Update sector data if provided in magazine.json
-    for (const [key, data] of Object.entries(sectors)) {
-        const changeEl = document.getElementById(`sector-${key}-change`);
+    // Populate AI-generated weekly commentary from magazine.json
+    // In magazine.json, sectors[key] is a string with the weekly commentary
+    for (const [key, commentary] of Object.entries(sectors)) {
         const weeklyEl = document.getElementById(`sector-${key}-weekly`);
         
-        if (changeEl && data.change !== undefined) {
-            const change = data.change;
-            const sign = change >= 0 ? '+' : '';
-            changeEl.textContent = `${sign}${change.toFixed(1)}%`;
-            changeEl.className = 'sector-change ' + (change > 0.5 ? 'positive' : change < -0.5 ? 'negative' : 'neutral');
+        if (weeklyEl && typeof commentary === 'string') {
+            const textSpan = weeklyEl.querySelector('.weekly-text');
+            if (textSpan) {
+                textSpan.textContent = commentary;
+            } else {
+                // Fallback if structure is different
+                weeklyEl.innerHTML = `<span class="weekly-label">THIS WEEK:</span> ${commentary}`;
+            }
         }
+    }
+    
+    // Fetch live sector performance data
+    fetchSectorPerformance();
+}
+
+async function fetchSectorPerformance() {
+    try {
+        const response = await fetch('/api/market-data');
+        if (!response.ok) return;
         
-        if (weeklyEl && data.weekly) {
-            weeklyEl.textContent = data.weekly;
+        const data = await response.json();
+        
+        // If API returns sector data, use it
+        if (data.sectors) {
+            for (const [key, sectorData] of Object.entries(data.sectors)) {
+                updateSectorDisplay(key, sectorData.change);
+            }
+        }
+    } catch (e) {
+        console.log('[Weekend] Could not fetch sector performance:', e);
+    }
+}
+
+function updateSectorDisplay(sectorKey, change) {
+    const changeEl = document.getElementById(`sector-${sectorKey}-change`);
+    const barEl = document.getElementById(`sector-${sectorKey}-bar`);
+    
+    if (changeEl && change !== undefined) {
+        const sign = change >= 0 ? '+' : '';
+        changeEl.textContent = `${sign}${change.toFixed(1)}%`;
+        
+        // Set color class
+        const colorClass = change > 0.5 ? 'positive' : change < -0.5 ? 'negative' : 'neutral';
+        changeEl.className = `sector-change ${colorClass}`;
+        
+        // Update bar
+        if (barEl) {
+            // Map change to bar width (0-100), centered at 50%
+            const barWidth = Math.min(100, Math.max(0, 50 + (change * 3)));
+            barEl.style.width = `${barWidth}%`;
+            barEl.className = `sector-fill ${colorClass}`;
         }
     }
 }

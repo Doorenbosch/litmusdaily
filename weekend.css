@@ -982,3 +982,26 @@ font-style: italic;
 .audio-speed:hover {
     background: rgba(255,255,255,0.3);
 }
+
+/* ========== SECTOR WEEKLY LABEL ========== */
+.weekly-label {
+    display: block;
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--burgundy);
+    margin-bottom: 6px;
+}
+
+.sector-weekly {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--ink);
+    margin-bottom: var(--sm);
+}
+
+.sector-weekly .weekly-text {
+    display: block;
+}
