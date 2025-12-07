@@ -1032,6 +1032,12 @@ function renderTakeawayQuote(data) {
 function renderReadingPane(sectionKey) {
     if (!briefData || !briefData.sections) return;
     
+    // Scroll reading pane to top
+    const readingPane = document.querySelector('.reading-pane');
+    if (readingPane) {
+        readingPane.scrollTop = 0;
+    }
+    
     const sections = getCurrentSections();
     const section = sections[sectionKey];
     

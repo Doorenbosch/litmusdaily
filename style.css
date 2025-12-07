@@ -59,10 +59,36 @@ a {
     padding: var(--lg) var(--xl);
 }
 
+/* Fixed Header Container */
+.header-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--paper);
+    z-index: 100;
+    padding: 0 var(--xl);
+}
+
+.header-fixed .masthead,
+.header-fixed .section-nav {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Content offset for fixed header */
+.content-offset {
+    padding-top: 0; /* Handled by editorial-grid position */
+}
+
 /* Center content on very wide screens */
 @media (min-width: 1500px) {
     .container {
         padding: var(--lg) calc((100vw - 1400px) / 2 + var(--xl));
+    }
+    
+    .header-fixed {
+        padding: 0 calc((100vw - 1400px) / 2 + var(--xl));
     }
 }
 
@@ -414,26 +440,9 @@ a {
     color: var(--ink);
 }
 
-/* ========== STICKY HEADER ========== */
+/* ========== STICKY HEADER (Hidden - using fixed header instead) ========== */
 .sticky-header {
-    position: fixed;
-    top: -60px;
-    left: 0;
-    right: 0;
-    height: 48px;
-    background: var(--paper);
-    border-bottom: 1px solid var(--rule);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 var(--xl);
-    z-index: 1000;
-    transition: top 0.25s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
-
-.sticky-header.visible {
-    top: 0;
+    display: none;
 }
 
 .sticky-left {
@@ -545,13 +554,73 @@ a {
     display: grid;
     grid-template-columns: 260px 1fr 300px;
     gap: var(--xl);
-    margin-top: var(--xl);
+    margin-top: 130px; /* Below fixed header */
+    height: calc(100vh - 150px); /* Viewport minus header + padding */
 }
 
 /* ========== ARTICLE INDEX (Left) ========== */
 .article-index {
     border-right: 1px solid var(--rule);
     padding-right: var(--xl);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule) transparent;
+}
+
+.article-index::-webkit-scrollbar {
+    width: 6px;
+}
+
+.article-index::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.article-index::-webkit-scrollbar-thumb {
+    background: var(--rule);
+    border-radius: 3px;
+}
+
+/* ========== READING PANE (Center) ========== */
+.reading-pane {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule) transparent;
+    padding-right: var(--md);
+}
+
+.reading-pane::-webkit-scrollbar {
+    width: 6px;
+}
+
+.reading-pane::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.reading-pane::-webkit-scrollbar-thumb {
+    background: var(--rule);
+    border-radius: 3px;
+}
+
+/* ========== CONTEXT SIDEBAR (Right) ========== */
+.context-sidebar {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule) transparent;
+    padding-left: var(--md);
+    border-left: 1px solid var(--rule);
+}
+
+.context-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.context-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.context-sidebar::-webkit-scrollbar-thumb {
+    background: var(--rule);
+    border-radius: 3px;
 }
 
 .index-header {
@@ -749,11 +818,6 @@ a {
     margin: 0;
     position: relative;
     z-index: 1;
-}
-
-/* ========== READING PANE (Center) ========== */
-.reading-pane {
-    min-height: 600px;
 }
 
 /* Audio Card - Matching iOS Design */
@@ -1775,8 +1839,21 @@ a {
 
 /* iPad portrait (768px - 900px) */
 @media (max-width: 900px) {
+    .header-fixed {
+        position: relative; /* Not fixed on mobile */
+    }
+    
     .editorial-grid {
         grid-template-columns: 1fr;
+        height: auto; /* Not fixed height on mobile */
+        margin-top: var(--md);
+    }
+    
+    .article-index,
+    .reading-pane,
+    .context-sidebar {
+        overflow-y: visible; /* No scrolling on mobile */
+        height: auto;
     }
     
     .article-index {

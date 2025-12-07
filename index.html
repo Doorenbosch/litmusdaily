@@ -27,7 +27,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <div class="container">
+    <!-- Fixed Header -->
+    <div class="header-fixed">
         <!-- Header - FT Style: Region | Logo | Auth -->
         <header class="masthead">
             <!-- Left: Region Picker -->
@@ -186,36 +187,10 @@
             <a href="personal.html" class="section-link">Personal Edition</a>
             <a href="#" class="section-link">Archive</a>
         </nav>
-
-        <!-- Sticky Header (appears on scroll) -->
-        <div class="sticky-header" id="sticky-header">
-            <div class="sticky-left">
-                <span class="sticky-ticker">
-                    <span class="sticky-label">BTC</span>
-                    <span class="sticky-value" id="sticky-btc-price">---</span>
-                    <span class="sticky-change" id="sticky-btc-change"></span>
-                </span>
-                <span class="sticky-ticker">
-                    <span class="sticky-label">ETH</span>
-                    <span class="sticky-value" id="sticky-eth-price">---</span>
-                    <span class="sticky-change" id="sticky-eth-change"></span>
-                </span>
-                <span class="sticky-ticker">
-                    <span class="sticky-label">MKT</span>
-                    <span class="sticky-value" id="sticky-market">---</span>
-                </span>
-                <span class="sticky-activity" id="sticky-activity">---</span>
-            </div>
-            <div class="sticky-right">
-                <nav class="sticky-nav">
-                    <a href="#" class="sticky-link active">Daily Edition</a>
-                    <a href="weekend.html" class="sticky-link">Weekend Magazine</a>
-                    <a href="personal.html" class="sticky-link">Personal Edition</a>
-                    <a href="#" class="sticky-link">Archive</a>
-                </nav>
-                <div class="sticky-region" id="sticky-region">APAC</div>
-            </div>
-        </div>
+    </div>
+    
+    <!-- Main Content Container -->
+    <div class="container content-offset">
 
         <!-- Main Grid -->
         <main class="editorial-grid">
@@ -247,7 +222,7 @@
                     </article>
 
                     <article class="index-card" data-section="mechanism">
-                        <span class="card-label">THE DRIVER</span>
+                        <span class="card-label">THE MECHANISM</span>
                         <h3 class="card-headline" id="index-mechanism-headline">Institutional Exit</h3>
                         <p class="card-excerpt" id="index-mechanism-excerpt">November's $3.5 billion ETF outflow wasn't just profit-taking—it was the institutional bid stepping away...</p>
                     </article>
@@ -301,22 +276,6 @@
 
             <!-- Center: Reading Pane -->
             <section class="reading-pane">
-                <button class="mobile-back-btn" id="mobile-back-btn">Back to list</button>
-                
-                <!-- Breaking News Banner (hidden by default) -->
-                <div class="breaking-news-banner" id="breaking-news-banner" style="display: none;">
-                    <div class="breaking-header">
-                        <span class="breaking-label">BREAKING</span>
-                        <button class="breaking-dismiss" id="breaking-dismiss" aria-label="Dismiss">×</button>
-                    </div>
-                    <h2 class="breaking-headline" id="breaking-headline"></h2>
-                    <p class="breaking-summary" id="breaking-summary"></p>
-                    <p class="breaking-implication" id="breaking-implication"></p>
-                    <div class="breaking-footer">
-                        <a class="breaking-source" id="breaking-source" href="#" target="_blank" rel="noopener"></a>
-                        <span class="breaking-time" id="breaking-time"></span>
-                    </div>
-                </div>
                 
                 <!-- Article Content -->
                 <article class="article-content">
@@ -405,18 +364,12 @@
                 <!-- The Number -->
                 <section class="the-number" id="the-number">
                     <header class="number-header">
-                        <span class="number-label" id="number-label">THE NUMBER</span>
-                        <span class="number-day" id="number-day"></span>
+                        <span class="number-label">THE NUMBER</span>
                     </header>
-                    <div class="number-main">
-                        <span class="number-value" id="number-value">65</span>
-                        <span class="number-unit" id="number-unit">/100</span>
-                    </div>
-                    <p class="number-subtitle" id="number-subtitle"></p>
+                    <div class="number-value" id="number-value">$94.2B</div>
                     <p class="number-context" id="number-context">
-                        Greed is building - momentum favors bulls, but watch for overextension
+                        Stablecoin market cap at all-time high—dry powder waiting on sidelines
                     </p>
-                    <span class="number-change" id="number-change"></span>
                 </section>
 
                 <!-- Market Mood 9-Box -->
