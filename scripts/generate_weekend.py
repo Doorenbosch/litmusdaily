@@ -631,31 +631,31 @@ Return as JSON with this structure:
         "author": "The Litmus Editorial"
     }},
     "week_in_review": {{
-        "title": "Compelling headline summarizing the week's story (not 'The Week in Review')",
+        "title": "Compelling headline summarizing the week's story (NOT 'The Week in Review')",
         "content": "Full content here..."
     }},
     "apac": {{
-        "title": "Asia-Pacific",
+        "title": "Compelling headline about Asia-Pacific developments (NOT 'Asia-Pacific')",
         "content": "Full content here..."
     }},
     "emea": {{
-        "title": "Europe & Middle East",
+        "title": "Compelling headline about EMEA developments (NOT 'Europe & Middle East')",
         "content": "Full content here..."
     }},
     "americas": {{
-        "title": "Americas",
+        "title": "Compelling headline about Americas developments (NOT 'Americas')",
         "content": "Full content here..."
     }},
     "capital_flows": {{
-        "title": "Capital Flows",
+        "title": "Compelling headline about capital flow story (NOT 'Capital Flows')",
         "content": "Full content here..."
     }},
     "corporate": {{
-        "title": "Corporate Moves",
+        "title": "Compelling headline about corporate news (NOT 'Corporate Moves')",
         "content": "Full content here..."
     }},
     "week_ahead": {{
-        "title": "The Week Ahead",
+        "title": "Compelling headline about what's coming (NOT 'The Week Ahead')",
         "content": "Full content here..."
     }},
     "mechanism": {{
@@ -681,6 +681,8 @@ Return as JSON with this structure:
         {{"day": "Fri {fri_date}", "event": "Specific event"}}
     ]
 }}
+
+IMPORTANT: Every section title MUST be a compelling, specific headline that captures the story - NOT the generic section name. Think FT/Economist style headlines.
 """
 
 
