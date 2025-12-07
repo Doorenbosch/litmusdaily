@@ -1,5 +1,5 @@
 /* ===== Personal Edition Styles ===== */
-/* Matches FT/Economist editorial design */
+/* Extends base style.css - Matches Weekend Magazine design */
 
 :root {
     --serif: 'Source Serif Pro', Georgia, serif;
@@ -41,78 +41,14 @@ body {
     min-height: 100vh;
 }
 
-/* ===== Masthead ===== */
-.masthead {
-    background: var(--paper);
-    border-bottom: 1px solid var(--rule);
-    padding: var(--md) var(--lg);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.masthead-inner {
+/* Container */
+.container {
     max-width: 1200px;
     margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--lg);
+    padding: 0 var(--lg);
 }
 
-.masthead-logo {
-    display: flex;
-    align-items: center;
-    gap: var(--sm);
-    text-decoration: none;
-    color: var(--ink);
-}
-
-.logo-icon {
-    font-family: var(--serif);
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--burgundy);
-    background: var(--paper-dark);
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-}
-
-.logo-text {
-    font-family: var(--serif);
-    font-size: 1.25rem;
-    font-weight: 600;
-}
-
-.masthead-nav {
-    display: flex;
-    gap: var(--lg);
-}
-
-.masthead-nav a {
-    font-family: var(--sans);
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--ink-secondary);
-    text-decoration: none;
-    padding: var(--xs) 0;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
-}
-
-.masthead-nav a:hover {
-    color: var(--ink);
-}
-
-.masthead-nav a.active {
-    color: var(--burgundy);
-    border-bottom-color: var(--burgundy);
-}
-
+/* Settings Button - positioned in masthead-right */
 .settings-btn {
     font-family: var(--sans);
     font-size: 0.8rem;
@@ -133,9 +69,7 @@ body {
 
 /* ===== Main Content ===== */
 .personal-main {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: var(--xl) var(--lg);
+    padding: var(--xl) 0;
 }
 
 /* ===== Section Headers ===== */

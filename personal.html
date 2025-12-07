@@ -3,28 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Edition | Litmus Daily</title>
+    <title>Personal Edition | The Litmus</title>
+    
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RL4ZYLE5G9"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-RL4ZYLE5G9');
+    </script>
+    
+    <link rel="icon" type="image/png" href="litmuslogo.png">
+    <link rel="apple-touch-icon" href="litmuslogo.png">
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="personal.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Libre+Baskerville:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Masthead -->
+<div class="container">
+    <!-- Header -->
     <header class="masthead">
-        <div class="masthead-inner">
-            <a href="index.html" class="masthead-logo">
-                <span class="logo-icon">/</span>
-                <span class="logo-text">Litmus Daily</span>
+        <div class="masthead-left">
+        </div>
+        
+        <div class="masthead-center">
+            <a href="personal.html" class="brand-link">
+                <img src="litmuslogo.png" alt="The Litmus" class="brand-logo">
+                <h1 class="brand-name">Litmus <em>Personal</em></h1>
             </a>
-            <nav class="masthead-nav">
-                <a href="index.html">Daily Edition</a>
-                <a href="weekend.html">Weekend Magazine</a>
-                <a href="personal.html" class="active">Personal Edition</a>
-            </nav>
+        </div>
+        
+        <div class="masthead-right">
             <button class="settings-btn" id="open-settings">Settings</button>
         </div>
     </header>
+
+    <!-- Navigation -->
+    <nav class="section-nav">
+        <a href="index.html" class="section-link">Daily Edition</a>
+        <a href="weekend.html" class="section-link">Weekend Magazine</a>
+        <a href="personal.html" class="section-link active">Personal Edition</a>
+    </nav>
 
     <main class="personal-main">
         <!-- The Landscape Section -->
@@ -112,6 +134,7 @@
             </div>
         </section>
     </main>
+</div>
 
     <!-- Settings Modal -->
     <div class="modal-overlay" id="settings-modal">
