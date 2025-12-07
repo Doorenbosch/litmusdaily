@@ -31,34 +31,6 @@ const WEIGHTS = {
     watching: { label: 'Watching', size: 0, priority: 5 }
 };
 
-// ===== Default segment assignments =====
-const DEFAULT_SEGMENTS = {
-    'bitcoin': 'store_of_value',
-    'ethereum': 'infrastructure',
-    'solana': 'infrastructure',
-    'cardano': 'infrastructure',
-    'avalanche-2': 'infrastructure',
-    'polkadot': 'infrastructure',
-    'near': 'infrastructure',
-    'cosmos': 'infrastructure',
-    'chainlink': 'real_world',
-    'the-graph': 'real_world',
-    'filecoin': 'real_world',
-    'render-token': 'ai_compute',
-    'fetch-ai': 'ai_compute',
-    'bittensor': 'ai_compute',
-    'uniswap': 'defi',
-    'aave': 'defi',
-    'maker': 'defi',
-    'lido-dao': 'defi',
-    'curve-dao-token': 'defi',
-    'ripple': 'payments',
-    'litecoin': 'payments',
-    'stellar': 'payments',
-    'tether': 'payments',
-    'usd-coin': 'payments'
-};
-
 // ===== State =====
 let state = {
     userCoins: [], // { id, symbol, name, weight, segment }
@@ -71,9 +43,9 @@ let state = {
 
 // ===== Initialize =====
 document.addEventListener('DOMContentLoaded', () => {
+    setupEventListeners();
     loadUserCoins();
     loadAvailableCoins();
-    setupEventListeners();
     render();
 });
 
@@ -100,6 +72,11 @@ function saveUserCoins() {
 // ===== API =====
 async function loadAvailableCoins() {
     // Use static coin list (from coins-data.js)
+    if (typeof TOP_100_COINS === 'undefined') {
+        console.error('coins-data.js not loaded');
+        return;
+    }
+    
     state.availableCoins = TOP_100_COINS.map(c => ({
         ...c,
         marketCap: 0,
