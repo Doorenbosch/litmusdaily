@@ -20,11 +20,5 @@
         { "key": "Access-Control-Allow-Methods", "value": "GET, OPTIONS" }
       ]
     }
-  ],
-  "crons": [
-    {
-      "path": "/api/breaking-news-check",
-      "schedule": "*/5 * * * *"
-    }
   ]
 }
