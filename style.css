@@ -67,7 +67,8 @@ a {
     right: 0;
     background: var(--paper);
     z-index: 100;
-    padding: 0 var(--xl);
+    padding: var(--md) var(--xl) 0 var(--xl);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 .header-fixed .masthead,
@@ -555,8 +556,8 @@ a {
     display: grid;
     grid-template-columns: 260px 1fr 300px;
     gap: var(--xl);
-    margin-top: 160px; /* Below fixed header */
-    height: calc(100vh - 180px); /* Viewport minus header + padding */
+    margin-top: 180px; /* Below fixed header */
+    height: calc(100vh - 200px); /* Viewport minus header + padding */
 }
 
 /* ========== ARTICLE INDEX (Left) ========== */
