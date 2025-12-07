@@ -212,11 +212,52 @@ gtag('config', 'G-RL4ZYLE5G9');
 </div>
 </header>
 
-<!-- Week in Review Video (only shown when video exists) -->
-<div class="week-video-container" id="week-video-container" style="display: none;">
-<video class="week-video" id="week-video" controls playsinline>
-<source id="week-video-source" src="" type="video/mp4">
-</video>
+<!-- Audio Edition -->
+<div class="audio-edition" id="audio-edition">
+<div class="audio-header">
+<div class="audio-badge">
+<svg class="audio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+<path d="M9 18V5l12-2v13"></path>
+<circle cx="6" cy="18" r="3"></circle>
+<circle cx="18" cy="16" r="3"></circle>
+</svg>
+<span>Audio Edition</span>
+</div>
+<span class="audio-duration" id="audio-duration">6 min listen</span>
+</div>
+
+<div class="audio-player" id="audio-player">
+<button class="audio-play-btn" id="audio-play-btn" aria-label="Play audio">
+<svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
+<path d="M8 5v14l11-7z"/>
+</svg>
+<svg class="pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+<path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+</svg>
+</button>
+
+<div class="audio-progress-container">
+<div class="audio-time-current" id="audio-time-current">0:00</div>
+<div class="audio-progress" id="audio-progress">
+<div class="audio-progress-bar" id="audio-progress-bar"></div>
+<div class="audio-progress-handle" id="audio-progress-handle"></div>
+</div>
+<div class="audio-time-total" id="audio-time-total">6:00</div>
+</div>
+
+<div class="audio-controls-right">
+<button class="audio-speed-btn" id="audio-speed-btn" aria-label="Playback speed">1×</button>
+<button class="audio-volume-btn" id="audio-volume-btn" aria-label="Volume">
+<svg viewBox="0 0 24 24" fill="currentColor">
+<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+</svg>
+</button>
+</div>
+</div>
+
+<audio id="audio-element" preload="metadata">
+<source id="audio-source" src="" type="audio/mpeg">
+</audio>
 </div>
 
 <div class="article-body" id="reading-body">

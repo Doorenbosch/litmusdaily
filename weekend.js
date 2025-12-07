@@ -19,6 +19,9 @@ async function init() {
     // Initialize sticky header
     initStickyHeader();
     
+    // Initialize audio player
+    initAudioPlayer();
+    
     // Load magazine content
     await loadMagazineContent();
     
@@ -562,4 +565,198 @@ function trackEvent(name, params = {}) {
     if (typeof gtag === 'function') {
         gtag('event', name, params);
     }
+}
+
+// ========== AUDIO EDITION PLAYER ==========
+
+function initAudioPlayer() {
+    const audioEdition = document.getElementById('audio-edition');
+    const audioElement = document.getElementById('audio-element');
+    const audioSource = document.getElementById('audio-source');
+    const playBtn = document.getElementById('audio-play-btn');
+    const playIcon = playBtn?.querySelector('.play-icon');
+    const pauseIcon = playBtn?.querySelector('.pause-icon');
+    const progressBar = document.getElementById('audio-progress-bar');
+    const progressHandle = document.getElementById('audio-progress-handle');
+    const progress = document.getElementById('audio-progress');
+    const currentTime = document.getElementById('audio-time-current');
+    const totalTime = document.getElementById('audio-time-total');
+    const durationDisplay = document.getElementById('audio-duration');
+    const speedBtn = document.getElementById('audio-speed-btn');
+    const volumeBtn = document.getElementById('audio-volume-btn');
+    const player = document.getElementById('audio-player');
+    
+    if (!audioEdition || !audioElement) return;
+    
+    // Try to load audio file
+    loadWeekInReviewAudio();
+    
+    let isSeeking = false;
+    const speeds = [1, 1.25, 1.5, 1.75, 2];
+    let speedIndex = 0;
+    
+    // Play/Pause
+    playBtn?.addEventListener('click', () => {
+        if (audioElement.paused) {
+            audioElement.play();
+        } else {
+            audioElement.pause();
+        }
+    });
+    
+    // Update UI on play
+    audioElement.addEventListener('play', () => {
+        player?.classList.add('playing');
+        if (playIcon) playIcon.style.display = 'none';
+        if (pauseIcon) pauseIcon.style.display = 'block';
+    });
+    
+    // Update UI on pause
+    audioElement.addEventListener('pause', () => {
+        player?.classList.remove('playing');
+        if (playIcon) playIcon.style.display = 'block';
+        if (pauseIcon) pauseIcon.style.display = 'none';
+    });
+    
+    // Update progress bar
+    audioElement.addEventListener('timeupdate', () => {
+        if (isSeeking) return;
+        
+        const percent = (audioElement.currentTime / audioElement.duration) * 100 || 0;
+        if (progressBar) progressBar.style.width = `${percent}%`;
+        if (progressHandle) progressHandle.style.left = `${percent}%`;
+        if (currentTime) currentTime.textContent = formatTime(audioElement.currentTime);
+    });
+    
+    // Set duration when loaded
+    audioElement.addEventListener('loadedmetadata', () => {
+        const duration = audioElement.duration;
+        if (totalTime) totalTime.textContent = formatTime(duration);
+        
+        // Update duration display
+        const minutes = Math.round(duration / 60);
+        if (durationDisplay) durationDisplay.textContent = `${minutes} min listen`;
+    });
+    
+    // Click on progress bar to seek
+    progress?.addEventListener('click', (e) => {
+        const rect = progress.getBoundingClientRect();
+        const percent = (e.clientX - rect.left) / rect.width;
+        audioElement.currentTime = percent * audioElement.duration;
+    });
+    
+    // Drag progress handle
+    progressHandle?.addEventListener('mousedown', () => {
+        isSeeking = true;
+        document.addEventListener('mousemove', handleSeek);
+        document.addEventListener('mouseup', () => {
+            isSeeking = false;
+            document.removeEventListener('mousemove', handleSeek);
+        }, { once: true });
+    });
+    
+    function handleSeek(e) {
+        if (!progress) return;
+        const rect = progress.getBoundingClientRect();
+        let percent = (e.clientX - rect.left) / rect.width;
+        percent = Math.max(0, Math.min(1, percent));
+        audioElement.currentTime = percent * audioElement.duration;
+        if (progressBar) progressBar.style.width = `${percent * 100}%`;
+        if (progressHandle) progressHandle.style.left = `${percent * 100}%`;
+    }
+    
+    // Speed control
+    speedBtn?.addEventListener('click', () => {
+        speedIndex = (speedIndex + 1) % speeds.length;
+        audioElement.playbackRate = speeds[speedIndex];
+        speedBtn.textContent = `${speeds[speedIndex]}×`;
+    });
+    
+    // Volume toggle (mute/unmute)
+    volumeBtn?.addEventListener('click', () => {
+        audioElement.muted = !audioElement.muted;
+        volumeBtn.style.opacity = audioElement.muted ? '0.5' : '1';
+    });
+    
+    // Loading state
+    audioElement.addEventListener('waiting', () => {
+        player?.classList.add('loading');
+    });
+    
+    audioElement.addEventListener('canplay', () => {
+        player?.classList.remove('loading');
+    });
+    
+    // Error handling
+    audioElement.addEventListener('error', () => {
+        console.warn('[Weekend] Audio failed to load');
+        audioEdition.classList.add('hidden');
+    });
+}
+
+async function loadWeekInReviewAudio() {
+    const audioEdition = document.getElementById('audio-edition');
+    const audioSource = document.getElementById('audio-source');
+    const audioElement = document.getElementById('audio-element');
+    
+    if (!audioEdition || !audioSource || !audioElement) return;
+    
+    // Try to load from magazine.json or direct path
+    try {
+        // First try magazine.json for audio URL
+        const response = await fetch('content/weekend/magazine.json');
+        if (response.ok) {
+            const data = await response.json();
+            if (data.audio_url) {
+                audioSource.src = data.audio_url;
+                audioElement.load();
+                audioEdition.classList.remove('hidden');
+                return;
+            }
+        }
+    } catch (e) {
+        console.log('[Weekend] No magazine.json audio URL');
+    }
+    
+    // Fallback: try standard path
+    const weekDate = getWeekendDate();
+    const fallbackPath = `content/weekend/audio/week-in-review-${weekDate}.mp3`;
+    
+    // Check if file exists
+    try {
+        const headResponse = await fetch(fallbackPath, { method: 'HEAD' });
+        if (headResponse.ok) {
+            audioSource.src = fallbackPath;
+            audioElement.load();
+            audioEdition.classList.remove('hidden');
+            return;
+        }
+    } catch (e) {
+        console.log('[Weekend] No audio file found at:', fallbackPath);
+    }
+    
+    // No audio available - hide the player
+    audioEdition.classList.add('hidden');
+}
+
+function getWeekendDate() {
+    const now = new Date();
+    // Get most recent Saturday
+    const day = now.getDay();
+    const diff = day === 0 ? 1 : day; // Sunday = 1 day back, others = day number
+    const saturday = new Date(now);
+    saturday.setDate(now.getDate() - diff + 6);
+    
+    const year = saturday.getFullYear();
+    const month = String(saturday.getMonth() + 1).padStart(2, '0');
+    const date = String(saturday.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${date}`;
+}
+
+function formatTime(seconds) {
+    if (isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
