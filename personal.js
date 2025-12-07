@@ -19,7 +19,8 @@ const SEGMENTS = {
     defi: { label: 'DeFi', row: 2 },
     real_world: { label: 'Real World Use', row: 3 },
     ai_compute: { label: 'AI & Compute', row: 4 },
-    payments: { label: 'Payments', row: 5 }
+    entertainment: { label: 'Entertainment', row: 5 },
+    payments: { label: 'Payments', row: 6 }
 };
 
 // ===== Weight sizes =====
@@ -217,8 +218,8 @@ function percentToX(pct) {
 }
 
 function segmentToY(row) {
-    // 6 rows, evenly distributed
-    const rowHeight = 100 / 6;
+    // 7 rows, evenly distributed
+    const rowHeight = 100 / 7;
     return (row * rowHeight) + (rowHeight / 2);
 }
 

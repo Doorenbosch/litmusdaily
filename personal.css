@@ -220,7 +220,7 @@ body {
     position: relative;
     background: var(--surface);
     border-radius: 8px;
-    min-height: 360px;
+    min-height: 357px;
     border: 1px solid var(--rule);
 }
 
@@ -235,9 +235,9 @@ body {
     background: repeating-linear-gradient(
         to bottom,
         transparent 0px,
-        transparent 59px,
-        var(--rule) 59px,
-        var(--rule) 60px
+        transparent 50px,
+        var(--rule) 50px,
+        var(--rule) 51px
     );
     pointer-events: none;
 }
