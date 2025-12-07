@@ -99,59 +99,70 @@ function saveUserCoins() {
 
 // ===== API =====
 async function loadAvailableCoins() {
+    // Use static coin list (from coins-data.js)
+    state.availableCoins = TOP_100_COINS.map(c => ({
+        ...c,
+        marketCap: 0,
+        price: 0,
+        change30d: 0,
+        change7d: 0
+    }));
+    
+    // Store in coinData for quick lookup
+    state.availableCoins.forEach(c => {
+        state.coinData[c.id] = c;
+    });
+    
+    renderAvailableCoins();
+    
+    // Then fetch live price data
+    await fetchPriceData();
+    render();
+}
+
+async function fetchPriceData() {
+    // Get IDs of user's coins only (to minimize API calls)
+    const userCoinIds = state.userCoins.map(c => c.id);
+    if (userCoinIds.length === 0) {
+        // Fetch top 10 for market reference
+        userCoinIds.push('bitcoin', 'ethereum', 'tether', 'binancecoin', 'solana');
+    }
+    
+    // Always include top coins for market calculation
+    const idsToFetch = [...new Set([...userCoinIds, 'bitcoin', 'ethereum', 'solana', 'binancecoin', 'cardano'])];
+    
     try {
         const response = await fetch(
-            `${CONFIG.coingeckoApi}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=30d,7d`
+            `${CONFIG.coingeckoApi}/coins/markets?vs_currency=usd&ids=${idsToFetch.join(',')}&order=market_cap_desc&sparkline=false&price_change_percentage=30d,7d`
         );
         
         if (!response.ok) throw new Error('API request failed');
         
         const coins = await response.json();
-        state.availableCoins = coins.map(c => ({
-            id: c.id,
-            symbol: c.symbol.toUpperCase(),
-            name: c.name,
-            image: c.image,
-            marketCap: c.market_cap,
-            price: c.current_price,
-            change30d: c.price_change_percentage_30d_in_currency || 0,
-            change7d: c.price_change_percentage_7d_in_currency || 0
-        }));
         
-        // Calculate market average (top 10 weighted)
-        const top10 = state.availableCoins.slice(0, 10);
-        const totalMcap = top10.reduce((sum, c) => sum + c.marketCap, 0);
-        state.marketChange = top10.reduce((sum, c) => {
-            const weight = c.marketCap / totalMcap;
-            return sum + (c.change30d * weight);
-        }, 0);
-        
-        // Store coin data for quick lookup
-        state.availableCoins.forEach(c => {
-            state.coinData[c.id] = c;
+        coins.forEach(c => {
+            const existing = state.coinData[c.id];
+            if (existing) {
+                existing.price = c.current_price;
+                existing.marketCap = c.market_cap;
+                existing.change30d = c.price_change_percentage_30d_in_currency || 0;
+                existing.change7d = c.price_change_percentage_7d_in_currency || 0;
+            }
         });
         
-        renderAvailableCoins();
-        render();
+        // Calculate market average from top coins
+        const btc = state.coinData['bitcoin'];
+        const eth = state.coinData['ethereum'];
+        if (btc && eth) {
+            // Simple average of BTC and ETH as market proxy
+            state.marketChange = ((btc.change30d || 0) + (eth.change30d || 0)) / 2;
+        }
         
     } catch (e) {
-        console.error('Failed to load coins:', e);
-        // Use fallback data
-        useFallbackData();
+        console.error('Failed to fetch price data:', e);
+        // Use placeholder data
+        state.marketChange = 5;
     }
-}
-
-function useFallbackData() {
-    // Minimal fallback if API fails
-    state.availableCoins = [
-        { id: 'bitcoin', symbol: 'BTC', name: 'Bitcoin', change30d: 8, change7d: 2 },
-        { id: 'ethereum', symbol: 'ETH', name: 'Ethereum', change30d: 12, change7d: 4 },
-        { id: 'solana', symbol: 'SOL', name: 'Solana', change30d: 25, change7d: 8 }
-    ];
-    state.marketChange = 10;
-    state.availableCoins.forEach(c => {
-        state.coinData[c.id] = c;
-    });
 }
 
 // ===== Rendering =====
@@ -392,7 +403,8 @@ function renderAvailableCoins(filter = '') {
             <button class="coin-option ${isSelected ? 'selected' : ''} ${disabled ? 'disabled' : ''}" 
                     data-coin-id="${coin.id}"
                     ${disabled ? 'disabled' : ''}>
-                ${coin.symbol}
+                ${coin.image ? `<img src="${coin.image}" alt="${coin.symbol}" onerror="this.style.display='none'">` : ''}
+                <span>${coin.symbol}</span>
             </button>
         `;
     }).join('');
