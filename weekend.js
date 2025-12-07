@@ -324,37 +324,40 @@ function renderSectors(sectors) {
     // In magazine.json, sectors[key] is a string with the weekly commentary
     for (const [key, commentary] of Object.entries(sectors)) {
         const weeklyEl = document.getElementById(`sector-${key}-weekly`);
+        const changeEl = document.getElementById(`sector-${key}-change`);
+        const barEl = document.getElementById(`sector-${key}-bar`);
         
         if (weeklyEl && typeof commentary === 'string') {
             const textSpan = weeklyEl.querySelector('.weekly-text');
             if (textSpan) {
                 textSpan.textContent = commentary;
             } else {
-                // Fallback if structure is different
                 weeklyEl.innerHTML = `<span class="weekly-label">THIS WEEK:</span> ${commentary}`;
             }
-        }
-    }
-    
-    // Fetch live sector performance data
-    fetchSectorPerformance();
-}
-
-async function fetchSectorPerformance() {
-    try {
-        const response = await fetch('/api/market-data');
-        if (!response.ok) return;
-        
-        const data = await response.json();
-        
-        // If API returns sector data, use it
-        if (data.sectors) {
-            for (const [key, sectorData] of Object.entries(data.sectors)) {
-                updateSectorDisplay(key, sectorData.change);
+            
+            // Extract percentage from commentary text
+            const percentMatch = commentary.match(/([+-]?\d+\.?\d*)%/);
+            if (percentMatch && changeEl) {
+                const change = parseFloat(percentMatch[1]);
+                // Check if it's a decline/loss (negative context)
+                const isNegative = /decline|lost|down|fell|dropped|shed|underperform/i.test(commentary);
+                const actualChange = isNegative ? -Math.abs(change) : change;
+                
+                const sign = actualChange >= 0 ? '+' : '';
+                changeEl.textContent = `${sign}${actualChange.toFixed(1)}%`;
+                
+                // Set color class
+                const colorClass = actualChange > 0.5 ? 'positive' : actualChange < -0.5 ? 'negative' : 'neutral';
+                changeEl.className = `sector-change ${colorClass}`;
+                
+                // Update bar
+                if (barEl) {
+                    const barWidth = Math.min(100, Math.max(0, 50 + (actualChange * 3)));
+                    barEl.style.width = `${barWidth}%`;
+                    barEl.className = `sector-fill ${colorClass}`;
+                }
             }
         }
-    } catch (e) {
-        console.log('[Weekend] Could not fetch sector performance:', e);
     }
 }
 

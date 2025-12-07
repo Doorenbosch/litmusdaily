@@ -995,13 +995,33 @@ font-style: italic;
     margin-bottom: 6px;
 }
 
+.drivers-label {
+    display: block;
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 6px;
+    font-style: normal;
+}
+
 .sector-weekly {
     font-size: 0.85rem;
     line-height: 1.5;
     color: var(--ink);
     margin-bottom: var(--sm);
+    font-style: italic;
 }
 
 .sector-weekly .weekly-text {
     display: block;
+}
+
+.sector-drivers {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--ink-secondary);
+    margin-bottom: var(--sm);
 }
