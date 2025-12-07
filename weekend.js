@@ -27,6 +27,9 @@ async function init() {
     
     // Load relative performance
     loadRelativePerformance();
+    
+    // Initialize audio player
+    initAudioPlayer();
 }
 
 function setMagazineDate() {
@@ -554,4 +557,127 @@ function getZoneFromTitle(title) {
     if (!title) return '';
     // Convert title to zone key: "Weak Rally" -> "weak-rally"
     return title.toLowerCase().replace(/\s+/g, '-');
+}
+
+// ========== AUDIO PLAYER ==========
+
+function initAudioPlayer() {
+    const audioEdition = document.getElementById('audio-edition');
+    const audio = document.getElementById('audio-element');
+    const playBtn = document.getElementById('audio-play-btn');
+    const progressFill = document.getElementById('audio-progress-fill');
+    const progressBar = document.querySelector('.audio-progress-bar');
+    const currentTime = document.getElementById('audio-current');
+    const totalTime = document.getElementById('audio-total');
+    const speedBtn = document.getElementById('audio-speed');
+    const durationDisplay = document.getElementById('audio-duration');
+    
+    if (!audio || !playBtn || !audioEdition) return;
+    
+    let playbackRate = 1;
+    const speeds = [1, 1.25, 1.5, 1.75, 2];
+    
+    // Try to load audio file
+    loadAudioFile();
+    
+    // Play/pause toggle
+    playBtn.addEventListener('click', () => {
+        if (audio.paused) {
+            audio.play();
+            playBtn.querySelector('.play-icon').style.display = 'none';
+            playBtn.querySelector('.pause-icon').style.display = 'block';
+        } else {
+            audio.pause();
+            playBtn.querySelector('.play-icon').style.display = 'block';
+            playBtn.querySelector('.pause-icon').style.display = 'none';
+        }
+    });
+    
+    // Update progress bar
+    audio.addEventListener('timeupdate', () => {
+        const percent = (audio.currentTime / audio.duration) * 100;
+        progressFill.style.width = `${percent}%`;
+        currentTime.textContent = formatTime(audio.currentTime);
+    });
+    
+    // Set total time when loaded
+    audio.addEventListener('loadedmetadata', () => {
+        totalTime.textContent = formatTime(audio.duration);
+        const mins = Math.ceil(audio.duration / 60);
+        durationDisplay.textContent = `${mins} min`;
+    });
+    
+    // Click on progress bar to seek
+    if (progressBar) {
+        progressBar.addEventListener('click', (e) => {
+            const rect = progressBar.getBoundingClientRect();
+            const percent = (e.clientX - rect.left) / rect.width;
+            audio.currentTime = percent * audio.duration;
+        });
+    }
+    
+    // Speed control
+    if (speedBtn) {
+        speedBtn.addEventListener('click', () => {
+            const currentIndex = speeds.indexOf(playbackRate);
+            playbackRate = speeds[(currentIndex + 1) % speeds.length];
+            audio.playbackRate = playbackRate;
+            speedBtn.textContent = `${playbackRate}×`;
+        });
+    }
+    
+    // Reset on end
+    audio.addEventListener('ended', () => {
+        playBtn.querySelector('.play-icon').style.display = 'block';
+        playBtn.querySelector('.pause-icon').style.display = 'none';
+        progressFill.style.width = '0%';
+    });
+}
+
+async function loadAudioFile() {
+    const audioEdition = document.getElementById('audio-edition');
+    const audio = document.getElementById('audio-element');
+    
+    if (!audioEdition || !audio) return;
+    
+    // Get weekend date for audio file
+    const weekendDate = getWeekendDate();
+    const audioPath = `content/weekend/audio/week-in-review-${weekendDate}.mp3`;
+    
+    try {
+        // Check if audio file exists
+        const response = await fetch(audioPath, { method: 'HEAD' });
+        
+        if (response.ok) {
+            audio.src = audioPath;
+            audioEdition.classList.remove('hidden');
+            console.log('[Weekend] Audio file found:', audioPath);
+        } else {
+            console.log('[Weekend] No audio file found at:', audioPath);
+        }
+    } catch (e) {
+        console.log('[Weekend] Audio check failed:', e);
+    }
+}
+
+function getWeekendDate() {
+    const now = new Date();
+    // Get most recent Saturday
+    const day = now.getDay();
+    const diff = day === 0 ? 1 : day; // Sunday = 1 day back, others = day number
+    const saturday = new Date(now);
+    saturday.setDate(now.getDate() - diff + 6);
+    
+    const year = saturday.getFullYear();
+    const month = String(saturday.getMonth() + 1).padStart(2, '0');
+    const date = String(saturday.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${date}`;
+}
+
+function formatTime(seconds) {
+    if (isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
 }

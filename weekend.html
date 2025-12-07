@@ -184,6 +184,35 @@ gtag('config', 'G-RL4ZYLE5G9');
 </div>
 </header>
 
+<!-- Audio Edition Player -->
+<div class="audio-edition hidden" id="audio-edition">
+<div class="audio-header">
+<span class="audio-label">LISTEN</span>
+<span class="audio-duration" id="audio-duration">6 min</span>
+</div>
+<div class="audio-controls">
+<button class="audio-play-btn" id="audio-play-btn">
+<svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
+<path d="M8 5v14l11-7z"/>
+</svg>
+<svg class="pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none">
+<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+</svg>
+</button>
+<div class="audio-progress">
+<div class="audio-progress-bar">
+<div class="audio-progress-fill" id="audio-progress-fill"></div>
+</div>
+<div class="audio-time">
+<span id="audio-current">0:00</span>
+<span id="audio-total">0:00</span>
+</div>
+</div>
+<div class="audio-speed" id="audio-speed">1×</div>
+</div>
+<audio id="audio-element"></audio>
+</div>
+
 <div class="article-body" id="reading-body">
 <p>Bitcoin's push toward $100,000 this week masked a more complex rotation beneath the surface. While headlines celebrated the milestone approach, the real story unfolded in the distribution of capital across the broader market—a story that reveals as much about institutional strategy as it does about price action.</p>
 

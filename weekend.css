@@ -105,6 +105,8 @@ max-width: 600px;
 /* Weekend Grid - Same 3-column but different proportions */
 .weekend-grid {
 grid-template-columns: 280px 1fr 260px;
+margin-top: var(--lg); /* Reset from Daily's 250px fixed header offset */
+height: auto; /* Reset from Daily's fixed height */
 }
 
 /* Key Dates Section */
@@ -866,3 +868,117 @@ font-style: italic;
     opacity: 0.3;
 }
 
+
+/* ========== AUDIO EDITION PLAYER ========== */
+.audio-edition {
+    background: linear-gradient(135deg, var(--burgundy) 0%, #6a0f30 100%);
+    border-radius: 8px;
+    padding: var(--md);
+    margin-bottom: var(--lg);
+    color: var(--white);
+}
+
+.audio-edition.hidden {
+    display: none;
+}
+
+.audio-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--sm);
+}
+
+.audio-label {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    opacity: 0.8;
+}
+
+.audio-duration {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+.audio-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--md);
+}
+
+.audio-play-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--white);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.15s;
+}
+
+.audio-play-btn:hover {
+    transform: scale(1.05);
+}
+
+.audio-play-btn svg {
+    width: 20px;
+    height: 20px;
+    color: var(--burgundy);
+}
+
+.audio-play-btn .play-icon {
+    margin-left: 2px;
+}
+
+.audio-progress {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.audio-progress-bar {
+    height: 4px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+}
+
+.audio-progress-fill {
+    height: 100%;
+    background: var(--white);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.1s linear;
+}
+
+.audio-time {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    opacity: 0.8;
+}
+
+.audio-speed {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 4px 8px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.audio-speed:hover {
+    background: rgba(255,255,255,0.3);
+}
