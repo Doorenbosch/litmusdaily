@@ -556,8 +556,8 @@ a {
     display: grid;
     grid-template-columns: 260px 1fr 300px;
     gap: var(--xl);
-    margin-top: 180px; /* Below fixed header */
-    height: calc(100vh - 200px); /* Viewport minus header + padding */
+    margin-top: 250px; /* Below fixed header */
+    height: calc(100vh - 270px); /* Viewport minus header + padding */
 }
 
 /* ========== ARTICLE INDEX (Left) ========== */
