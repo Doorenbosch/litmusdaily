@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Edition | Litmus Daily</title>
+    <link rel="stylesheet" href="personal.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Masthead -->
+    <header class="masthead">
+        <div class="masthead-inner">
+            <a href="index.html" class="masthead-logo">
+                <span class="logo-icon">/</span>
+                <span class="logo-text">Litmus Daily</span>
+            </a>
+            <nav class="masthead-nav">
+                <a href="index.html">Daily Edition</a>
+                <a href="weekend.html">Weekend Magazine</a>
+                <a href="personal.html" class="active">Personal Edition</a>
+            </nav>
+            <button class="settings-btn" id="open-settings">Settings</button>
+        </div>
+    </header>
+
+    <main class="personal-main">
+        <!-- The Landscape Section -->
+        <section class="landscape-section">
+            <header class="section-header">
+                <h1 class="section-title">The Landscape</h1>
+                <p class="section-subtitle">Your portfolio mapped against market performance</p>
+            </header>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="empty-state">
+                <p>Add coins to see your portfolio landscape</p>
+                <button class="btn-primary" id="empty-add-coins">Add Your Coins</button>
+            </div>
+
+            <!-- Chart Container -->
+            <div class="landscape-chart-container" id="landscape-chart" style="display: none;">
+                <div class="chart-wrapper">
+                    <!-- Y-axis labels -->
+                    <div class="y-axis">
+                        <span class="y-label" data-segment="store_of_value">Store of Value</span>
+                        <span class="y-label" data-segment="infrastructure">Infrastructure</span>
+                        <span class="y-label" data-segment="defi">DeFi</span>
+                        <span class="y-label" data-segment="real_world">Real World Use</span>
+                        <span class="y-label" data-segment="ai_compute">AI & Compute</span>
+                        <span class="y-label" data-segment="payments">Payments</span>
+                    </div>
+                    
+                    <!-- Chart area -->
+                    <div class="chart-area" id="chart-area">
+                        <!-- Market benchmark line - positioned dynamically -->
+                        <div class="market-line" id="market-line">
+                            <span class="market-label">MARKET</span>
+                        </div>
+                        <!-- Coins will be rendered here -->
+                    </div>
+
+                    <!-- X-axis -->
+                    <div class="x-axis">
+                        <span class="x-label">-20%</span>
+                        <span class="x-label">-10%</span>
+                        <span class="x-label">0%</span>
+                        <span class="x-label">+10%</span>
+                        <span class="x-label">+20%</span>
+                        <span class="x-label">+40%</span>
+                    </div>
+                </div>
+
+                <!-- Legend -->
+                <div class="chart-legend">
+                    <span class="legend-item"><span class="dot core"></span> Core</span>
+                    <span class="legend-item"><span class="dot significant"></span> Significant</span>
+                    <span class="legend-item"><span class="dot moderate"></span> Moderate</span>
+                    <span class="legend-item"><span class="dot small"></span> Small</span>
+                    <span class="legend-item"><span class="text-muted">TEXT</span> Watching</span>
+                </div>
+
+                <!-- Period selector -->
+                <div class="period-selector">
+                    <span class="period-label">Period:</span>
+                    <button class="period-btn active" data-period="30">30 Days</button>
+                    <button class="period-btn" data-period="7">7 Days</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Portfolio Read Section -->
+        <section class="portfolio-read-section" id="portfolio-read" style="display: none;">
+            <header class="section-header">
+                <h2 class="section-title">Portfolio Read</h2>
+            </header>
+            <div class="read-content" id="portfolio-read-content">
+                <!-- AI-generated portfolio analysis -->
+            </div>
+        </section>
+
+        <!-- Your Coins Section -->
+        <section class="coins-section" id="coins-section" style="display: none;">
+            <header class="section-header">
+                <h2 class="section-title">Your Coins</h2>
+                <span class="coin-count" id="coin-count">0 / 5</span>
+            </header>
+            <div class="coins-list" id="coins-list">
+                <!-- Coin cards rendered here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal">
+            <header class="modal-header">
+                <h2>Your Coins</h2>
+                <button class="modal-close" id="close-settings">&times;</button>
+            </header>
+            
+            <div class="modal-body">
+                <!-- Search -->
+                <div class="search-container">
+                    <input type="text" id="coin-search" placeholder="Search coins..." class="search-input">
+                </div>
+
+                <!-- Selected Coins -->
+                <div class="selected-coins" id="selected-coins">
+                    <h3>Selected <span id="selected-count">(0/5)</span></h3>
+                    <div class="selected-list" id="selected-list">
+                        <p class="empty-selected">No coins selected</p>
+                    </div>
+                </div>
+
+                <!-- Available Coins -->
+                <div class="available-coins">
+                    <h3>Top 100 Coins</h3>
+                    <div class="coins-grid" id="available-coins">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <footer class="modal-footer">
+                <button class="btn-secondary" id="cancel-settings">Cancel</button>
+                <button class="btn-primary" id="save-settings">Save Changes</button>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Coin Edit Modal -->
+    <div class="modal-overlay" id="edit-coin-modal">
+        <div class="modal modal-small">
+            <header class="modal-header">
+                <h2 id="edit-coin-name">Edit Coin</h2>
+                <button class="modal-close" id="close-edit-coin">&times;</button>
+            </header>
+            
+            <div class="modal-body">
+                <!-- Weight Selection -->
+                <div class="edit-section">
+                    <label>Weight</label>
+                    <div class="weight-options" id="weight-options">
+                        <button class="weight-btn" data-weight="core">Core</button>
+                        <button class="weight-btn" data-weight="significant">Significant</button>
+                        <button class="weight-btn" data-weight="moderate">Moderate</button>
+                        <button class="weight-btn" data-weight="small">Small</button>
+                        <button class="weight-btn" data-weight="watching">Watching</button>
+                    </div>
+                </div>
+
+                <!-- Segment Selection -->
+                <div class="edit-section">
+                    <label>Belief / Segment</label>
+                    <div class="segment-options" id="segment-options">
+                        <button class="segment-btn" data-segment="store_of_value">Store of Value</button>
+                        <button class="segment-btn" data-segment="infrastructure">Infrastructure</button>
+                        <button class="segment-btn" data-segment="defi">DeFi</button>
+                        <button class="segment-btn" data-segment="real_world">Real World Use</button>
+                        <button class="segment-btn" data-segment="ai_compute">AI & Compute</button>
+                        <button class="segment-btn" data-segment="payments">Payments</button>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="modal-footer">
+                <button class="btn-danger" id="remove-coin">Remove</button>
+                <button class="btn-primary" id="save-coin-edit">Save</button>
+            </footer>
+        </div>
+    </div>
+
+    <script src="personal.js"></script>
+</body>
+</html>
