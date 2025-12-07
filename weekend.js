@@ -505,12 +505,19 @@ function trackEvent(name, params = {}) {
 // ========== MARKET MOOD FROM MAGAZINE ==========
 
 function renderMarketMoodFromMagazine(moodData) {
-    if (!moodData) return;
+    if (!moodData) {
+        console.log('[Weekend] No mood data');
+        return;
+    }
     
     const grid = document.getElementById('nine-box-grid-weekend');
-    if (!grid) return;
+    if (!grid) {
+        console.log('[Weekend] No grid element');
+        return;
+    }
     
     const { current, trail, title, description } = moodData;
+    console.log('[Weekend] Market mood data:', { current, trailLength: trail?.length, title });
     
     // Update title and description
     setText('mood-title-weekend', title || 'Market Mood');
@@ -535,8 +542,11 @@ function renderMarketMoodFromMagazine(moodData) {
     // Position teal dot (current position)
     const tealDot = document.getElementById('mood-dot-teal-weekend');
     if (tealDot && current) {
-        tealDot.style.left = `${mapX(current.breadth)}%`;
-        tealDot.style.top = `${mapY(current.volume_ratio)}%`;
+        const tealX = mapX(current.breadth);
+        const tealY = mapY(current.volume_ratio);
+        console.log('[Weekend] Teal dot position:', { x: tealX, y: tealY });
+        tealDot.style.left = `${tealX}%`;
+        tealDot.style.top = `${tealY}%`;
     }
     
     // Draw trail and position burgundy dot at end
@@ -550,6 +560,8 @@ function renderMarketMoodFromMagazine(moodData) {
             x: mapX(p.breadth),
             y: mapY(p.volume_ratio)
         }));
+        
+        console.log('[Weekend] Trail points:', points);
         
         if (trailPath && points.length > 0) {
             // Create smooth path
@@ -571,11 +583,13 @@ function renderMarketMoodFromMagazine(moodData) {
                 d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${curr.x} ${curr.y}`;
             }
             
+            console.log('[Weekend] Trail path d:', d);
             trailPath.setAttribute('d', d);
         }
         
         // Position start dot (first point of trail)
         if (startDot && points.length > 0) {
+            console.log('[Weekend] Start dot position:', points[0]);
             startDot.style.left = `${points[0].x}%`;
             startDot.style.top = `${points[0].y}%`;
         }
@@ -583,9 +597,12 @@ function renderMarketMoodFromMagazine(moodData) {
         // Position burgundy dot at end of trail
         if (burgundyDot && points.length > 0) {
             const lastPoint = points[points.length - 1];
+            console.log('[Weekend] Burgundy dot position:', lastPoint);
             burgundyDot.style.left = `${lastPoint.x}%`;
             burgundyDot.style.top = `${lastPoint.y}%`;
         }
+    } else {
+        console.log('[Weekend] No trail or trail too short:', trail?.length);
     }
     
     // Highlight active zone
