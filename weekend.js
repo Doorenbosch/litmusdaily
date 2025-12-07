@@ -16,12 +16,6 @@ async function init() {
     // Set date
     setMagazineDate();
     
-    // Initialize sticky header
-    initStickyHeader();
-    
-    // Initialize audio player
-    initAudioPlayer();
-    
     // Load magazine content
     await loadMagazineContent();
     
@@ -33,83 +27,6 @@ async function init() {
     
     // Load relative performance
     loadRelativePerformance();
-    
-    // Load market mood
-    loadMarketMood();
-}
-
-// Sticky Header
-function initStickyHeader() {
-    const stickyHeader = document.getElementById('sticky-header');
-    const sectionNav = document.querySelector('.section-nav');
-    
-    if (!stickyHeader) return;
-    
-    // Get threshold
-    let threshold = sectionNav ? sectionNav.offsetTop + sectionNav.offsetHeight : 150;
-    
-    // Update threshold on resize
-    window.addEventListener('resize', () => {
-        if (sectionNav) {
-            threshold = sectionNav.offsetTop + sectionNav.offsetHeight;
-        }
-    });
-    
-    // Show/hide on scroll
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > threshold) {
-            stickyHeader.classList.add('visible');
-        } else {
-            stickyHeader.classList.remove('visible');
-        }
-    });
-    
-    // Load sticky prices
-    loadStickyPrices();
-}
-
-async function loadStickyPrices() {
-    try {
-        const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum&order=market_cap_desc&sparkline=false&price_change_percentage=7d');
-        if (!response.ok) return;
-        
-        const coins = await response.json();
-        const btc = coins.find(c => c.id === 'bitcoin');
-        const eth = coins.find(c => c.id === 'ethereum');
-        
-        if (btc) {
-            const btcPrice = document.getElementById('sticky-btc-price');
-            const btcChange = document.getElementById('sticky-btc-change');
-            if (btcPrice) btcPrice.textContent = `$${(btc.current_price / 1000).toFixed(1)}k`;
-            if (btcChange) {
-                const change = btc.price_change_percentage_7d_in_currency || 0;
-                btcChange.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(1)}%`;
-                btcChange.className = `sticky-change ${change >= 0 ? 'positive' : 'negative'}`;
-            }
-        }
-        
-        if (eth) {
-            const ethPrice = document.getElementById('sticky-eth-price');
-            const ethChange = document.getElementById('sticky-eth-change');
-            if (ethPrice) ethPrice.textContent = `$${(eth.current_price / 1000).toFixed(1)}k`;
-            if (ethChange) {
-                const change = eth.price_change_percentage_7d_in_currency || 0;
-                ethChange.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(1)}%`;
-                ethChange.className = `sticky-change ${change >= 0 ? 'positive' : 'negative'}`;
-            }
-        }
-        
-        // Market = average of BTC + ETH
-        const marketEl = document.getElementById('sticky-market');
-        if (marketEl && btc && eth) {
-            const btcChange = btc.price_change_percentage_7d_in_currency || 0;
-            const ethChange = eth.price_change_percentage_7d_in_currency || 0;
-            const avgChange = (btcChange + ethChange) / 2;
-            marketEl.textContent = `${avgChange >= 0 ? '+' : ''}${avgChange.toFixed(1)}%`;
-        }
-    } catch (e) {
-        console.warn('[Weekend] Could not load sticky prices:', e);
-    }
 }
 
 function setMagazineDate() {
@@ -150,30 +67,35 @@ async function loadMagazineContent() {
             }
         }
         
-        // Populate index card headlines
+        // Populate index card headlines with content excerpts
         if (magazineData.week_in_review) {
-            setText('card-week-review', magazineData.week_in_review.title || 'The Week in Review');
+            setText('card-week-review', getExcerpt(magazineData.week_in_review.content, 80));
         }
         if (magazineData.apac) {
-            setText('card-apac', magazineData.apac.title || 'Asia-Pacific');
+            setText('card-apac', getExcerpt(magazineData.apac.content, 60));
         }
         if (magazineData.emea) {
-            setText('card-emea', magazineData.emea.title || 'Europe & Middle East');
+            setText('card-emea', getExcerpt(magazineData.emea.content, 60));
         }
         if (magazineData.americas) {
-            setText('card-americas', magazineData.americas.title || 'Americas');
+            setText('card-americas', getExcerpt(magazineData.americas.content, 60));
         }
         if (magazineData.capital_flows) {
-            setText('card-flows', magazineData.capital_flows.title || 'Capital Flows');
+            setText('card-flows', getExcerpt(magazineData.capital_flows.content, 60));
         }
         if (magazineData.corporate) {
-            setText('card-corporate', magazineData.corporate.title || 'Corporate Moves');
+            setText('card-corporate', getExcerpt(magazineData.corporate.content, 60));
         }
         if (magazineData.week_ahead) {
-            setText('card-outlook', magazineData.week_ahead.title || 'Week Ahead');
+            setText('card-outlook', getExcerpt(magazineData.week_ahead.content, 60));
         }
         if (magazineData.mechanism) {
             setText('card-mechanism', magazineData.mechanism.topic || 'The Mechanism');
+        }
+        
+        // Load market mood from magazine data
+        if (magazineData.market_mood) {
+            renderMarketMoodFromMagazine(magazineData.market_mood);
         }
         
         // Load default section (week_review)
@@ -439,89 +361,41 @@ async function loadRelativePerformance() {
     if (!chartEl) return;
     
     try {
-        // Get user's coins from Personal Edition first
-        let personalCoinIds = [];
-        const personalSaved = localStorage.getItem('litmus_personal_coins');
-        if (personalSaved) {
-            try {
-                const personalCoins = JSON.parse(personalSaved);
-                const holdings = personalCoins.filter(c => c.weight !== 'watching');
-                personalCoinIds = holdings.map(c => c.id);
-            } catch (e) {
-                console.warn('Failed to parse Personal Edition coins');
-            }
-        }
-        
-        // Fallback to focusCoins if no Personal Edition
-        if (personalCoinIds.length === 0) {
-            const focusCoins = JSON.parse(localStorage.getItem('focusCoins') || '[]');
-            personalCoinIds = focusCoins;
-        }
-        
-        // Always include BTC and ETH
-        const allCoinIds = [...new Set(['bitcoin', 'ethereum', ...personalCoinIds])];
-        
-        // Fetch directly from CoinGecko with 7d data
-        const coinIds = allCoinIds.join(',');
-        const response = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${coinIds}&order=market_cap_desc&sparkline=false&price_change_percentage=7d`);
-        
+        // Fetch market data
+        const response = await fetch('/api/market-data');
         if (!response.ok) return;
         
-        const coins = await response.json();
-        
-        // Calculate market 7d change from BTC + ETH average
-        const btc = coins.find(c => c.id === 'bitcoin');
-        const eth = coins.find(c => c.id === 'ethereum');
-        const marketChange = ((btc?.price_change_percentage_7d_in_currency || 0) + 
-                              (eth?.price_change_percentage_7d_in_currency || 0)) / 2;
+        const data = await response.json();
         
         // Update market baseline
-        if (marketChangeEl) {
-            const sign = marketChange >= 0 ? '+' : '';
-            marketChangeEl.textContent = `${sign}${marketChange.toFixed(1)}%`;
+        if (marketChangeEl && data.market_change_7d !== undefined) {
+            const change = data.market_change_7d;
+            const sign = change >= 0 ? '+' : '';
+            marketChangeEl.textContent = `${sign}${change.toFixed(1)}%`;
         }
         
-        // Clear existing coin rows (keep market row)
-        const existingRows = chartEl.querySelectorAll('.relative-row:not(.market-row)');
-        existingRows.forEach(row => row.remove());
+        // Get user's focus coins from localStorage
+        const focusCoins = JSON.parse(localStorage.getItem('focusCoins') || '["bitcoin","ethereum"]');
         
-        // Render coin rows in order
-        allCoinIds.forEach(coinId => {
-            const coin = coins.find(c => c.id === coinId);
-            if (coin) {
-                const row = createRelativeRow7d(coin, marketChange);
-                chartEl.appendChild(row);
-            }
-        });
+        // Render coin rows
+        if (data.coins && focusCoins.length > 0) {
+            const existingRows = chartEl.querySelectorAll('.relative-row:not(.market-row)');
+            existingRows.forEach(row => row.remove());
+            
+            const marketChange = data.market_change_7d || 0;
+            
+            focusCoins.forEach(coinId => {
+                const coin = data.coins.find(c => c.id === coinId);
+                if (coin) {
+                    const row = createRelativeRow(coin, marketChange);
+                    chartEl.appendChild(row);
+                }
+            });
+        }
         
     } catch (error) {
         console.warn('[Weekend] Could not load relative performance:', error);
     }
-}
-
-function createRelativeRow7d(coin, marketChange) {
-    const change = coin.price_change_percentage_7d_in_currency || 0;
-    const relative = change - marketChange;
-    const sign = change >= 0 ? '+' : '';
-    const relSign = relative >= 0 ? '+' : '';
-    const isOutperform = relative >= 0;
-    
-    // Calculate bar width (max 50% of container width for each direction)
-    const barWidth = Math.min(Math.abs(relative) * 2, 50);
-    
-    const row = document.createElement('div');
-    row.className = 'relative-row';
-    row.innerHTML = `
-        <span class="rel-name">${coin.symbol.toUpperCase()}</span>
-        <span class="rel-change">${sign}${change.toFixed(1)}%</span>
-        <div class="rel-bar-container">
-            <div class="rel-baseline"></div>
-            <div class="rel-bar ${isOutperform ? 'outperform' : 'underperform'}" style="width: ${barWidth}%"></div>
-        </div>
-        <span class="rel-vs ${isOutperform ? 'positive' : 'negative'}">${relSign}${relative.toFixed(1)}%</span>
-    `;
-    
-    return row;
 }
 
 function createRelativeRow(coin, marketChange) {
@@ -556,6 +430,16 @@ function setText(id, text) {
     if (el && text) el.textContent = text;
 }
 
+function getExcerpt(content, maxLength = 80) {
+    if (!content) return '';
+    // Get first sentence or truncate
+    const firstSentence = content.split(/[.!?]/)[0];
+    if (firstSentence.length <= maxLength) {
+        return firstSentence + '...';
+    }
+    return firstSentence.substring(0, maxLength).trim() + '...';
+}
+
 function escapeHtml(text) {
     if (!text) return '';
     const div = document.createElement('div');
@@ -570,295 +454,57 @@ function trackEvent(name, params = {}) {
     }
 }
 
-// ========== AUDIO EDITION PLAYER ==========
+// ========== MARKET MOOD FROM MAGAZINE ==========
 
-function initAudioPlayer() {
-    const audioEdition = document.getElementById('audio-edition');
-    const audioElement = document.getElementById('audio-element');
-    const audioSource = document.getElementById('audio-source');
-    const playBtn = document.getElementById('audio-play-btn');
-    const playIcon = playBtn?.querySelector('.play-icon');
-    const pauseIcon = playBtn?.querySelector('.pause-icon');
-    const progressBar = document.getElementById('audio-progress-bar');
-    const progressHandle = document.getElementById('audio-progress-handle');
-    const progress = document.getElementById('audio-progress');
-    const currentTime = document.getElementById('audio-time-current');
-    const totalTime = document.getElementById('audio-time-total');
-    const durationDisplay = document.getElementById('audio-duration');
-    const speedBtn = document.getElementById('audio-speed-btn');
-    const volumeBtn = document.getElementById('audio-volume-btn');
-    const player = document.getElementById('audio-player');
+function renderMarketMoodFromMagazine(moodData) {
+    if (!moodData) return;
     
-    if (!audioEdition || !audioElement) return;
-    
-    // Try to load audio file
-    loadWeekInReviewAudio();
-    
-    let isSeeking = false;
-    const speeds = [1, 1.25, 1.5, 1.75, 2];
-    let speedIndex = 0;
-    
-    // Play/Pause
-    playBtn?.addEventListener('click', () => {
-        if (audioElement.paused) {
-            audioElement.play();
-        } else {
-            audioElement.pause();
-        }
-    });
-    
-    // Update UI on play
-    audioElement.addEventListener('play', () => {
-        player?.classList.add('playing');
-        if (playIcon) playIcon.style.display = 'none';
-        if (pauseIcon) pauseIcon.style.display = 'block';
-    });
-    
-    // Update UI on pause
-    audioElement.addEventListener('pause', () => {
-        player?.classList.remove('playing');
-        if (playIcon) playIcon.style.display = 'block';
-        if (pauseIcon) pauseIcon.style.display = 'none';
-    });
-    
-    // Update progress bar
-    audioElement.addEventListener('timeupdate', () => {
-        if (isSeeking) return;
-        
-        const percent = (audioElement.currentTime / audioElement.duration) * 100 || 0;
-        if (progressBar) progressBar.style.width = `${percent}%`;
-        if (progressHandle) progressHandle.style.left = `${percent}%`;
-        if (currentTime) currentTime.textContent = formatTime(audioElement.currentTime);
-    });
-    
-    // Set duration when loaded
-    audioElement.addEventListener('loadedmetadata', () => {
-        const duration = audioElement.duration;
-        if (totalTime) totalTime.textContent = formatTime(duration);
-        
-        // Update duration display
-        const minutes = Math.round(duration / 60);
-        if (durationDisplay) durationDisplay.textContent = `${minutes} min listen`;
-    });
-    
-    // Click on progress bar to seek
-    progress?.addEventListener('click', (e) => {
-        const rect = progress.getBoundingClientRect();
-        const percent = (e.clientX - rect.left) / rect.width;
-        audioElement.currentTime = percent * audioElement.duration;
-    });
-    
-    // Drag progress handle
-    progressHandle?.addEventListener('mousedown', () => {
-        isSeeking = true;
-        document.addEventListener('mousemove', handleSeek);
-        document.addEventListener('mouseup', () => {
-            isSeeking = false;
-            document.removeEventListener('mousemove', handleSeek);
-        }, { once: true });
-    });
-    
-    function handleSeek(e) {
-        if (!progress) return;
-        const rect = progress.getBoundingClientRect();
-        let percent = (e.clientX - rect.left) / rect.width;
-        percent = Math.max(0, Math.min(1, percent));
-        audioElement.currentTime = percent * audioElement.duration;
-        if (progressBar) progressBar.style.width = `${percent * 100}%`;
-        if (progressHandle) progressHandle.style.left = `${percent * 100}%`;
-    }
-    
-    // Speed control
-    speedBtn?.addEventListener('click', () => {
-        speedIndex = (speedIndex + 1) % speeds.length;
-        audioElement.playbackRate = speeds[speedIndex];
-        speedBtn.textContent = `${speeds[speedIndex]}×`;
-    });
-    
-    // Volume toggle (mute/unmute)
-    volumeBtn?.addEventListener('click', () => {
-        audioElement.muted = !audioElement.muted;
-        volumeBtn.style.opacity = audioElement.muted ? '0.5' : '1';
-    });
-    
-    // Loading state
-    audioElement.addEventListener('waiting', () => {
-        player?.classList.add('loading');
-    });
-    
-    audioElement.addEventListener('canplay', () => {
-        player?.classList.remove('loading');
-    });
-    
-    // Error handling
-    audioElement.addEventListener('error', () => {
-        console.warn('[Weekend] Audio failed to load');
-        audioEdition.classList.add('hidden');
-    });
-}
-
-async function loadWeekInReviewAudio() {
-    const audioEdition = document.getElementById('audio-edition');
-    const audioSource = document.getElementById('audio-source');
-    const audioElement = document.getElementById('audio-element');
-    
-    if (!audioEdition || !audioSource || !audioElement) return;
-    
-    // Try to load from magazine.json or direct path
-    try {
-        // First try magazine.json for audio URL
-        const response = await fetch('content/weekend/magazine.json');
-        if (response.ok) {
-            const data = await response.json();
-            if (data.audio_url) {
-                audioSource.src = data.audio_url;
-                audioElement.load();
-                audioEdition.classList.remove('hidden');
-                return;
-            }
-        }
-    } catch (e) {
-        console.log('[Weekend] No magazine.json audio URL');
-    }
-    
-    // Fallback: try standard path
-    const weekDate = getWeekendDate();
-    const fallbackPath = `content/weekend/audio/week-in-review-${weekDate}.mp3`;
-    
-    // Check if file exists
-    try {
-        const headResponse = await fetch(fallbackPath, { method: 'HEAD' });
-        if (headResponse.ok) {
-            audioSource.src = fallbackPath;
-            audioElement.load();
-            audioEdition.classList.remove('hidden');
-            return;
-        }
-    } catch (e) {
-        console.log('[Weekend] No audio file found at:', fallbackPath);
-    }
-    
-    // No audio available - hide the player
-    audioEdition.classList.add('hidden');
-}
-
-function getWeekendDate() {
-    const now = new Date();
-    // Get most recent Saturday
-    const day = now.getDay();
-    const diff = day === 0 ? 1 : day; // Sunday = 1 day back, others = day number
-    const saturday = new Date(now);
-    saturday.setDate(now.getDate() - diff + 6);
-    
-    const year = saturday.getFullYear();
-    const month = String(saturday.getMonth() + 1).padStart(2, '0');
-    const date = String(saturday.getDate()).padStart(2, '0');
-    
-    return `${year}-${month}-${date}`;
-}
-
-function formatTime(seconds) {
-    if (isNaN(seconds)) return '0:00';
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-}
-
-// ========== MARKET MOOD 9-BOX (Weekend Edition) ==========
-
-const MOOD_ZONES = {
-    'concentration':   { row: 0, col: 0, label: 'Concentration' },
-    'leadership':      { row: 0, col: 1, label: 'Leadership' },
-    'strong-rally':    { row: 0, col: 2, label: 'Strong Rally' },
-    'rotation':        { row: 1, col: 0, label: 'Rotation' },
-    'consolidation':   { row: 1, col: 1, label: 'Consolidation' },
-    'steady-advance':  { row: 1, col: 2, label: 'Steady Advance' },
-    'capitulation':    { row: 2, col: 0, label: 'Capitulation' },
-    'drift':           { row: 2, col: 1, label: 'Drift' },
-    'weak-rally':      { row: 2, col: 2, label: 'Weak Rally' }
-};
-
-const MOOD_DESCRIPTIONS = {
-    'strong-rally': 'Broad participation with high conviction. The market is moving decisively higher with strong volume confirmation.',
-    'leadership': 'Select leaders driving gains on elevated volume. Watch for rotation or broadening participation.',
-    'steady-advance': 'Healthy breadth with moderate volume. Measured advance with sustainable participation.',
-    'consolidation': 'Mixed breadth on quiet volume. The market is digesting recent moves and awaiting direction.',
-    'concentration': 'Narrow leadership with frenzied activity. Gains concentrated in few names—fragile setup.',
-    'rotation': 'Sector rotation underway with elevated volume. Capital is moving, but direction is unclear.',
-    'weak-rally': 'Broad gains but lacking volume conviction. Advance may stall without renewed participation.',
-    'drift': 'Indecisive action on low volume. The market lacks catalyst and conviction.',
-    'capitulation': 'Widespread selling on high volume. Potential washout—watch for exhaustion signals.'
-};
-
-async function loadMarketMood() {
-    try {
-        const response = await fetch('/api/market-mood');
-        if (!response.ok) {
-            console.log('[Weekend] Market mood API not available');
-            return;
-        }
-        
-        const data = await response.json();
-        renderMarketMood(data);
-        
-    } catch (error) {
-        console.log('[Weekend] Market mood API error:', error);
-    }
-}
-
-function renderMarketMood(data) {
-    // Use weekend-specific grid ID
     const grid = document.getElementById('nine-box-grid-weekend');
     if (!grid) return;
     
-    const { breadth, breadthAvg24h, mvRatio24h, mvRatio7d, trail, mvRange } = data;
-    
-    const avgBreadth = breadthAvg24h !== undefined ? breadthAvg24h : breadth;
-    
-    // Calculate zone
-    const zone = getMarketZone(breadth, mvRatio24h, mvRange);
+    const { current, trail, title, description } = moodData;
     
     // Update title and description
-    const titleEl = document.getElementById('mood-title-weekend');
-    const descEl = document.getElementById('mood-description-weekend');
-    const breadthEl = document.getElementById('breadth-value-weekend');
+    setText('mood-title-weekend', title || 'Market Mood');
+    setText('mood-description-weekend', description || '');
     
-    if (titleEl) titleEl.textContent = MOOD_ZONES[zone]?.label || 'Market Mood';
-    if (descEl) descEl.textContent = MOOD_DESCRIPTIONS[zone] || '';
-    if (breadthEl) breadthEl.textContent = `${Math.round(breadth)}% of coins are green`;
+    if (current) {
+        setText('breadth-value-weekend', `${Math.round(current.breadth)}% of coins are green`);
+    }
+    
+    // M/V range for mapping (volume_ratio is typically 30-60)
+    const mvRange = { low: 30, high: 60 };
     
     // Map coordinates
     const mapX = (b) => (b / 100) * 100;
     const mapY = (mv) => {
+        // Lower M/V = more activity = frenzied = top
+        // Higher M/V = less activity = quiet = bottom
         const normalized = (mv - mvRange.low) / (mvRange.high - mvRange.low);
         return Math.max(0, Math.min(100, normalized * 100));
     };
     
-    // Position teal dot (current breadth, 24h M/V)
+    // Position teal dot (current position)
     const tealDot = document.getElementById('mood-dot-teal-weekend');
-    if (tealDot) {
-        tealDot.style.left = `${mapX(breadth)}%`;
-        tealDot.style.top = `${mapY(mvRatio24h)}%`;
+    if (tealDot && current) {
+        tealDot.style.left = `${mapX(current.breadth)}%`;
+        tealDot.style.top = `${mapY(current.volume_ratio)}%`;
     }
     
-    // Position burgundy dot (average breadth 24h, 7d avg M/V)
-    const burgundyDot = document.getElementById('mood-dot-burgundy-weekend');
-    if (burgundyDot) {
-        burgundyDot.style.left = `${mapX(avgBreadth)}%`;
-        burgundyDot.style.top = `${mapY(mvRatio7d)}%`;
-    }
-    
-    // Draw trail
+    // Draw trail and position burgundy dot at end
     if (trail && trail.length > 1) {
-        const trailPath = document.getElementById('trail-path-weekend');
+        const trailPath = document.getElementById('trail-path-7day');
         const startDot = document.getElementById('mood-dot-start-weekend');
+        const burgundyDot = document.getElementById('mood-dot-burgundy-weekend');
         
+        // Map trail points
         const points = trail.map(p => ({
             x: mapX(p.breadth),
-            y: mapY(p.mv)
+            y: mapY(p.volume_ratio)
         }));
         
         if (trailPath && points.length > 0) {
+            // Create smooth path
             let d = `M ${points[0].x} ${points[0].y}`;
             
             for (let i = 1; i < points.length; i++) {
@@ -867,6 +513,7 @@ function renderMarketMood(data) {
                 const next = points[i + 1] || curr;
                 const prevPrev = points[i - 2] || prev;
                 
+                // Catmull-Rom to Bezier conversion
                 const tension = 0.3;
                 const cp1x = prev.x + (curr.x - prevPrev.x) * tension;
                 const cp1y = prev.y + (curr.y - prevPrev.y) * tension;
@@ -879,13 +526,22 @@ function renderMarketMood(data) {
             trailPath.setAttribute('d', d);
         }
         
-        if (startDot) {
-            startDot.style.left = `${mapX(trail[0].breadth)}%`;
-            startDot.style.top = `${mapY(trail[0].mv)}%`;
+        // Position start dot (first point of trail)
+        if (startDot && points.length > 0) {
+            startDot.style.left = `${points[0].x}%`;
+            startDot.style.top = `${points[0].y}%`;
+        }
+        
+        // Position burgundy dot at end of trail
+        if (burgundyDot && points.length > 0) {
+            const lastPoint = points[points.length - 1];
+            burgundyDot.style.left = `${lastPoint.x}%`;
+            burgundyDot.style.top = `${lastPoint.y}%`;
         }
     }
     
     // Highlight active zone
+    const zone = current?.zone || getZoneFromTitle(title);
     grid.querySelectorAll('.box').forEach(box => {
         box.classList.remove('active-zone');
         if (box.dataset.zone === zone) {
@@ -894,16 +550,8 @@ function renderMarketMood(data) {
     });
 }
 
-function getMarketZone(breadth, mv, mvRange) {
-    const col = breadth < 33 ? 0 : breadth < 66 ? 1 : 2;
-    const mvNormalized = (mv - mvRange.low) / (mvRange.high - mvRange.low);
-    const row = mvNormalized < 0.33 ? 0 : mvNormalized < 0.66 ? 1 : 2;
-    
-    const zones = [
-        ['concentration', 'leadership', 'strong-rally'],
-        ['rotation', 'consolidation', 'steady-advance'],
-        ['capitulation', 'drift', 'weak-rally']
-    ];
-    
-    return zones[row][col];
+function getZoneFromTitle(title) {
+    if (!title) return '';
+    // Convert title to zone key: "Weak Rally" -> "weak-rally"
+    return title.toLowerCase().replace(/\s+/g, '-');
 }
