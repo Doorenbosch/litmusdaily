@@ -1276,30 +1276,66 @@ function formatShortDate(date) {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
-// Render Timestamp
+// Render Timestamp - show date in regional time
 function renderTimestamp(data) {
     if (data.generated_at) {
         const isoString = data.generated_at;
         
-        // Parse date components directly from ISO string to avoid timezone conversion
-        // Format: "2025-12-03T06:00:00+08:00"
-        const dateMatch = isoString.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
-        if (dateMatch) {
-            const [, year, month, day, hour, minute] = dateMatch;
+        // Check if timestamp has timezone offset
+        const tzMatch = isoString.match(/([+-])(\d{2}):?(\d{2})$/);
+        const isUTC = isoString.endsWith('Z') || !tzMatch;
+        
+        let displayDate;
+        
+        if (isUTC) {
+            // UTC timestamp - convert to regional time
+            const utcDate = new Date(isoString);
             
-            // Format date manually (month names)
-            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
-                               'July', 'August', 'September', 'October', 'November', 'December'];
-            const dateStr = `${monthNames[parseInt(month) - 1]} ${parseInt(day)}, ${year}`;
+            // Get offset for current region
+            const regionOffsets = {
+                'apac': 8,    // SGT +8
+                'emea': 1,    // CET +1  
+                'americas': -5 // EST -5
+            };
             
-            // Format time with timezone
-            const tzAbbrev = getTimezoneAbbrev(isoString);
-            const timeStr = `${hour}:${minute} ${tzAbbrev}`;
-            
-            setText('brief-date', dateStr);
-            setText('reading-timestamp', `${dateStr} · ${timeStr}`);
+            const offsetHours = regionOffsets[currentRegion] || 0;
+            displayDate = new Date(utcDate.getTime() + (offsetHours * 60 * 60 * 1000));
+        } else {
+            // Timestamp already includes timezone - parse the date from the string
+            // Format: "2025-12-03T06:00:00+08:00"
+            const dateMatch = isoString.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+            if (dateMatch) {
+                const [, year, month, day, hour, minute] = dateMatch;
+                displayDate = new Date(year, month - 1, day, hour, minute);
+            } else {
+                displayDate = new Date(isoString);
+            }
         }
+        
+        // Format date
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                           'July', 'August', 'September', 'October', 'November', 'December'];
+        const dateStr = `${monthNames[displayDate.getMonth()]} ${displayDate.getDate()}, ${displayDate.getFullYear()}`;
+        
+        // Format time
+        const hour = String(displayDate.getHours()).padStart(2, '0');
+        const minute = String(displayDate.getMinutes()).padStart(2, '0');
+        const tzAbbrev = getTimezoneAbbrev(isoString) || getRegionTimezone(currentRegion);
+        const timeStr = `${hour}:${minute} ${tzAbbrev}`;
+        
+        setText('brief-date', dateStr);
+        setText('reading-timestamp', `${dateStr} · ${timeStr}`);
     }
+}
+
+// Get timezone abbreviation for a region
+function getRegionTimezone(region) {
+    const tzMap = {
+        'apac': 'SGT',
+        'emea': 'CET',
+        'americas': 'EST'
+    };
+    return tzMap[region] || 'UTC';
 }
 
 // Get timezone abbreviation from ISO string
