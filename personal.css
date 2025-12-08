@@ -1005,7 +1005,9 @@ body {
 }
 
 .region-btn .region-icon {
-    font-size: 1.5rem;
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
 }
 
 .region-btn .region-name {
@@ -1033,6 +1035,7 @@ body {
     }
     
     .region-btn .region-icon {
-        font-size: 1.2rem;
+        width: 24px;
+        height: 24px;
     }
 }
