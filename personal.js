@@ -143,12 +143,10 @@ async function saveUserCoins() {
         // Always save to localStorage (offline fallback)
         localStorage.setItem(CONFIG.storageKey, JSON.stringify(state.userCoins));
         
-        // If signed in, sync to Firebase
+        // If signed in, sync full coin objects to Firebase (includes weight, segment)
         if (typeof userSync !== 'undefined' && typeof getCurrentUser === 'function' && getCurrentUser()) {
-            // Extract just coin IDs for focus coins sync
-            const coinIds = state.userCoins.map(c => c.id);
-            await userSync.saveFocusCoins(coinIds);
-            console.log('[Personal] Synced to cloud');
+            await userSync.saveFocusCoins(state.userCoins);
+            console.log('[Personal] Synced to cloud:', state.userCoins.length, 'coins');
         }
     } catch (e) {
         console.error('Failed to save coins:', e);
@@ -161,22 +159,22 @@ window.addEventListener('userDataLoaded', async (e) => {
     if (userData?.focusCoins && Array.isArray(userData.focusCoins)) {
         console.log('[Personal] Loading coins from cloud:', userData.focusCoins);
         
-        // Convert focusCoins array to full coin objects
+        // Handle both old format (array of strings) and new format (array of objects)
         const cloudCoins = [];
-        for (const coinId of userData.focusCoins) {
-            // Check if we already have this coin with full data
-            const existing = state.userCoins.find(c => c.id === coinId);
-            if (existing) {
-                cloudCoins.push(existing);
-            } else {
-                // Create basic entry, will be enriched by price fetch
+        for (const item of userData.focusCoins) {
+            // Check if it's already a full object or just a string ID
+            if (typeof item === 'object' && item.id) {
+                // New format: full coin object with weight/segment
+                cloudCoins.push(item);
+            } else if (typeof item === 'string') {
+                // Old format: just coin ID, need to enrich
                 const coinData = typeof TOP_100_COINS !== 'undefined' 
-                    ? TOP_100_COINS.find(c => c.id === coinId) 
+                    ? TOP_100_COINS.find(c => c.id === item) 
                     : null;
                     
                 if (coinData) {
                     cloudCoins.push({
-                        id: coinId,
+                        id: item,
                         symbol: coinData.symbol,
                         name: coinData.name,
                         weight: 'moderate',

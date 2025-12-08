@@ -100,15 +100,30 @@ async function signOut() {
 async function createUserProfile(user) {
     const userRef = db.collection('users').doc(user.uid);
     
-    // Get existing localStorage data to migrate
-    const localCoins = JSON.parse(localStorage.getItem('litmus_focus_coins') || '[]');
+    // Get existing localStorage data to migrate (use correct key)
+    let localCoins = [];
+    try {
+        const saved = localStorage.getItem('litmus_personal_coins');
+        if (saved) {
+            localCoins = JSON.parse(saved);
+        }
+    } catch (e) {
+        console.warn('[Auth] Could not parse local coins');
+    }
+    
     const localRegion = localStorage.getItem('litmus_region') || 'americas';
+    
+    // Default coins with full structure if no local data
+    const defaultCoins = [
+        { id: 'bitcoin', symbol: 'BTC', name: 'Bitcoin', weight: 'core', segment: 'store_of_value' },
+        { id: 'ethereum', symbol: 'ETH', name: 'Ethereum', weight: 'significant', segment: 'infrastructure' }
+    ];
     
     const profile = {
         email: user.email,
         displayName: user.displayName || '',
         photoURL: user.photoURL || '',
-        focusCoins: localCoins.length > 0 ? localCoins : ['BTC', 'ETH'],
+        focusCoins: localCoins.length > 0 ? localCoins : defaultCoins,
         region: localRegion,
         accountType: 'free',
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),

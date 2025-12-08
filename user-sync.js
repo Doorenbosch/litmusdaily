@@ -6,6 +6,9 @@
 // Cached user data
 let userData = null;
 
+// Storage key for personal coins (matches personal.js)
+const PERSONAL_COINS_KEY = 'litmus_personal_coins';
+
 /**
  * Load user data from Firestore
  */
@@ -18,9 +21,9 @@ async function loadUserData(userId) {
             userData = doc.data();
             console.log('[Sync] User data loaded:', userData);
             
-            // Update localStorage as cache
+            // Update localStorage as cache - store full coin objects
             if (userData.focusCoins) {
-                localStorage.setItem('litmus_focus_coins', JSON.stringify(userData.focusCoins));
+                localStorage.setItem(PERSONAL_COINS_KEY, JSON.stringify(userData.focusCoins));
             }
             if (userData.region) {
                 localStorage.setItem('litmus_region', userData.region);
@@ -41,11 +44,12 @@ async function loadUserData(userId) {
 }
 
 /**
- * Save focus coins to Firestore
+ * Save focus coins to Firestore (full objects with weight/segment)
+ * @param {Array} coins - Array of coin objects: [{id, symbol, name, weight, segment}, ...]
  */
 async function saveFocusCoins(coins) {
     // Always save to localStorage (offline fallback)
-    localStorage.setItem('litmus_focus_coins', JSON.stringify(coins));
+    localStorage.setItem(PERSONAL_COINS_KEY, JSON.stringify(coins));
     
     // If signed in, sync to Firestore
     const user = getCurrentUser();
@@ -56,7 +60,7 @@ async function saveFocusCoins(coins) {
                 focusCoins: coins,
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            console.log('[Sync] Focus coins saved to cloud');
+            console.log('[Sync] Focus coins saved to cloud:', coins.length, 'coins');
         } catch (error) {
             console.error('[Sync] Error saving focus coins:', error);
         }
@@ -65,12 +69,21 @@ async function saveFocusCoins(coins) {
 
 /**
  * Get focus coins (from cloud or localStorage)
+ * Returns full coin objects with weight/segment
  */
 function getFocusCoins() {
     if (userData?.focusCoins) {
         return userData.focusCoins;
     }
-    return JSON.parse(localStorage.getItem('litmus_focus_coins') || '["BTC", "ETH"]');
+    const saved = localStorage.getItem(PERSONAL_COINS_KEY);
+    if (saved) {
+        try {
+            return JSON.parse(saved);
+        } catch (e) {
+            return [];
+        }
+    }
+    return [];
 }
 
 /**

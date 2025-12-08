@@ -421,3 +421,8 @@
         transform: translateY(0);
     }
 }
+
+/* ========== MASTHEAD POSITIONING FIX ========== */
+.masthead-right {
+    position: relative;
+}
