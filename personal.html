@@ -22,6 +22,36 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Libre+Baskerville:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+    // UI Functions - defined early so they're available globally
+    function toggleUserMenu() {
+        var menu = document.getElementById('user-menu');
+        if (menu) {
+            menu.classList.toggle('active');
+        }
+    }
+    
+    function openSettings() {
+        var modal = document.getElementById('settings-modal');
+        if (modal) {
+            modal.classList.add('active');
+        }
+        // Close user menu
+        var menu = document.getElementById('user-menu');
+        if (menu) {
+            menu.classList.remove('active');
+        }
+    }
+    
+    function handleAuthClick() {
+        if (typeof isSignedIn === 'function' && isSignedIn()) {
+            toggleUserMenu();
+        } else if (typeof openAuthModal === 'function') {
+            openAuthModal();
+        }
+    }
+    </script>
 </head>
 <body>
 <div class="container">
@@ -38,7 +68,7 @@
         </div>
         
         <div class="masthead-right">
-            <button class="auth-button" id="auth-button" title="Sign in">
+            <button class="auth-button" id="auth-button" onclick="handleAuthClick()" title="Sign in">
                 <span id="user-avatar">
                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                 </span>
@@ -50,7 +80,7 @@
                     <p class="user-menu-plan" id="user-plan">Free Plan</p>
                 </div>
                 <div class="user-menu-items">
-                    <button class="user-menu-item" id="open-settings">
+                    <button class="user-menu-item" id="open-settings" onclick="openSettings()">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
                         Settings
                     </button>
@@ -357,66 +387,34 @@
     <script src="personal.js"></script>
     
     <script>
-    // Toggle user menu
-    function toggleUserMenu() {
-        const menu = document.getElementById('user-menu');
-        if (menu) {
-            menu.classList.toggle('active');
-            console.log('[UI] User menu toggled:', menu.classList.contains('active'));
-        } else {
-            console.error('[UI] User menu element not found');
-        }
-    }
-    
-    // Handle auth button click
-    function handleAuthClick(e) {
-        e.stopPropagation(); // Prevent document click from immediately closing
-        console.log('[UI] Auth button clicked');
-        if (typeof isSignedIn === 'function' && isSignedIn()) {
-            console.log('[UI] User is signed in, showing menu');
-            toggleUserMenu();
-        } else if (typeof openAuthModal === 'function') {
-            console.log('[UI] User not signed in, opening auth modal');
-            openAuthModal();
-        } else {
-            console.error('[UI] Auth functions not available');
-        }
-    }
-    
-    // Set up auth button click handler
-    const authBtn = document.getElementById('auth-button');
-    if (authBtn) {
-        authBtn.addEventListener('click', handleAuthClick);
-        console.log('[UI] Auth button handler attached');
-    } else {
-        console.error('[UI] Auth button not found!');
-    }
-    
     // Close menu when clicking outside
-    document.addEventListener('click', (e) => {
-        const menu = document.getElementById('user-menu');
-        const authBtn = document.getElementById('auth-button');
+    document.addEventListener('click', function(e) {
+        var menu = document.getElementById('user-menu');
+        var authBtn = document.getElementById('auth-button');
         if (menu && menu.classList.contains('active')) {
             if (!menu.contains(e.target) && !authBtn.contains(e.target)) {
                 menu.classList.remove('active');
-                console.log('[UI] Menu closed by outside click');
             }
         }
     });
     
     // Update user menu when auth state changes
-    onAuthStateChange((user) => {
-        const emailEl = document.getElementById('user-email');
-        const planEl = document.getElementById('user-plan');
-        
-        if (user && emailEl) {
-            emailEl.textContent = user.email;
-            planEl.textContent = userSync.isPremium() ? 'Premium' : 'Free Plan';
-            if (userSync.isPremium()) {
-                planEl.classList.add('premium');
+    if (typeof onAuthStateChange === 'function') {
+        onAuthStateChange(function(user) {
+            var emailEl = document.getElementById('user-email');
+            var planEl = document.getElementById('user-plan');
+            
+            if (user && emailEl) {
+                emailEl.textContent = user.email;
+                if (typeof userSync !== 'undefined' && userSync.isPremium()) {
+                    planEl.textContent = 'Premium';
+                    planEl.classList.add('premium');
+                } else {
+                    planEl.textContent = 'Free Plan';
+                }
             }
-        }
-    });
-    
-    // Listen for user data updates and refresh focus coins
-    window.addEventListen
+        });
+    }
+    </script>
+</body>
+</html>
