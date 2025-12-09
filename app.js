@@ -943,6 +943,7 @@ async function loadTheNumber() {
 function renderTheNumber(data) {
     const valueEl = document.getElementById('number-value');
     const metricEl = document.getElementById('number-metric');
+    const changeEl = document.getElementById('number-change');
     const contextEl = document.getElementById('number-context');
     
     if (valueEl) {
@@ -983,6 +984,26 @@ function renderTheNumber(data) {
             metricEl.style.display = 'block';
         } else {
             metricEl.style.display = 'none';
+        }
+    }
+    
+    // Display change/delta (e.g., "+5 vs last week")
+    if (changeEl) {
+        if (data && data.change) {
+            changeEl.textContent = data.change;
+            changeEl.style.display = 'block';
+            // Color code based on direction
+            if (data.change.startsWith('+')) {
+                changeEl.classList.add('positive');
+                changeEl.classList.remove('negative');
+            } else if (data.change.startsWith('-')) {
+                changeEl.classList.add('negative');
+                changeEl.classList.remove('positive');
+            } else {
+                changeEl.classList.remove('positive', 'negative');
+            }
+        } else {
+            changeEl.style.display = 'none';
         }
     }
     

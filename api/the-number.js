@@ -101,9 +101,9 @@ async function getFearAndGreed() {
         }
         history.reverse();
         
-        // Calculate 30-day change
-        const thirtyDaysAgo = data[29] ? parseInt(data[29].value) : current;
-        const change = current - thirtyDaysAgo;
+        // Calculate 7-day change (since this metric shows once per week)
+        const sevenDaysAgo = data[6] ? parseInt(data[6].value) : current;
+        const change7d = current - sevenDaysAgo;
         
         // Determine interpretation
         let interpretation = 'neutral';
@@ -135,7 +135,7 @@ async function getFearAndGreed() {
             subtitle: classification,
             context,
             interpretation,
-            change: change !== 0 ? (change > 0 ? `+${change}` : `${change}`) + ' vs 30d ago' : null,
+            change: change7d !== 0 ? (change7d > 0 ? `+${change7d}` : `${change7d}`) + ' vs last week' : 'unchanged',
             history,
             historyLabel: '6 months',
             source: 'alternative.me'
@@ -180,6 +180,7 @@ async function getBTCDominance() {
         const json = await response.json();
         const dominance = json.data?.market_cap_percentage?.btc || 0;
         const ethDominance = json.data?.market_cap_percentage?.eth || 0;
+        const marketCapChange24h = json.data?.market_cap_change_percentage_24h_usd || 0;
         
         // Determine interpretation
         let interpretation = 'neutral';
@@ -208,8 +209,8 @@ async function getBTCDominance() {
             subtitle: `ETH: ${ethDominance.toFixed(1)}%`,
             context,
             interpretation,
-            change: null, // Would need historical data
-            history: [], // CoinGecko free tier doesn't provide historical dominance
+            change: `Market ${marketCapChange24h >= 0 ? '+' : ''}${marketCapChange24h.toFixed(1)}% 24h`,
+            history: [],
             historyLabel: '6 months',
             source: 'coingecko'
         };

@@ -1797,7 +1797,24 @@ a {
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--teal);
+    margin-bottom: var(--xs);
+}
+
+/* Change/delta display (e.g., "+5 vs last week") */
+.number-change {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--ink-tertiary);
     margin-bottom: var(--sm);
+}
+
+.number-change.positive {
+    color: var(--positive);
+}
+
+.number-change.negative {
+    color: var(--negative);
 }
 
 .number-context {
