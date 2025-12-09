@@ -1232,35 +1232,42 @@ function renderReadingPane(sectionKey) {
         // Special handling for The Region section with sub-regions (evening brief)
         if (sectionKey === 'region' && currentBriefType === 'evening') {
             const regionData = briefData.sections.the_region;
-            if (regionData && typeof regionData === 'object') {
+            
+            // Check if regionData is a proper object with sub-regions
+            if (regionData && typeof regionData === 'object' && !Array.isArray(regionData)) {
                 let html = '';
                 
-                // Iterate through sub-regions (skip 'title' field)
-                const subRegionKeys = Object.keys(regionData).filter(k => k !== 'title');
+                // Iterate through sub-regions (skip 'title' and 'name' fields)
+                const subRegionKeys = Object.keys(regionData).filter(k => k !== 'title' && k !== 'name');
                 
-                for (const subKey of subRegionKeys) {
-                    const subRegion = regionData[subKey];
-                    if (subRegion && subRegion.name) {
-                        html += `<h3 class="sub-region-header">${subRegion.name}</h3>`;
-                        if (subRegion.content) {
-                            const paragraphs = splitIntoParagraphs(subRegion.content);
-                            html += paragraphs.map(p => {
-                                // Don't wrap if already HTML (e.g., bullet list)
-                                if (p.startsWith('<ul') || p.startsWith('<ol')) return p;
-                                return `<p>${p}</p>`;
-                            }).join('');
+                if (subRegionKeys.length > 0) {
+                    for (const subKey of subRegionKeys) {
+                        const subRegion = regionData[subKey];
+                        if (subRegion && subRegion.name) {
+                            html += `<h3 class="sub-region-header">${subRegion.name}</h3>`;
+                            if (subRegion.content) {
+                                const paragraphs = splitIntoParagraphs(subRegion.content);
+                                html += paragraphs.map(p => {
+                                    // Don't wrap if already HTML (e.g., bullet list)
+                                    if (p.startsWith('<ul') || p.startsWith('<ol')) return p;
+                                    return `<p>${p}</p>`;
+                                }).join('');
+                            }
                         }
                     }
                 }
                 
-                bodyEl.innerHTML = html || '<p>No regional updates available.</p>';
-            } else {
-                // Fallback to regular content display
-                const paragraphs = splitIntoParagraphs(content);
+                bodyEl.innerHTML = html || '<p>Regional updates are being prepared. Check back shortly.</p>';
+            } else if (regionData && typeof regionData === 'string' && regionData.length > 0) {
+                // Fallback: regionData is a string (old format)
+                const paragraphs = splitIntoParagraphs(regionData);
                 bodyEl.innerHTML = paragraphs.map(p => {
                     if (p.startsWith('<ul') || p.startsWith('<ol')) return p;
                     return `<p>${p}</p>`;
                 }).join('');
+            } else {
+                // No region data available
+                bodyEl.innerHTML = '<p>Regional updates are being prepared. Check back shortly.</p>';
             }
         } else {
             // Standard paragraph rendering

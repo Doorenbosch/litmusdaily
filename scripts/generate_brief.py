@@ -712,9 +712,10 @@ Provide 3-4 visual keywords for the hero image that capture today's session mood
 
 CRITICAL JSON FORMATTING RULES:
 • All string values must have quotes escaped as \\"
-• No literal newlines inside strings - use \\n instead
+• No literal newlines inside strings - use \\n instead  
 • No trailing commas
 • Avoid special characters
+• the_region MUST contain sub-region objects with "name" and "content" fields
 
 OUTPUT FORMAT:
 Return ONLY valid JSON:
@@ -724,16 +725,22 @@ Return ONLY valid JSON:
     "sections": {{
         "the_session": {{
             "title": "4-8 word headline",
-            "content": "3-5 editorial bullets on global crypto action"
+            "content": "3-5 editorial bullets starting with • on global crypto action"
         }},
         "the_macro": {{
             "title": "4-8 word headline",
-            "content": "3-5 editorial bullets on global finance/politics"
+            "content": "3-5 editorial bullets starting with • on global finance/politics"
         }},
         "the_region": {{
             "title": "What Moved in {ctx['name']}",{sub_region_json}
         }}
     }}{etf_json}
+}}
+
+IMPORTANT: Each sub-region in the_region MUST have this structure:
+"sub_region_key": {{
+    "name": "Sub-Region Name",
+    "content": "• Bullet one with fact, context, insight.\\n\\n• Bullet two..."
 }}
 
 Return ONLY the JSON object, no other text."""
@@ -805,6 +812,16 @@ def transform_to_flat_structure(brief_data: dict) -> dict:
         # Preserve ETF flows as-is (not flattened)
         if key == "etf_flows":
             etf_flows = value
+            continue
+        
+        # Preserve the_region structure with sub-regions (don't flatten)
+        if key == "the_region":
+            if isinstance(value, dict):
+                # Keep the full structure including sub-regions
+                flat_sections[key] = value
+                flat_sections[f"{key}_title"] = value.get("title", "What Moved Locally")
+            else:
+                flat_sections[key] = value
             continue
             
         if isinstance(value, dict):
