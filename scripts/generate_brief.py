@@ -560,7 +560,7 @@ Write a morning intelligence brief that sophisticated investors would forward to
 
 THE STRUCTURE:
 
-1. THE LEAD (150 words)
+1. THE LEAD (200 words)
 The Lead does three jobs in one flowing narrative:
 • THE OVERNIGHT: What happened while your reader slept (18:00-06:00)? Not a list — weave the key moves into your narrative.
 • THE SETUP: Where do we start today? What are the dynamics and tensions in play?
@@ -660,7 +660,7 @@ Return ONLY valid JSON with this exact structure:
     "sections": {{
         "the_lead": {{
             "title": "4-8 word headline",
-            "content": "150 words — overnight + setup + hinge as flowing editorial prose"
+            "content": "200 words — overnight + setup + hinge as flowing editorial prose"
         }},
         "the_angle": {{
             "title": "4-8 word provocative headline",
