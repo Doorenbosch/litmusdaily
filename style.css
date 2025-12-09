@@ -2625,6 +2625,8 @@ BREAKPOINTS:
     margin-bottom: var(--lg);
     padding: var(--md) 0;
     border-bottom: 1px solid var(--rule);
+    background: #ffcccc; /* DEBUG - bright pink background */
+    min-height: 100px; /* DEBUG - force minimum height */
 }
 
 .week-focus-header {
