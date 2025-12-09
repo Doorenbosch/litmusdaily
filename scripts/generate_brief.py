@@ -44,6 +44,8 @@ CURATED_IMAGES = {
     "still": "photo-1507003211169-0a1dd7228f2d",
     "reflection": "photo-1502101872923-d48509bff386",
     "water": "photo-1507003211169-0a1dd7228f2d",
+    "quiet": "photo-1507003211169-0a1dd7228f2d",
+    "serene": "photo-1507003211169-0a1dd7228f2d",
     
     # Optimistic/sunrise moods  
     "sunrise": "photo-1470252649378-9c29740c9fa8",
@@ -53,43 +55,85 @@ CURATED_IMAGES = {
     "peak": "photo-1507090960745-b32f65d3113a",
     "horizon": "photo-1502101872923-d48509bff386",
     "clear": "photo-1507090960745-b32f65d3113a",
+    "rising": "photo-1470252649378-9c29740c9fa8",
+    "bright": "photo-1470252649378-9c29740c9fa8",
+    "light": "photo-1470252649378-9c29740c9fa8",
+    
+    # Ocean/harbor moods
+    "ocean": "photo-1505142468610-359e7d316be0",
+    "sea": "photo-1505142468610-359e7d316be0",
+    "harbor": "photo-1505142468610-359e7d316be0",
+    "harbour": "photo-1505142468610-359e7d316be0",
+    "tide": "photo-1505142468610-359e7d316be0",
+    "waves": "photo-1505142468610-359e7d316be0",
+    "coast": "photo-1505142468610-359e7d316be0",
     
     # Uncertainty/fog moods
     "fog": "photo-1489549132488-d00b7eee80f1",
     "mist": "photo-1489549132488-d00b7eee80f1",
     "uncertainty": "photo-1489549132488-d00b7eee80f1",
     "clouds": "photo-1534088568595-a066f410bcda",
+    "haze": "photo-1489549132488-d00b7eee80f1",
+    "unclear": "photo-1489549132488-d00b7eee80f1",
     
     # Storm/dramatic moods
     "storm": "photo-1534088568595-a066f410bcda",
     "dramatic": "photo-1534274988757-a28bf1a57c17",
     "tension": "photo-1534274988757-a28bf1a57c17",
     "dark": "photo-1534088568595-a066f410bcda",
+    "thunder": "photo-1534088568595-a066f410bcda",
+    "turbulent": "photo-1534088568595-a066f410bcda",
     
     # Urban/city moods
     "city": "photo-1480714378408-67cf0d13bc1b",
     "skyline": "photo-1534430480872-3498386e7856",
     "urban": "photo-1486406146926-c627a92ad1ab",
+    "buildings": "photo-1486406146926-c627a92ad1ab",
+    "night": "photo-1480714378408-67cf0d13bc1b",
+    
+    # Architecture/office moods
+    "architecture": "photo-1464082354059-27db6ce50048",
+    "office": "photo-1486406146926-c627a92ad1ab",
+    "skyscraper": "photo-1486406146926-c627a92ad1ab",
+    "tower": "photo-1486406146926-c627a92ad1ab",
+    "glass": "photo-1464082354059-27db6ce50048",
+    "modern": "photo-1464082354059-27db6ce50048",
+    "financial": "photo-1449157291145-7efd050a4d0e",
+    "district": "photo-1449157291145-7efd050a4d0e",
     
     # Evening/sunset moods
     "sunset": "photo-1472120435266-53107fd0c44a",
     "evening": "photo-1472120435266-53107fd0c44a",
     "dusk": "photo-1472120435266-53107fd0c44a",
+    "golden": "photo-1472120435266-53107fd0c44a",
     
     # Flow/movement moods
     "flow": "photo-1509023464722-18d996393ca8",
     "movement": "photo-1509023464722-18d996393ca8",
     "lights": "photo-1509023464722-18d996393ca8",
+    "motion": "photo-1509023464722-18d996393ca8",
+    
+    # Path/journey moods
+    "path": "photo-1501785888041-af3ef285b470",
+    "road": "photo-1501785888041-af3ef285b470",
+    "journey": "photo-1501785888041-af3ef285b470",
+    "crossroads": "photo-1501785888041-af3ef285b470",
+    
+    # Forest/nature moods
+    "forest": "photo-1448375240586-882707db888b",
+    "trees": "photo-1448375240586-882707db888b",
+    "nature": "photo-1448375240586-882707db888b",
+    "green": "photo-1448375240586-882707db888b",
     
     # Default
-    "default": "photo-1639762681485-074b7f938ba0"
+    "default": "photo-1470252649378-9c29740c9fa8"
 }
 
 # Fallback images by time of day
 FALLBACK_IMAGES = {
-    "default": "photo-1639762681485-074b7f938ba0",
-    "morning": "photo-1470252649378-9c29740c9fa8",
-    "evening": "photo-1472120435266-53107fd0c44a",
+    "default": "photo-1470252649378-9c29740c9fa8",  # Sunrise/optimism
+    "morning": "photo-1470252649378-9c29740c9fa8",  # Sunrise
+    "evening": "photo-1472120435266-53107fd0c44a",  # Sunset
 }
 
 def build_image_url(keywords: str, fallback: str = "default") -> str:
