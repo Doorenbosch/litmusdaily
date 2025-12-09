@@ -1136,7 +1136,7 @@ a {
     position: relative;
     width: 100%;
     max-width: 720px;
-    height: 360px;
+    height: 250px;
     margin-bottom: var(--lg);
     border-radius: 0;
     overflow: hidden;
@@ -1161,7 +1161,7 @@ a {
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 80px 32px 28px 32px;
+    padding: 60px 28px 24px 28px;
     background: linear-gradient(
         to bottom,
         rgba(0, 0, 0, 0) 0%,
@@ -2670,7 +2670,6 @@ BREAKPOINTS:
     margin-top: 210px; /* Push below fixed header */
     margin-bottom: var(--md);
     padding: var(--sm) 0;
-    border-bottom: 1px solid var(--rule);
 }
 
 .week-focus-header {
