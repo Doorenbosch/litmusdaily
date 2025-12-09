@@ -37,27 +37,22 @@ const SECTIONS_MORNING = {
         field: 'the_lead',
         defaultHeadline: 'The Opening Take'
     },
-    mechanism: {
+    angle: {
+        label: 'THE ANGLE',
+        field: 'the_angle',
+        defaultHeadline: 'What Everyone\'s Missing'
+    },
+    driver: {
         label: 'THE DRIVER',
-        field: 'the_mechanism',
-        defaultHeadline: 'What\'s Driving This'
+        field: 'the_driver',
+        defaultHeadline: 'What\'s Moving Markets'
     },
-    complication: {
-        label: 'THE COMPLICATION',
-        field: 'the_complication',
-        defaultHeadline: 'The Counterpoint'
-    },
-    behavior: {
-        label: 'THE BEHAVIORAL ANGLE',
-        field: 'the_behavioral_angle',
-        defaultHeadline: 'The Psychology'
-    },
-    outlook: {
-        label: 'LOOKING AHEAD',
-        field: 'looking_ahead',
-        defaultHeadline: 'What to Watch'
+    signal: {
+        label: 'THE SIGNAL',
+        field: 'the_signal',
+        defaultHeadline: 'The Numbers That Matter'
     }
-    // THE TAKEAWAY is now a separate quote box, not clickable
+    // THE TAKEAWAY is a separate quote box, not in the index
 };
 
 // Section definitions - Evening Brief
@@ -65,29 +60,19 @@ const SECTIONS_EVENING = {
     session: {
         label: 'THE SESSION',
         field: 'the_session',
-        defaultHeadline: 'Today\'s Character'
+        defaultHeadline: 'Global Crypto Today'
     },
-    flows: {
-        label: 'THE FLOWS',
-        field: 'the_flows',
-        defaultHeadline: 'Where Money Moved'
+    macro: {
+        label: 'THE MACRO',
+        field: 'the_macro',
+        defaultHeadline: 'Finance & Politics'
     },
-    divergence: {
-        label: 'THE DIVERGENCE',
-        field: 'the_divergence',
-        defaultHeadline: 'What Doesn\'t Fit'
-    },
-    regime: {
-        label: 'THE REGIME CHECK',
-        field: 'the_regime_check',
-        defaultHeadline: 'Has Anything Changed?'
-    },
-    overnight: {
-        label: 'THE OVERNIGHT SETUP',
-        field: 'the_overnight_setup',
-        defaultHeadline: 'What\'s Ahead'
+    region: {
+        label: 'THE REGION',
+        field: 'the_region',
+        defaultHeadline: 'What Moved Locally'
     }
-    // THE TAKEAWAY is now a separate quote box, not clickable
+    // No takeaway in evening - it's news-wire style
 };
 
 // Get current sections based on brief type
@@ -1213,8 +1198,37 @@ function renderReadingPane(sectionKey) {
     // Update body - split into paragraphs for better reading
     const bodyEl = document.getElementById('reading-body');
     if (bodyEl) {
-        const paragraphs = splitIntoParagraphs(content);
-        bodyEl.innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
+        // Special handling for The Region section with sub-regions (evening brief)
+        if (sectionKey === 'region' && currentBriefType === 'evening') {
+            const regionData = briefData.sections.the_region;
+            if (regionData && typeof regionData === 'object') {
+                let html = '';
+                
+                // Iterate through sub-regions (skip 'title' field)
+                const subRegionKeys = Object.keys(regionData).filter(k => k !== 'title');
+                
+                for (const subKey of subRegionKeys) {
+                    const subRegion = regionData[subKey];
+                    if (subRegion && subRegion.name) {
+                        html += `<h3 class="sub-region-header">${subRegion.name}</h3>`;
+                        if (subRegion.content) {
+                            const paragraphs = splitIntoParagraphs(subRegion.content);
+                            html += paragraphs.map(p => `<p>${p}</p>`).join('');
+                        }
+                    }
+                }
+                
+                bodyEl.innerHTML = html || '<p>No regional updates available.</p>';
+            } else {
+                // Fallback to regular content display
+                const paragraphs = splitIntoParagraphs(content);
+                bodyEl.innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
+            }
+        } else {
+            // Standard paragraph rendering
+            const paragraphs = splitIntoParagraphs(content);
+            bodyEl.innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
+        }
     }
 }
 

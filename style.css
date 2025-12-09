@@ -1221,6 +1221,24 @@ a {
     margin-bottom: 0;
 }
 
+/* Sub-region headers (Evening Edition - The Region) */
+.sub-region-header {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--teal);
+    margin-top: var(--xl);
+    margin-bottom: var(--md);
+    padding-bottom: var(--xs);
+    border-bottom: 1px solid var(--rule);
+}
+
+.sub-region-header:first-child {
+    margin-top: 0;
+}
+
 /* ========== CONTEXT SIDEBAR (Right) ========== */
 .context-sidebar {
     padding-left: var(--xl);
