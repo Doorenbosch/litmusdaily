@@ -942,6 +942,7 @@ async function loadTheNumber() {
 
 function renderTheNumber(data) {
     const valueEl = document.getElementById('number-value');
+    const metricEl = document.getElementById('number-metric');
     const contextEl = document.getElementById('number-context');
     
     if (valueEl) {
@@ -950,21 +951,38 @@ function renderTheNumber(data) {
             valueEl.innerHTML = '—';
         } else {
             const value = String(data.value);
+            const unit = data.unit || '';
             
             // Detect format and render appropriately
             if (value.includes('$') || value.includes('B') || value.includes('T') || value.includes('M')) {
-                // Currency format (stablecoin, ETF flows) - no suffix
+                // Currency format (stablecoin, ETF flows) - no suffix needed
                 valueEl.innerHTML = value;
             } else if (value.includes('%')) {
-                // Percentage format (BTC dominance) - no suffix
+                // Percentage format - no suffix needed
                 valueEl.innerHTML = value;
-            } else if (/^\d+(\.\d+)?$/.test(value)) {
+            } else if (unit === '%') {
+                // Add % suffix
+                valueEl.innerHTML = `${value}<span class="number-suffix">%</span>`;
+            } else if (unit === 'B') {
+                // Billions with $ prefix
+                valueEl.innerHTML = `$${value}<span class="number-suffix">B</span>`;
+            } else if (unit === '/100' || /^\d+(\.\d+)?$/.test(value)) {
                 // Plain number - likely an index, add /100
                 valueEl.innerHTML = `${value}<span class="number-suffix">/100</span>`;
             } else {
                 // Unknown format - display as-is
                 valueEl.innerHTML = value;
             }
+        }
+    }
+    
+    // Display metric name label (e.g., "BTC DOMINANCE", "FEAR & GREED")
+    if (metricEl) {
+        if (data && data.label) {
+            metricEl.textContent = data.label;
+            metricEl.style.display = 'block';
+        } else {
+            metricEl.style.display = 'none';
         }
     }
     

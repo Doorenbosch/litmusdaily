@@ -1789,6 +1789,17 @@ a {
     margin-left: 2px;
 }
 
+/* Metric name label (e.g., "BTC DOMINANCE", "FEAR & GREED") */
+.number-metric {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--teal);
+    margin-bottom: var(--sm);
+}
+
 .number-context {
     font-family: var(--serif);
     font-size: 0.85rem;
