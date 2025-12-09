@@ -402,14 +402,8 @@ function rebuildIndexCards() {
 
 // Index Card Click Handlers
 function initIndexCards() {
-    const cards = document.querySelectorAll('.index-card');
-    
-    cards.forEach(card => {
-        card.addEventListener('click', () => {
-            const section = card.dataset.section;
-            setActiveSection(section);
-        });
-    });
+    // Index cards are now dynamically generated in renderIndexCards()
+    // with click handlers attached at creation time
 }
 
 // Set Active Section
@@ -1003,12 +997,18 @@ function renderIndexCards(data) {
     
     const sections = getCurrentSections();
     const firstSectionKey = currentBriefType === 'evening' ? 'session' : 'lead';
+    const indexList = document.querySelector('.index-list');
     
-    Object.keys(sections).forEach(key => {
+    if (!indexList) return;
+    
+    // Clear existing cards and rebuild based on current brief type
+    indexList.innerHTML = '';
+    
+    Object.keys(sections).forEach((key, index) => {
         const section = sections[key];
         const content = data.sections[section.field] || '';
         
-        // Get section-specific title if available (new format)
+        // Get section-specific title if available
         let headline;
         const sectionTitle = data.sections[`${section.field}_title`];
         
@@ -1020,21 +1020,47 @@ function renderIndexCards(data) {
             headline = section.defaultHeadline;
         }
         
-        setText(`index-${key}-headline`, headline);
+        // Create card element
+        const card = document.createElement('article');
+        card.className = `index-card${index === 0 ? ' active' : ''}`;
+        card.dataset.section = key;
         
-        // FT style: excerpt ONLY for THE LEAD
-        const excerptEl = document.getElementById(`index-${key}-excerpt`);
-        if (excerptEl) {
-            if (key === firstSectionKey) {
-                excerptEl.style.display = 'block';
-                excerptEl.textContent = truncate(content, 100);
-            } else {
-                excerptEl.style.display = 'none';
-            }
+        // Build card HTML
+        let cardHTML = `
+            <span class="card-label">${section.label}</span>
+            <h3 class="card-headline" id="index-${key}-headline">${headline}</h3>
+        `;
+        
+        // Only show excerpt for first section (THE LEAD or THE SESSION)
+        if (key === firstSectionKey && content) {
+            cardHTML += `<p class="card-excerpt" id="index-${key}-excerpt">${truncate(content, 100)}</p>`;
         }
+        
+        card.innerHTML = cardHTML;
+        
+        // Add click handler
+        card.addEventListener('click', () => {
+            // Update active state
+            document.querySelectorAll('.index-card').forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+            
+            // Update current section and render
+            currentSection = key;
+            renderReadingPane(key);
+            
+            // Mobile: show reading pane
+            const readingPane = document.querySelector('.reading-pane');
+            if (readingPane && window.innerWidth <= 768) {
+                readingPane.classList.add('active');
+            }
+            
+            trackEvent('section_selected', { section: key });
+        });
+        
+        indexList.appendChild(card);
     });
     
-    // Render THE TAKEAWAY quote box
+    // Render THE TAKEAWAY quote box (Morning only)
     renderTakeawayQuote(data);
 }
 
