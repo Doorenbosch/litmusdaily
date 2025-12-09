@@ -151,26 +151,54 @@ def fetch_unsplash_image(keywords: str, region: str = "", brief_type: str = "mor
         print("  Warning: UNSPLASH_ACCESS_KEY not set, using fallback")
         return None
     
-    # Build search query with regional context
+    # Parse keywords
     query_parts = [k.strip() for k in keywords.split(",") if k.strip()]
     
-    # Add regional landmark hints if not already present
-    regional_terms = {
-        "apac": ["Hong Kong", "Singapore", "Tokyo", "Sydney"],
-        "emea": ["London", "Canary Wharf", "Frankfurt", "Dubai"],
-        "americas": ["New York", "Manhattan", "Wall Street", "Chicago"]
-    }
+    if not query_parts:
+        print("  Warning: No keywords provided")
+        return None
     
-    # Check if region-specific terms are already in keywords
-    region_in_keywords = False
-    if region in regional_terms:
-        for term in regional_terms[region]:
-            if term.lower() in keywords.lower():
-                region_in_keywords = True
-                break
+    # Strategy: Try location-focused search first, then broaden if needed
+    # Unsplash works better with 2-3 keywords than 5+
     
-    # Build the search query
-    search_query = " ".join(query_parts[:4])  # Use top 4 keywords
+    # Identify location keywords (most important for editorial feel)
+    location_keywords = []
+    mood_keywords = []
+    
+    location_terms = [
+        "canary wharf", "london", "city of london", "frankfurt", "dubai", "paris",
+        "hong kong", "singapore", "tokyo", "sydney", "victoria harbour", "marina bay",
+        "manhattan", "wall street", "new york", "chicago", "san francisco",
+        "financial district", "skyline", "tower", "skyscraper"
+    ]
+    
+    mood_terms = [
+        "dawn", "sunrise", "morning", "sunset", "dusk", "evening", "night",
+        "golden hour", "light", "fog", "mist", "dramatic", "calm", "quiet"
+    ]
+    
+    for kw in query_parts:
+        kw_lower = kw.lower()
+        if any(loc in kw_lower for loc in location_terms):
+            location_keywords.append(kw)
+        elif any(mood in kw_lower for mood in mood_terms):
+            mood_keywords.append(kw)
+        else:
+            mood_keywords.append(kw)
+    
+    # Build search query: prioritize 1-2 location + 1 mood keyword
+    search_parts = []
+    if location_keywords:
+        search_parts.extend(location_keywords[:2])
+    if mood_keywords:
+        search_parts.append(mood_keywords[0])
+    
+    # Fallback: just use first 2-3 keywords
+    if not search_parts:
+        search_parts = query_parts[:3]
+    
+    search_query = " ".join(search_parts[:3])
+    print(f"  Unsplash search: '{search_query}'")
     
     try:
         # Call Unsplash API
@@ -194,24 +222,54 @@ def fetch_unsplash_image(keywords: str, region: str = "", brief_type: str = "mor
         
         if not results:
             print(f"  No Unsplash results for: {search_query}")
-            return None
+            # Try a broader search with just the first keyword
+            if len(query_parts) > 1:
+                print(f"  Retrying with broader search: '{query_parts[0]}'")
+                params = urllib.parse.urlencode({
+                    "query": query_parts[0],
+                    "per_page": 10,
+                    "orientation": "landscape"
+                })
+                url = f"{UNSPLASH_API_URL}?{params}"
+                req = urllib.request.Request(url, headers={
+                    "Authorization": f"Client-ID {UNSPLASH_ACCESS_KEY}",
+                    "User-Agent": "TheLitmus/1.0"
+                })
+                with urllib.request.urlopen(req, timeout=15) as resp:
+                    data = json.loads(resp.read().decode())
+                results = data.get("results", [])
+            
+            if not results:
+                return None
+        
+        print(f"  Found {len(results)} images")
         
         # Pick randomly from top results (weighted toward higher quality)
-        # Top 3 have higher chance, but any of top 10 possible
         if len(results) >= 5:
             weights = [3, 3, 2, 2, 1, 1, 1, 1, 1, 1][:len(results)]
             selected = random.choices(results, weights=weights, k=1)[0]
         else:
             selected = random.choice(results)
         
-        # Get the image URL with our sizing
-        raw_url = selected.get("urls", {}).get("raw", "")
+        # Safely get the image URL
+        if not selected:
+            print("  Error: No image selected")
+            return None
+            
+        urls = selected.get("urls")
+        if not urls:
+            print("  Error: No URLs in selected image")
+            return None
+            
+        raw_url = urls.get("raw", "")
         if raw_url:
             # Add Unsplash parameters for consistent sizing
             image_url = f"{raw_url}&w=1400&h=500&fit=crop&q=80"
-            print(f"  Unsplash image: {selected.get('description', 'No description')[:50]}...")
+            desc = selected.get('description') or selected.get('alt_description') or 'No description'
+            print(f"  Selected: {desc[:60]}...")
             return image_url
         
+        print("  Error: No raw URL found")
         return None
         
     except Exception as e:
