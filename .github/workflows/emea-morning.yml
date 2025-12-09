@@ -25,6 +25,7 @@ jobs:
       - name: Generate EMEA morning brief
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
         run: python scripts/generate_brief.py emea morning
       
       - name: Commit and push
