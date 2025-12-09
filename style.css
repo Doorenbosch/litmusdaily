@@ -92,10 +92,6 @@ a {
     .header-fixed {
         padding: 0 calc((100vw - 1400px) / 2 + var(--xl));
     }
-    
-    .week-focus {
-        padding: var(--sm) calc((100vw - 1400px) / 2 + var(--xl));
-    }
 }
 
 /* ========== MASTHEAD ========== */
@@ -2673,11 +2669,8 @@ BREAKPOINTS:
 .week-focus {
     margin-top: 210px; /* Push below fixed header */
     margin-bottom: var(--md);
-    padding: var(--sm) var(--xl);
+    padding: var(--sm) 0;
     border-bottom: 1px solid var(--rule);
-    max-width: 1400px;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 .week-focus-header {
