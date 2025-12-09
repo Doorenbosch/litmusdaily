@@ -1329,15 +1329,42 @@ function renderReadingPane(sectionKey) {
         if (isLead) {
             articleEnding.style.display = 'block';
             
-            // Get THE TAKEAWAY for pull quote
-            const takeawayContent = briefData.sections.the_takeaway || briefData.sections.takeaway || '';
-            if (takeawayContent) {
-                // Extract first sentence or first ~100 chars as quote
-                const firstSentence = takeawayContent.split(/[.!?]/)[0];
-                const quoteText = firstSentence.length > 120 
-                    ? firstSentence.substring(0, 117) + '...'
-                    : firstSentence + '.';
-                setText('ending-quote-text', quoteText);
+            // Generate a one-sentence editorial insight from THE ANGLE (not takeaway - too repetitive)
+            const angleContent = briefData.sections.the_angle || briefData.sections.angle || '';
+            const leadContent = briefData.sections.the_lead || briefData.sections.lead || content || '';
+            const sourceContent = angleContent || leadContent;
+            
+            if (sourceContent) {
+                // Extract key insight sentence
+                const sentences = sourceContent.match(/[^.!?]+[.!?]+/g) || [];
+                let summaryQuote = '';
+                
+                // Find a sentence with editorial insight
+                const insightPatterns = /matter|signal|suggest|reveal|indicate|mean|imply|show|tell|point|watch|key|critical|important|question|real|actual|beneath/i;
+                
+                for (let i = 0; i < sentences.length; i++) {
+                    const sentence = sentences[i].trim();
+                    if (sentence.length > 50 && sentence.length < 180) {
+                        if (insightPatterns.test(sentence)) {
+                            summaryQuote = sentence;
+                            break;
+                        }
+                    }
+                }
+                
+                // Fallback to first substantial sentence from angle
+                if (!summaryQuote && sentences.length > 0) {
+                    for (const sentence of sentences) {
+                        if (sentence.trim().length > 50 && sentence.trim().length < 180) {
+                            summaryQuote = sentence.trim();
+                            break;
+                        }
+                    }
+                }
+                
+                if (summaryQuote) {
+                    setText('ending-quote-text', summaryQuote);
+                }
             }
             
             // Populate related reading with other sections
