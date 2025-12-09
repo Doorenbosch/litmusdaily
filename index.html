@@ -252,21 +252,23 @@
                     </div>
                 </header>
 
-                <nav class="index-list">
-                    <!-- Index cards are dynamically generated based on brief type -->
-                </nav>
-                
-                <!-- THE TAKEAWAY - Rory-style quote box (not clickable) -->
-                <aside class="takeaway-quote" id="takeaway-quote" style="display: none;">
-                    <span class="takeaway-label">THE TAKEAWAY</span>
-                    <blockquote class="takeaway-text" id="takeaway-text"></blockquote>
-                </aside>
-                
-                <!-- Relative Performance Section -->
-                <section class="relative-performance" id="relative-performance">
-                    <header class="relative-header">
-                        <span class="relative-label">YOUR COINS VS MARKET</span>
-                    </header>
+                <!-- Scrollable content area -->
+                <div class="index-content" id="index-content">
+                    <nav class="index-list">
+                        <!-- Index cards are dynamically generated based on brief type -->
+                    </nav>
+                    
+                    <!-- THE TAKEAWAY - Rory-style quote box (not clickable) -->
+                    <aside class="takeaway-quote" id="takeaway-quote" style="display: none;">
+                        <span class="takeaway-label">THE TAKEAWAY</span>
+                        <blockquote class="takeaway-text" id="takeaway-text"></blockquote>
+                    </aside>
+                    
+                    <!-- Relative Performance Section -->
+                    <section class="relative-performance" id="relative-performance">
+                        <header class="relative-header">
+                            <span class="relative-label">YOUR COINS VS MARKET</span>
+                        </header>
                     <div class="relative-chart" id="relative-chart">
                         <!-- Market baseline row -->
                         <div class="relative-row market-row">
@@ -280,6 +282,7 @@
                         <!-- Dynamic coin rows inserted here -->
                     </div>
                 </section>
+                </div><!-- /.index-content -->
             </aside>
 
             <!-- Center: Reading Pane -->

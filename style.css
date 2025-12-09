@@ -587,20 +587,28 @@ a {
 .article-index {
     border-right: 1px solid var(--rule);
     padding-right: var(--xl);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Scrollable content wrapper for index list */
+.index-content {
+    flex: 1;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: var(--rule) transparent;
 }
 
-.article-index::-webkit-scrollbar {
+.index-content::-webkit-scrollbar {
     width: 6px;
 }
 
-.article-index::-webkit-scrollbar-track {
+.index-content::-webkit-scrollbar-track {
     background: transparent;
 }
 
-.article-index::-webkit-scrollbar-thumb {
+.index-content::-webkit-scrollbar-thumb {
     background: var(--rule);
     border-radius: 3px;
 }

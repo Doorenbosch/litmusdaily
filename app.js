@@ -398,6 +398,12 @@ function rebuildIndexCards() {
         card.addEventListener('click', () => setActiveSection(key));
         indexList.appendChild(card);
     });
+    
+    // Scroll index content to top
+    const indexContent = document.getElementById('index-content');
+    if (indexContent) {
+        indexContent.scrollTop = 0;
+    }
 }
 
 // Index Card Click Handlers
@@ -1059,6 +1065,12 @@ function renderIndexCards(data) {
         
         indexList.appendChild(card);
     });
+    
+    // Scroll index content to top
+    const indexContent = document.getElementById('index-content');
+    if (indexContent) {
+        indexContent.scrollTop = 0;
+    }
     
     // Render THE TAKEAWAY quote box (Morning only)
     renderTakeawayQuote(data);
