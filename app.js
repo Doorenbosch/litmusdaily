@@ -1377,6 +1377,8 @@ function renderWeekAhead(data) {
     if (!data.sections) return;
     
     // Update date in sidebar
+    console.log('renderWeekAhead called with data:', data);
+    
     if (data.generated_at) {
         const date = new Date(data.generated_at);
         setText('week-ahead-date', `Week of ${formatShortDate(date)}`);
@@ -1384,17 +1386,22 @@ function renderWeekAhead(data) {
     }
     
     // Render each section
-    const sections = ['fulcrum', 'levels', 'unpriced', 'underestimated'];
+    const sectionKeys = ['fulcrum', 'levels', 'unpriced', 'underestimated'];
     
-    sections.forEach(key => {
+    sectionKeys.forEach(key => {
         const section = data.sections[key];
         if (section) {
             // Sidebar cards
             setText(`week-${key}-headline`, section.title || key);
             setText(`week-${key}-excerpt`, truncate(section.content, 80));
             
-            // Top focus cards
-            setText(`focus-${key}-headline`, section.title || key);
+            // Top focus cards - debug
+            const focusEl = document.getElementById(`focus-${key}-headline`);
+            console.log(`Focus card ${key}:`, focusEl, 'Title:', section.title);
+            
+            if (focusEl) {
+                focusEl.textContent = section.title || key;
+            }
         }
     });
 }
