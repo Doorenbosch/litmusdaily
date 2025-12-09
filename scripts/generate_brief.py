@@ -17,7 +17,9 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 import urllib.request
 import urllib.error
+import urllib.parse
 import time
+import random
 
 # Configuration
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
@@ -129,16 +131,103 @@ CURATED_IMAGES = {
     "default": "photo-1470252649378-9c29740c9fa8"
 }
 
-# Fallback images by time of day
+# Fallback images by time of day (used if API fails)
 FALLBACK_IMAGES = {
     "default": "photo-1470252649378-9c29740c9fa8",  # Sunrise/optimism
     "morning": "photo-1470252649378-9c29740c9fa8",  # Sunrise
     "evening": "photo-1472120435266-53107fd0c44a",  # Sunset
 }
 
-def build_image_url(keywords: str, fallback: str = "default") -> str:
-    """Build Unsplash URL from AI-generated keywords using curated images"""
+# Unsplash API configuration
+UNSPLASH_ACCESS_KEY = os.environ.get("UNSPLASH_ACCESS_KEY", "")
+UNSPLASH_API_URL = "https://api.unsplash.com/search/photos"
+
+import random
+
+def fetch_unsplash_image(keywords: str, region: str = "", brief_type: str = "morning") -> str:
+    """Fetch image from Unsplash API with variety and regional context"""
     
+    if not UNSPLASH_ACCESS_KEY:
+        print("  Warning: UNSPLASH_ACCESS_KEY not set, using fallback")
+        return None
+    
+    # Build search query with regional context
+    query_parts = [k.strip() for k in keywords.split(",") if k.strip()]
+    
+    # Add regional landmark hints if not already present
+    regional_terms = {
+        "apac": ["Hong Kong", "Singapore", "Tokyo", "Sydney"],
+        "emea": ["London", "Canary Wharf", "Frankfurt", "Dubai"],
+        "americas": ["New York", "Manhattan", "Wall Street", "Chicago"]
+    }
+    
+    # Check if region-specific terms are already in keywords
+    region_in_keywords = False
+    if region in regional_terms:
+        for term in regional_terms[region]:
+            if term.lower() in keywords.lower():
+                region_in_keywords = True
+                break
+    
+    # Build the search query
+    search_query = " ".join(query_parts[:4])  # Use top 4 keywords
+    
+    try:
+        # Call Unsplash API
+        params = urllib.parse.urlencode({
+            "query": search_query,
+            "per_page": 10,
+            "orientation": "landscape",
+            "content_filter": "high"
+        })
+        
+        url = f"{UNSPLASH_API_URL}?{params}"
+        req = urllib.request.Request(url, headers={
+            "Authorization": f"Client-ID {UNSPLASH_ACCESS_KEY}",
+            "User-Agent": "TheLitmus/1.0"
+        })
+        
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            data = json.loads(resp.read().decode())
+        
+        results = data.get("results", [])
+        
+        if not results:
+            print(f"  No Unsplash results for: {search_query}")
+            return None
+        
+        # Pick randomly from top results (weighted toward higher quality)
+        # Top 3 have higher chance, but any of top 10 possible
+        if len(results) >= 5:
+            weights = [3, 3, 2, 2, 1, 1, 1, 1, 1, 1][:len(results)]
+            selected = random.choices(results, weights=weights, k=1)[0]
+        else:
+            selected = random.choice(results)
+        
+        # Get the image URL with our sizing
+        raw_url = selected.get("urls", {}).get("raw", "")
+        if raw_url:
+            # Add Unsplash parameters for consistent sizing
+            image_url = f"{raw_url}&w=1400&h=500&fit=crop&q=80"
+            print(f"  Unsplash image: {selected.get('description', 'No description')[:50]}...")
+            return image_url
+        
+        return None
+        
+    except Exception as e:
+        print(f"  Unsplash API error: {e}")
+        return None
+
+
+def build_image_url(keywords: str, fallback: str = "default", region: str = "", brief_type: str = "morning") -> str:
+    """Build image URL - tries Unsplash API first, falls back to curated images"""
+    
+    # Try Unsplash API first
+    api_url = fetch_unsplash_image(keywords, region, brief_type)
+    if api_url:
+        return api_url
+    
+    # Fallback to curated images
     if not keywords:
         photo_id = FALLBACK_IMAGES.get(fallback, FALLBACK_IMAGES["default"])
         return f"https://images.unsplash.com/{photo_id}?w=1400&h=500&fit=crop&q=80"
@@ -362,7 +451,8 @@ def get_morning_prompt(region: str, market_data: dict) -> str:
             "readers": "institutional investors in Singapore, Hong Kong, Tokyo, Sydney",
             "local_factors": "Hong Kong regulatory developments, Japan institutional flows, Korean retail sentiment, Australian macro policy, Chinese economic signals",
             "trading_hours": "Asian trading hours with US and European markets closed",
-            "overnight_window": "18:00 SGT yesterday to 06:00 SGT today"
+            "overnight_window": "18:00 SGT yesterday to 06:00 SGT today",
+            "landmarks": "Hong Kong skyline, Singapore Marina Bay, Tokyo Marunouchi, Sydney CBD, Victoria Harbour"
         },
         "emea": {
             "name": "Europe, Middle East & Africa", 
@@ -371,7 +461,8 @@ def get_morning_prompt(region: str, market_data: dict) -> str:
             "readers": "institutional investors in London, Frankfurt, Zurich, Dubai",
             "local_factors": "ECB monetary policy, MiCA regulatory implementation, UK regulatory stance, European institutional positioning, Middle Eastern sovereign wealth activity",
             "trading_hours": "European trading hours with overlap into US open",
-            "overnight_window": "18:00 GMT yesterday to 06:00 GMT today"
+            "overnight_window": "18:00 GMT yesterday to 06:00 GMT today",
+            "landmarks": "Canary Wharf, City of London, Frankfurt skyline, Dubai Marina, La Défense Paris, Swiss Alps"
         },
         "americas": {
             "name": "Americas",
@@ -380,7 +471,8 @@ def get_morning_prompt(region: str, market_data: dict) -> str:
             "readers": "institutional investors in New York, Chicago, San Francisco, Toronto",
             "local_factors": "Federal Reserve policy signals, SEC regulatory actions, ETF flow data, US macro indicators, institutional positioning",
             "trading_hours": "US trading hours driving global price discovery",
-            "overnight_window": "18:00 EST yesterday to 06:00 EST today"
+            "overnight_window": "18:00 EST yesterday to 06:00 EST today",
+            "landmarks": "Manhattan skyline, Wall Street, One World Trade, Chicago Loop, San Francisco Bay"
         }
     }
     
@@ -480,14 +572,20 @@ ABSOLUTELY PROHIBITED:
 • Starting sentences with "This" without clear antecedent
 
 HERO IMAGE KEYWORDS:
-Provide 3-4 visual keywords for the hero image that capture the mood of your lead story.
+Generate 4-5 keywords for the hero image using EDITORIAL + MOOD approach (70/30 balance).
 
-✓ Good: "storm clouds, ocean, dark sky" (for uncertainty)
-✓ Good: "sunrise, mountain peak, clear sky" (for optimism)  
-✓ Good: "fog, forest, mist" (for unclear outlook)
-✓ Good: "city lights, night, skyline" (for after-hours activity)
+EDITORIAL (primary): What/where is the story happening?
+- Regional landmarks for {ctx['name']}: {ctx['landmarks']}
+- Scenes: financial district, trading floor, institutional office, glass towers
+- Named entities if story-relevant: BlackRock, SEC building, specific companies
 
-✗ Avoid: crypto, bitcoin, trading, chart, money, stock, market, coin, currency
+MOOD (secondary): How should it feel?
+- Light conditions: dawn light, golden hour, overcast, dramatic sky, soft morning
+- Atmosphere: quiet streets, busy, tension, calm, empty plaza
+
+FORMAT: "Canary Wharf, dawn light, glass towers, quiet streets" or "Hong Kong skyline, morning fog, harbor"
+
+✗ NEVER use: crypto, bitcoin, trading, chart, money, stock, market, coin, currency, generic
 
 CRITICAL JSON FORMATTING RULES:
 • All string values must have quotes escaped as \\"
@@ -542,6 +640,7 @@ def get_evening_prompt(region: str, market_data: dict) -> str:
             "handoff_to": "European markets",
             "key_hours": "Hong Kong and Singapore close",
             "sub_regions": ["East Asia", "Southeast Asia", "Oceania"],
+            "landmarks": "Hong Kong skyline, Singapore Marina Bay, Tokyo Tower, Sydney Opera House, Victoria Harbour",
             "sub_region_factors": {
                 "East Asia": "China economic policy, Hong Kong regulatory moves, Japan institutional activity, Korean exchange developments, Taiwan semiconductor links to crypto mining",
                 "Southeast Asia": "Singapore as crypto hub, Thai regulatory stance, Vietnamese retail activity, Philippine remittance corridors, Indonesian adoption trends",
@@ -554,6 +653,7 @@ def get_evening_prompt(region: str, market_data: dict) -> str:
             "handoff_to": "US afternoon session",
             "key_hours": "London close and US mid-day",
             "sub_regions": ["Europe", "Middle East", "Africa"],
+            "landmarks": "Canary Wharf, Tower Bridge, Frankfurt skyline, Dubai Marina, Big Ben, Thames",
             "sub_region_factors": {
                 "Europe": "ECB policy signals, MiCA implementation updates, UK FCA stance, Swiss institutional flows, German regulatory developments, EU stablecoin rules",
                 "Middle East": "UAE crypto hub status, Saudi Vision 2030 digital assets, Bahrain regulatory framework, sovereign wealth positioning, regional exchange launches",
@@ -566,6 +666,7 @@ def get_evening_prompt(region: str, market_data: dict) -> str:
             "handoff_to": "Asian open",
             "key_hours": "NYSE close approaching",
             "sub_regions": ["North America", "Central America", "South America"],
+            "landmarks": "Manhattan skyline, Wall Street, Statue of Liberty, Brooklyn Bridge, Hudson River, sunset",
             "sub_region_factors": {
                 "North America": "SEC enforcement actions, ETF flow dynamics, Fed policy impact, Canadian regulatory updates, institutional custody developments, mining energy debates",
                 "Central America": "El Salvador Bitcoin developments, Panama regulatory progress, Guatemala remittance adoption, regional dollarization dynamics",
@@ -702,13 +803,20 @@ ABSOLUTELY PROHIBITED:
 • "It's worth noting," "Interestingly," "It remains to be seen"
 
 HERO IMAGE KEYWORDS:
-Provide 3-4 visual keywords for the hero image that capture today's session mood.
+Generate 4-5 keywords for the hero image using EDITORIAL + MOOD approach (70/30 balance).
 
-✓ Good: "sunset, city, reflection" (for end of day)
-✓ Good: "calm water, evening light" (for quiet session)
-✓ Good: "storm, clouds, dramatic sky" (for volatile day)
+EDITORIAL (primary): What/where is the story happening?
+- Regional landmarks for {ctx['name']}: {ctx['landmarks']}
+- Scenes: financial district, evening cityscape, office buildings, harbor
+- Named entities if story-relevant: specific exchanges, institutions
 
-✗ Avoid: crypto, bitcoin, trading, chart, money
+MOOD (secondary): How should it feel?
+- Light conditions: sunset, golden hour, dusk, evening light, city lights
+- Atmosphere: end of day, quiet, reflection, closing time
+
+FORMAT: "Manhattan skyline, sunset, Hudson River, golden light" or "Singapore Marina Bay, dusk, city lights"
+
+✗ NEVER use: crypto, bitcoin, trading, chart, money, stock, market, coin, currency, generic
 
 CRITICAL JSON FORMATTING RULES:
 • All string values must have quotes escaped as \\"
@@ -1019,10 +1127,10 @@ def generate_brief(region: str, brief_type: str) -> dict:
             # Transform structure
             transformed = transform_to_flat_structure(brief_data)
             
-            # Build hero image URL from keywords
+            # Build hero image URL from keywords (using Unsplash API with regional context)
             keywords = transformed.get("image_keywords", "")
             fallback = "morning" if brief_type == "morning" else "evening"
-            transformed["image_url"] = build_image_url(keywords, fallback)
+            transformed["image_url"] = build_image_url(keywords, fallback, region, brief_type)
             print(f"  Image keywords: {keywords}")
             
             # Add metadata
