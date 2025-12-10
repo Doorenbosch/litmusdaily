@@ -974,8 +974,8 @@ function renderTheNumber(data) {
             const unit = data.unit || '';
             
             // Detect format and render appropriately
-            if (value.includes('$') || value.includes('B') || value.includes('T') || value.includes('M')) {
-                // Currency format (stablecoin, ETF flows) - no suffix needed
+            if (value.includes('$') || value.includes('B') || value.includes('T') || value.includes('M') || value.includes('K')) {
+                // Already formatted - no suffix needed
                 valueEl.innerHTML = value;
             } else if (value.includes('%')) {
                 // Percentage format - no suffix needed
@@ -986,8 +986,14 @@ function renderTheNumber(data) {
             } else if (unit === 'B') {
                 // Billions with $ prefix
                 valueEl.innerHTML = `$${value}<span class="number-suffix">B</span>`;
-            } else if (unit === '/100' || /^\d+(\.\d+)?$/.test(value)) {
-                // Plain number - likely an index, add /100
+            } else if (unit === 'K') {
+                // Thousands
+                valueEl.innerHTML = `${value}<span class="number-suffix">K</span>`;
+            } else if (unit === '/100') {
+                // Index out of 100 (Fear & Greed)
+                valueEl.innerHTML = `${value}<span class="number-suffix">/100</span>`;
+            } else if (/^\d+(\.\d+)?$/.test(value) && !unit) {
+                // Plain number with no unit - assume index /100
                 valueEl.innerHTML = `${value}<span class="number-suffix">/100</span>`;
             } else {
                 // Unknown format - display as-is
