@@ -46,7 +46,7 @@
 
 .footer-name {
     font-family: var(--sans);
-    font-size: 1.5rem;
+    font-size: 1.0rem;
     font-weight: 500;
     letter-spacing: 0.2em;
     color: var(--ink-tertiary);
@@ -56,7 +56,7 @@
 /* Center: Tagline */
 .footer-tagline {
     font-family: var(--serif);
-    font-size: 0.95rem;
+    font-size: 1.5rem;
     font-style: italic;
     color: var(--ink-secondary);
     margin: 0;
