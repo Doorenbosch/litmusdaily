@@ -3,7 +3,7 @@
  * 
  * Monday:    Fear & Greed Index
  * Tuesday:   BTC Dominance
- * Wednesday: Funding Rates
+ * Wednesday: Active Addresses (30d change)
  * Thursday:  Open Interest
  * Friday:    Stablecoin Supply
  * Weekend:   Stablecoin Supply
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
                 data = await getBTCDominance();
                 break;
             case 3: // Wednesday
-                data = await getFundingRates();
+                data = await getActiveAddresses();
                 break;
             case 4: // Thursday
                 data = await getOpenInterest();
@@ -235,92 +235,106 @@ async function getBTCDominance() {
 }
 
 // ============================================
-// WEDNESDAY: Funding Rates
+// WEDNESDAY: Active Addresses (30d Change)
 // ============================================
 
-async function getFundingRates() {
+async function getActiveAddresses() {
     try {
-        // CoinGlass public endpoint for funding rates
+        // Blockchain.com API - free, no auth required
+        // Get BTC active addresses for today and 30 days ago
+        const today = new Date();
+        const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+        
+        const formatDate = (d) => d.toISOString().split('T')[0];
+        
+        // Fetch current active addresses (uses chart endpoint with recent data)
         const response = await fetch(
-            'https://open-api.coinglass.com/public/v2/funding',
-            { headers: { 'User-Agent': 'TheLitmus/1.0' } }
+            'https://api.blockchain.info/charts/n-unique-addresses?timespan=60days&format=json',
+            { headers: { 'User-Agent': 'Sirruna/1.0' } }
         );
         
         if (!response.ok) {
-            // Fallback: try alternative source or return estimated data
-            return getFallbackFundingRates();
+            return getFallbackActiveAddresses();
         }
         
         const json = await response.json();
+        const values = json.values || [];
         
-        // Find BTC funding rate (average across major exchanges)
-        const btcData = json.data?.find(d => d.symbol === 'BTC');
-        
-        if (!btcData) {
-            return getFallbackFundingRates();
+        if (values.length < 30) {
+            return getFallbackActiveAddresses();
         }
         
-        // Average funding rate across exchanges (annualized)
-        const avgRate = btcData.uMarginList?.reduce((sum, ex) => sum + (ex.rate || 0), 0) / 
-                        (btcData.uMarginList?.length || 1);
+        // Get latest value and value from ~30 days ago
+        const current = values[values.length - 1]?.y || 0;
+        const thirtyDaysAgoValue = values[values.length - 30]?.y || current;
         
-        const annualized = avgRate * 3 * 365; // 8-hour rate * 3 * 365
-        const displayRate = (avgRate * 100).toFixed(4);
+        // Calculate 30-day change
+        const change30d = ((current - thirtyDaysAgoValue) / thirtyDaysAgoValue * 100);
+        const displayValue = (current / 1000).toFixed(0); // Show in thousands (K)
+        
+        // Build mini history for sparkline (weekly samples)
+        const history = [];
+        for (let i = 0; i < values.length; i += 7) {
+            history.push({
+                value: values[i].y,
+                date: new Date(values[i].x * 1000).toISOString()
+            });
+        }
         
         let interpretation = 'neutral';
         let context = '';
         
-        if (avgRate > 0.0003) { // > 0.03% per 8h = very positive
-            interpretation = 'crowded-long';
-            context = 'Longs paying heavily - crowded trade. Squeeze risk if price drops';
-        } else if (avgRate > 0.0001) {
-            interpretation = 'bullish-bias';
-            context = 'Modest long bias - healthy bullish positioning';
-        } else if (avgRate > -0.0001) {
-            interpretation = 'neutral';
-            context = 'Funding neutral - no strong directional bias in derivatives';
-        } else if (avgRate > -0.0003) {
-            interpretation = 'bearish-bias';
-            context = 'Shorts paying - contrarian signal, potential squeeze setup';
+        if (change30d > 10) {
+            interpretation = 'strong-growth';
+            context = 'Network activity surging - strong adoption signal, fundamentally bullish';
+        } else if (change30d > 3) {
+            interpretation = 'growing';
+            context = 'Healthy network growth - more users engaging with Bitcoin';
+        } else if (change30d > -3) {
+            interpretation = 'stable';
+            context = 'Network activity stable - neither expansion nor contraction';
+        } else if (change30d > -10) {
+            interpretation = 'declining';
+            context = 'Network usage declining - fewer active users, watch for trend reversal';
         } else {
-            interpretation = 'crowded-short';
-            context = 'Extreme negative funding - shorts crowded, squeeze likely';
+            interpretation = 'contracting';
+            context = 'Significant drop in activity - bearish fundamental signal';
         }
         
         return {
-            metric: 'funding_rates',
-            label: 'FUNDING RATE',
-            value: displayRate,
-            numericValue: avgRate * 100,
-            unit: '%',
-            subtitle: `≈ ${annualized.toFixed(0)}% APR`,
+            metric: 'active_addresses',
+            label: 'ACTIVE ADDRESSES',
+            value: displayValue,
+            numericValue: current,
+            unit: 'K',
+            subtitle: `BTC 24h unique`,
             context,
             interpretation,
-            change: null,
-            history: [],
-            historyLabel: '30 days',
-            source: 'coinglass'
+            change: `${change30d >= 0 ? '+' : ''}${change30d.toFixed(1)}% vs 30d ago`,
+            history,
+            historyLabel: '60 days',
+            source: 'blockchain.info'
         };
         
     } catch (error) {
-        console.error('[Funding Rates]', error.message);
-        return getFallbackFundingRates();
+        console.error('[Active Addresses]', error.message);
+        return getFallbackActiveAddresses();
     }
 }
 
-function getFallbackFundingRates() {
+function getFallbackActiveAddresses() {
     return {
-        metric: 'funding_rates',
-        label: 'FUNDING RATE',
-        value: '0.0100',
-        numericValue: 0.01,
-        unit: '%',
-        subtitle: '≈ 11% APR',
-        context: 'Modest long bias - healthy bullish positioning',
-        interpretation: 'bullish-bias',
-        change: null,
+        metric: 'active_addresses',
+        label: 'ACTIVE ADDRESSES',
+        value: '850',
+        numericValue: 850000,
+        unit: 'K',
+        subtitle: 'BTC 24h unique',
+        context: 'Network activity stable - neither expansion nor contraction',
+        interpretation: 'stable',
+        change: '+2.5% vs 30d ago',
         history: [],
-        historyLabel: '30 days',
+        historyLabel: '60 days',
         source: 'fallback'
     };
 }
