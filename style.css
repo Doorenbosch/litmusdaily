@@ -2032,151 +2032,272 @@ BREAKPOINTS:
    TABLET / iPAD OPTIMIZATION (768px - 1200px)
    ============================================ */
 
-/* iPad Portrait & Small Tablets (768px - 1024px) */
+/* iPad Portrait (768px - 1024px) */
 @media (min-width: 768px) and (max-width: 1024px) {
-    /* Container */
+    /* Tighter container */
     .container {
-        padding: var(--lg);
+        padding: var(--md) var(--lg);
     }
     
-    /* Header - more compact */
+    /* Compact header */
     .header-fixed {
         padding: var(--sm) var(--lg) 0 var(--lg);
     }
     
     .masthead {
-        padding: var(--sm) 0;
+        padding: var(--sm) 0 var(--xs) 0;
+        margin-bottom: var(--xs);
     }
     
     .brand-name {
-        font-size: 1.6rem;
+        font-size: 1.5rem;
     }
     
-    /* Market ticker - horizontal scroll if needed */
+    /* Market ticker - single line, compact */
     .market-ticker {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
         gap: var(--md);
-        padding-bottom: var(--xs);
+        padding: var(--xs) 0;
     }
     
-    .ticker-item {
-        flex-shrink: 0;
+    .ticker-label {
+        font-size: 0.6rem;
     }
     
-    /* Section nav - scrollable */
+    .ticker-value {
+        font-size: 0.85rem;
+    }
+    
+    .ticker-change {
+        font-size: 0.7rem;
+    }
+    
+    /* Section nav - compact */
     .section-nav {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        justify-content: flex-start;
         gap: var(--lg);
-        padding-bottom: var(--xs);
+        padding: var(--sm) 0;
+        border-bottom-width: 2px;
     }
     
-    /* Week Focus - 2x2 grid for better readability */
+    .section-link {
+        font-size: 0.8rem;
+        padding: var(--xs) 0;
+    }
+    
+    /* WEEK FOCUS - Reduced top margin, 2x2 grid */
+    .week-focus {
+        margin-top: var(--md);
+        margin-bottom: var(--md);
+    }
+    
+    .week-focus-header {
+        margin-bottom: var(--sm);
+    }
+    
+    .week-focus-title {
+        font-size: 0.7rem;
+    }
+    
     .week-focus-cards {
         grid-template-columns: repeat(2, 1fr);
-        gap: var(--md);
+        gap: var(--sm);
     }
     
     .focus-card {
-        padding: var(--md);
+        padding: var(--sm) var(--md);
+    }
+    
+    .focus-label {
+        font-size: 0.55rem;
+        margin-bottom: 2px;
     }
     
     .focus-headline {
-        font-size: 0.95rem;
-        -webkit-line-clamp: 3;
+        font-size: 0.9rem;
+        margin-bottom: 4px;
     }
     
     .focus-excerpt {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         -webkit-line-clamp: 2;
     }
     
-    /* Main grid - 2 columns, sidebar hidden */
+    /* MAIN GRID - Full width reading, index as horizontal strip */
     .editorial-grid {
         display: grid;
-        grid-template-columns: 280px 1fr;
+        grid-template-columns: 1fr 300px;
+        grid-template-rows: auto 1fr;
         grid-template-areas: 
-            "left center";
-        gap: var(--lg);
-        height: calc(100vh - 280px);
+            "center right"
+            "center right";
+        gap: var(--md);
+        height: calc(100vh - 320px);
+        margin-top: var(--sm);
     }
     
+    /* Index becomes horizontal scrolling strip above reading pane */
     .article-index {
-        grid-area: left;
-        border-right: 1px solid var(--rule);
-        padding-right: var(--lg);
-        overflow-y: auto;
+        display: none; /* Hide on portrait - use bottom sheet instead */
     }
     
     .reading-pane {
         grid-area: center;
         overflow-y: auto;
+        padding-right: var(--md);
     }
     
-    /* Hide context sidebar on iPad portrait - show as drawer or bottom sheet */
+    /* Context sidebar - visible and valuable! */
     .context-sidebar {
-        display: none;
+        grid-area: right;
+        display: block;
+        border-left: 1px solid var(--rule);
+        padding-left: var(--md);
+        overflow-y: auto;
     }
     
-    /* Index cards - larger touch targets */
-    .index-card {
-        padding: var(--md);
-        margin-bottom: var(--md);
+    /* Compact sidebar content */
+    .number-value {
+        font-size: 2.5rem;
     }
     
-    .index-headline {
-        font-size: 1rem;
-        line-height: 1.35;
+    .number-metric {
+        font-size: 0.65rem;
     }
     
-    .index-excerpt {
-        font-size: 0.85rem;
-        -webkit-line-clamp: 2;
+    .mood-title {
+        font-size: 1.2rem;
     }
     
-    /* Brief selector - larger buttons */
-    .brief-tab {
-        padding: var(--sm) var(--md);
-        min-height: 56px;
+    .nine-box-grid {
+        gap: 2px;
     }
     
-    .brief-tab-label {
-        font-size: 0.85rem;
+    .nine-box-cell {
+        padding: var(--xs);
+        font-size: 0.5rem;
     }
     
-    /* Reading pane optimizations */
-    .article-header {
-        padding: var(--lg) 0;
+    /* Reading pane - optimized for touch */
+    .article-header.with-image {
+        margin: 0 calc(-1 * var(--md));
     }
     
     .article-title {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
+        line-height: 1.25;
     }
     
     .article-body {
-        font-size: 1.05rem;
-        line-height: 1.7;
+        font-size: 1rem;
+        line-height: 1.65;
     }
     
-    .article-body p {
-        margin-bottom: var(--lg);
+    /* Index list overlay - slide up panel */
+    .index-header {
+        padding-bottom: var(--sm);
+        margin-bottom: var(--sm);
+    }
+    
+    .index-title {
+        font-size: 0.7rem;
+    }
+    
+    .brief-selector {
+        margin-bottom: var(--sm);
+    }
+    
+    .brief-tab {
+        padding: var(--sm) var(--md);
+        min-height: 48px;
+    }
+    
+    .brief-tab-label {
+        font-size: 0.75rem;
+    }
+    
+    .brief-tab-time {
+        font-size: 0.65rem;
+    }
+    
+    .index-card {
+        padding: var(--sm) var(--md);
+        margin-bottom: var(--sm);
+    }
+    
+    .index-label {
+        font-size: 0.55rem;
+    }
+    
+    .index-headline {
+        font-size: 0.9rem;
+    }
+    
+    .index-excerpt {
+        font-size: 0.75rem;
+        -webkit-line-clamp: 2;
     }
     
     .mobile-back-btn {
         display: none;
     }
-}
-
-/* iPad Landscape & Large Tablets (1025px - 1200px) */
-@media (min-width: 1025px) and (max-width: 1200px) {
-    .container {
-        padding: var(--lg) var(--xl);
+    
+    /* Show article index as slide-up drawer */
+    .article-index {
+        display: block;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--paper);
+        border-top: 1px solid var(--rule);
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+        max-height: 45vh;
+        overflow-y: auto;
+        z-index: 50;
+        padding: var(--md) var(--lg);
+        transform: translateY(calc(100% - 60px));
+        transition: transform 0.3s ease;
+        border-radius: 16px 16px 0 0;
     }
     
-    /* Week Focus - back to 4 columns but with better spacing */
+    .article-index::before {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 4px;
+        background: var(--rule);
+        border-radius: 2px;
+        margin: 0 auto var(--sm);
+    }
+    
+    .article-index:hover,
+    .article-index:focus-within,
+    .article-index.expanded {
+        transform: translateY(0);
+    }
+    
+    .index-content {
+        max-height: calc(45vh - 80px);
+        overflow-y: auto;
+    }
+}
+
+/* iPad Landscape (1025px - 1200px) */
+@media (min-width: 1025px) and (max-width: 1200px) {
+    .container {
+        padding: var(--md) var(--xl);
+    }
+    
+    /* Compact header */
+    .masthead {
+        padding: var(--sm) 0;
+    }
+    
+    /* Week Focus - 4 columns, tighter */
+    .week-focus {
+        margin-top: var(--md);
+        margin-bottom: var(--md);
+    }
+    
     .week-focus-cards {
         grid-template-columns: repeat(4, 1fr);
         gap: var(--sm);
@@ -2190,17 +2311,29 @@ BREAKPOINTS:
         font-size: 0.85rem;
     }
     
-    /* Main grid - include sidebar but narrower */
+    /* Main grid - 3 columns, balanced */
     .editorial-grid {
         display: grid;
-        grid-template-columns: 260px 1fr 240px;
-        gap: var(--lg);
-        height: calc(100vh - 270px);
+        grid-template-columns: 240px 1fr 260px;
+        gap: var(--md);
+        height: calc(100vh - 300px);
+        margin-top: var(--sm);
     }
     
     .article-index {
+        position: relative;
+        transform: none;
+        border-top: none;
+        box-shadow: none;
+        max-height: none;
+        border-radius: 0;
+        padding: 0;
         border-right: 1px solid var(--rule);
         padding-right: var(--md);
+    }
+    
+    .article-index::before {
+        display: none;
     }
     
     .context-sidebar {
@@ -2210,9 +2343,9 @@ BREAKPOINTS:
         overflow-y: auto;
     }
     
-    /* Smaller nine-box for sidebar */
+    /* Compact nine-box */
     .nine-box-container {
-        transform: scale(0.9);
+        transform: scale(0.85);
         transform-origin: top center;
     }
     
