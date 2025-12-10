@@ -49,16 +49,14 @@ body {
     line-height: 1.5;
 }
 
-/* DM Serif Display - slightly open kerning for headers */
+/* DM Serif Display - breathing room for headers */
 h1, h2, h3, h4, h5, h6,
 .article-title,
-.focus-headline {
-    letter-spacing: 0.01em;
-},
+.focus-headline,
 .index-title,
 .mood-title,
 .section-title {
-    letter-spacing: 0.01em;
+    letter-spacing: 0.02em;
 }
 
 a {
