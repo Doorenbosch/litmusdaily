@@ -49,6 +49,16 @@ body {
     line-height: 1.5;
 }
 
+/* DM Serif Display - slightly open kerning for headers */
+h1, h2, h3, h4, h5, h6,
+.article-title,
+.focus-headline,
+.index-title,
+.mood-title,
+.section-title {
+    letter-spacing: 0.01em;
+}
+
 a {
     color: inherit;
     text-decoration: none;
