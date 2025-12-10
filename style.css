@@ -2844,6 +2844,7 @@ BREAKPOINTS:
 .analyst-info {
     display: flex;
     flex-direction: column;
+    flex: 1;
 }
 
 .analyst-name {
@@ -2858,6 +2859,24 @@ BREAKPOINTS:
     font-size: 0.75rem;
     color: var(--ink-tertiary);
     margin-top: 2px;
+}
+
+.analyst-brand {
+    margin-left: auto;
+}
+
+.brand-mark {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    color: var(--ink);
+}
+
+.brand-mark strong {
+    font-weight: 700;
+}
+
+.brand-mark .brand-dot {
+    color: var(--gold);
 }
 
 /* Related Reading */
