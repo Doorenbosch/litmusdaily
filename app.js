@@ -2375,17 +2375,77 @@ async function loadYourCoins() {
         const baseCoinIds = ['bitcoin', 'ethereum'];
         const allCoinIds = [...new Set([...baseCoinIds, ...userCoins])]; // Dedupe
         
-        const coinIds = allCoinIds.join(',');
-        const coinsResponse = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${coinIds}&order=market_cap_desc&sparkline=false&price_change_percentage=24h`);
+        // Use cached coins data instead of direct CoinGecko call
+        const cacheResponse = await fetch('/api/coins-cache');
         
-        // Fetch market data for baseline
+        if (!cacheResponse.ok) {
+            // Fallback to direct API
+            return loadYourCoinsDirect(allCoinIds);
+        }
+        
+        const cacheData = await cacheResponse.json();
+        const allCachedCoins = cacheData.coins || [];
+        
+        // Filter to only user's selected coins
+        const coins = allCachedCoins.filter(coin => allCoinIds.includes(coin.id));
+        
+        // Sort: BTC first, ETH second, then rest by market cap
+        const sortedCoins = coins.sort((a, b) => {
+            if (a.id === 'bitcoin') return -1;
+            if (b.id === 'bitcoin') return 1;
+            if (a.id === 'ethereum') return -1;
+            if (b.id === 'ethereum') return 1;
+            return (a.rank || 999) - (b.rank || 999);
+        });
+        
+        // Transform to expected format
+        const formattedCoins = sortedCoins.map(coin => ({
+            id: coin.id,
+            symbol: coin.symbol,
+            name: coin.name,
+            image: coin.image,
+            current_price: coin.price,
+            market_cap: coin.marketCap,
+            market_cap_rank: coin.rank,
+            price_change_percentage_24h: coin.change24h
+        }));
+        
+        // Get market 24h change from market-cache
+        let marketChange = 0;
+        try {
+            const marketResponse = await fetch('/api/market-cache');
+            if (marketResponse.ok) {
+                const marketData = await marketResponse.json();
+                marketChange = marketData.market?.marketCapChange24h || 0;
+            }
+        } catch (e) {
+            console.log('Market cache unavailable for baseline');
+        }
+        
+        renderRelativePerformance(formattedCoins, marketChange);
+        
+        // Update coins timestamp if element exists
+        const timestampEl = document.getElementById('coins-updated');
+        if (timestampEl && cacheData.updated) {
+            updateCoinsTimestamp(cacheData.updated, cacheData.cached);
+        }
+        
+    } catch (error) {
+        console.error('Error loading your coins:', error);
+    }
+}
+
+// Fallback: direct CoinGecko fetch for user coins
+async function loadYourCoinsDirect(coinIds) {
+    try {
+        const ids = coinIds.join(',');
+        const coinsResponse = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${ids}&order=market_cap_desc&sparkline=false&price_change_percentage=24h`);
         const globalResponse = await fetch('https://api.coingecko.com/api/v3/global');
         
         if (!coinsResponse.ok) return;
         
         const coins = await coinsResponse.json();
         
-        // Sort: BTC first, ETH second, then rest by market cap
         const sortedCoins = coins.sort((a, b) => {
             if (a.id === 'bitcoin') return -1;
             if (b.id === 'bitcoin') return 1;
@@ -2394,7 +2454,6 @@ async function loadYourCoins() {
             return (a.market_cap_rank || 999) - (b.market_cap_rank || 999);
         });
         
-        // Get market 24h change (fallback to 0 if unavailable)
         let marketChange = 0;
         if (globalResponse.ok) {
             const globalData = await globalResponse.json();
@@ -2404,8 +2463,31 @@ async function loadYourCoins() {
         renderRelativePerformance(sortedCoins, marketChange);
         
     } catch (error) {
-        console.error('Error loading your coins:', error);
+        console.error('Error loading your coins (direct):', error);
     }
+}
+
+// Update coins data timestamp
+function updateCoinsTimestamp(isoString, cached) {
+    const el = document.getElementById('coins-updated');
+    if (!el) return;
+    
+    const date = new Date(isoString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    
+    let text;
+    if (diffMins < 1) {
+        text = 'just now';
+    } else if (diffMins < 60) {
+        text = `${diffMins}m ago`;
+    } else {
+        text = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    
+    el.textContent = text;
+    el.title = `Data updated: ${date.toLocaleString()}${cached ? ' (cached)' : ''}`;
 }
 
 // Render Relative Performance section
