@@ -12,12 +12,12 @@
     --paper-dark: #F5EDE5;
     --rule: #E8DFD5;
     
-    --ink: #351822;
-    --ink-secondary: #5C3D45;
-    --ink-tertiary: #8A6B72;
+    --ink: #1a1a1a;
+    --ink-secondary: #4a4a4a;
+    --ink-tertiary: #7a7a7a;
     
     /* Typography */
-    --serif: 'Source Serif Pro', Georgia, serif;
+    --serif: 'Bodoni Moda', Georgia, serif;
     --sans: 'Inter', -apple-system, sans-serif;
     
     /* Spacing */
@@ -139,15 +139,19 @@ a {
 }
 
 .brand-name {
-    font-family: 'Libre Baskerville', Georgia, serif;
-    font-weight: 700;
+    font-family: var(--serif);
+    font-weight: 400;
     font-size: 2rem;
     color: var(--ink);
-    letter-spacing: 0;
+    letter-spacing: 0.02em;
+}
+
+.brand-name strong {
+    font-weight: 700;
 }
 
 .brand-name em {
-    font-style: italic;
+    font-style: normal;
     font-weight: 400;
     color: var(--ink);
 }
