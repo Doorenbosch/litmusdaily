@@ -3072,7 +3072,7 @@ BREAKPOINTS:
 
 .week-focus {
     margin-top: var(--sm); /* Small margin, offset handled by container */
-    margin-bottom: var(--sm);
+    margin-bottom: var(--lg); /* More breathing room before editorial grid */
     padding: var(--xs) 0;
 }
 
@@ -3087,13 +3087,6 @@ BREAKPOINTS:
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--teal);
-}
-
-.week-focus-subtitle {
-    font-family: var(--sans);
-    font-size: 0.75rem;
-    color: var(--ink-tertiary);
-    margin-top: 2px;
 }
 
 .week-focus-cards {

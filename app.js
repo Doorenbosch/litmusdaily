@@ -1548,8 +1548,8 @@ function renderWeekAhead(data) {
         const date = new Date(data.generated_at);
         const titleEl = document.getElementById('week-focus-title');
         if (titleEl) {
-            // Format: "This Week · Dec 9" - cleaner, more editorial
-            titleEl.textContent = `This Week · ${formatShortDate(date)}`;
+            // Format: "What to Watch · Dec 9" - clear purpose, compact
+            titleEl.textContent = `What to Watch · ${formatShortDate(date)}`;
         }
     }
     
