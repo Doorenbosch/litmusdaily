@@ -240,7 +240,7 @@ async function fetchPriceData() {
     const idsToFetch = [...new Set([...userCoinIds, ...segmentRepresentatives])];
     
     try {
-        // Try cached API first (daily refresh, includes 7d/30d/90d data)
+        // Try cached API first (refreshes at 00:00 and 12:00 UTC)
         let coins = [];
         const cacheResponse = await fetch('/api/personal-cache');
         
@@ -248,6 +248,9 @@ async function fetchPriceData() {
             const cacheData = await cacheResponse.json();
             // Filter to only coins we need
             coins = (cacheData.coins || []).filter(c => idsToFetch.includes(c.id));
+            
+            // Update data timestamp display
+            updateDataTimestamp(cacheData.updated, cacheData.dataPeriod);
             
             // Update market data from cache
             if (cacheData.market) {
@@ -426,6 +429,25 @@ function updateMarketConditionHeader() {
     }
     
     labelEl.textContent = headline;
+}
+
+// Update data timestamp display
+function updateDataTimestamp(isoString, dataPeriod) {
+    const el = document.getElementById('data-timestamp');
+    if (!el) return;
+    
+    if (dataPeriod) {
+        // Show the fetch period (00:00 UTC or 12:00 UTC)
+        el.textContent = dataPeriod;
+    } else if (isoString) {
+        // Fallback: parse ISO string and show time
+        const date = new Date(isoString);
+        const hours = date.getUTCHours().toString().padStart(2, '0');
+        const mins = date.getUTCMinutes().toString().padStart(2, '0');
+        el.textContent = `${hours}:${mins} UTC`;
+    } else {
+        el.textContent = '--:-- UTC';
+    }
 }
 
 function renderChart() {
