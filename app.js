@@ -454,6 +454,11 @@ function setActiveSection(sectionKey) {
         card.classList.remove('active');
     });
     
+    // Deactivate focus cards (Week Ahead top cards)
+    document.querySelectorAll('.focus-card').forEach(card => {
+        card.classList.remove('active');
+    });
+    
     // Reset label color to burgundy
     const labelEl = document.getElementById('reading-label');
     if (labelEl) {
@@ -1661,7 +1666,7 @@ function renderWeekAheadPane(sectionKey) {
     const byline = document.querySelector('.reading-byline');
     if (byline) {
         const date = weekAheadData.generated_at ? new Date(weekAheadData.generated_at) : new Date();
-        byline.innerHTML = `<span class="byline-author" style="color: var(--teal)">L/tmus Intelligence</span><time class="byline-time" id="reading-timestamp">${formatDate(date)} · 12:00 GMT</time>`;
+        byline.innerHTML = `<span class="byline-author" style="color: var(--teal)">Sirruna Intelligence</span><time class="byline-time" id="reading-timestamp">${formatDate(date)} · 12:00 GMT</time>`;
     }
     
     // Update body
@@ -1669,6 +1674,27 @@ function renderWeekAheadPane(sectionKey) {
     if (bodyEl) {
         const paragraphs = splitIntoParagraphs(section.content);
         bodyEl.innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
+    }
+    
+    // Set Week Ahead analyst - James, Chief Strategist
+    const weekAheadAnalyst = {
+        name: 'James',
+        role: 'Chief Strategist',
+        photo: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=96&h=96&fit=crop&crop=face&q=80'
+    };
+    
+    const photoEl = document.getElementById('analyst-photo');
+    const nameEl = document.getElementById('analyst-name');
+    const roleEl = document.getElementById('analyst-role');
+    
+    if (photoEl) photoEl.src = weekAheadAnalyst.photo;
+    if (nameEl) nameEl.textContent = `${weekAheadAnalyst.name} · Sirruna`;
+    if (roleEl) roleEl.textContent = weekAheadAnalyst.role;
+    
+    // Clear ending quote for Week Ahead (or set a generic one)
+    const quoteText = document.getElementById('ending-quote-text');
+    if (quoteText) {
+        quoteText.textContent = 'The week ahead demands attention to what others might overlook.';
     }
 }
 
