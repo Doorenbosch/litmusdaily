@@ -502,9 +502,10 @@ function renderChart() {
     // Position market line at center (0% relative = 50% position)
     marketLine.style.left = '50%';
     
-    // Update market label with absolute value
+    // Update market label with absolute value and color
     const marketLabel = marketLine.querySelector('.market-label');
     marketLabel.textContent = `MARKET ${marketChange >= 0 ? '+' : ''}${marketChange.toFixed(0)}%`;
+    marketLabel.classList.toggle('negative', marketChange < 0);
     
     // Update Y-axis segment changes
     renderSegmentChanges();

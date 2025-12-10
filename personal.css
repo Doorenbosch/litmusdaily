@@ -410,19 +410,23 @@ body {
 
 .market-label {
     position: absolute;
-    top: -24px;
+    top: -28px;
     left: 50%;
     transform: translateX(-50%);
     font-family: var(--sans);
-    font-size: 0.6rem;
+    font-size: 0.7rem;
     font-weight: 600;
-    color: var(--ink-tertiary);
+    color: white;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     white-space: nowrap;
-    background: var(--paper);
-    padding: 2px 6px;
-    border-radius: 2px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: var(--teal);
+}
+
+.market-label.negative {
+    background: var(--burgundy);
 }
 
 /* X-axis */
