@@ -96,6 +96,8 @@ a {
 /* Content offset for fixed header */
 .content-offset {
     padding-top: 160px; /* Space for fixed header */
+    position: relative;
+    z-index: 1; /* Below header and dropdowns */
 }
 
 /* Wide screens - expand container for editorial grid */
@@ -357,7 +359,7 @@ a {
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.12);
     padding: var(--xs);
-    z-index: 100;
+    z-index: 200;
     display: none;
 }
 
