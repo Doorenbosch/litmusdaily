@@ -2034,325 +2034,304 @@ BREAKPOINTS:
 
 /* iPad Portrait (768px - 1024px) */
 @media (min-width: 768px) and (max-width: 1024px) {
-    /* Tighter container */
+    /* Much tighter container */
     .container {
-        padding: var(--md) var(--lg);
+        padding: var(--sm) var(--md) !important;
     }
     
     /* Compact header */
     .header-fixed {
-        padding: var(--sm) var(--lg) 0 var(--lg);
+        padding: var(--xs) var(--md) 0 var(--md) !important;
     }
     
     .masthead {
-        padding: var(--sm) 0 var(--xs) 0;
-        margin-bottom: var(--xs);
+        padding: var(--xs) 0 !important;
+        margin-bottom: 0 !important;
     }
     
     .brand-name {
-        font-size: 1.5rem;
+        font-size: 1.4rem !important;
     }
     
-    /* Market ticker - single line, compact */
+    /* Compact ticker */
     .market-ticker {
-        gap: var(--md);
-        padding: var(--xs) 0;
+        gap: var(--sm) !important;
+        padding: var(--xs) 0 !important;
+    }
+    
+    .ticker-item {
+        gap: 4px !important;
     }
     
     .ticker-label {
-        font-size: 0.6rem;
+        font-size: 0.55rem !important;
     }
     
     .ticker-value {
-        font-size: 0.85rem;
+        font-size: 0.8rem !important;
     }
     
     .ticker-change {
-        font-size: 0.7rem;
+        font-size: 0.65rem !important;
     }
     
-    /* Section nav - compact */
+    /* Compact nav */
     .section-nav {
-        gap: var(--lg);
-        padding: var(--sm) 0;
-        border-bottom-width: 2px;
+        gap: var(--md) !important;
+        padding: var(--xs) 0 !important;
+        margin-bottom: 0 !important;
     }
     
     .section-link {
-        font-size: 0.8rem;
-        padding: var(--xs) 0;
+        font-size: 0.75rem !important;
+        padding: var(--xs) 0 !important;
     }
     
-    /* WEEK FOCUS - Reduced top margin, 2x2 grid */
+    /* WEEK FOCUS - Much tighter */
     .week-focus {
-        margin-top: var(--md);
-        margin-bottom: var(--md);
+        margin-top: var(--sm) !important;
+        margin-bottom: var(--sm) !important;
+        padding-top: 0 !important;
     }
     
     .week-focus-header {
-        margin-bottom: var(--sm);
+        margin-bottom: var(--xs) !important;
     }
     
     .week-focus-title {
-        font-size: 0.7rem;
+        font-size: 0.65rem !important;
     }
     
     .week-focus-cards {
-        grid-template-columns: repeat(2, 1fr);
-        gap: var(--sm);
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: var(--xs) !important;
     }
     
     .focus-card {
-        padding: var(--sm) var(--md);
+        padding: var(--xs) var(--sm) !important;
     }
     
     .focus-label {
-        font-size: 0.55rem;
-        margin-bottom: 2px;
+        font-size: 0.5rem !important;
+        margin-bottom: 2px !important;
     }
     
     .focus-headline {
-        font-size: 0.9rem;
-        margin-bottom: 4px;
+        font-size: 0.8rem !important;
+        line-height: 1.25 !important;
+        margin-bottom: 2px !important;
     }
     
     .focus-excerpt {
-        font-size: 0.75rem;
-        -webkit-line-clamp: 2;
+        font-size: 0.7rem !important;
+        -webkit-line-clamp: 2 !important;
+        line-height: 1.3 !important;
     }
     
-    /* MAIN GRID - Full width reading, index as horizontal strip */
+    /* MAIN GRID - 2 columns */
     .editorial-grid {
-        display: grid;
-        grid-template-columns: 1fr 300px;
-        grid-template-rows: auto 1fr;
-        grid-template-areas: 
-            "center right"
-            "center right";
-        gap: var(--md);
-        height: calc(100vh - 320px);
-        margin-top: var(--sm);
+        display: grid !important;
+        grid-template-columns: 220px 1fr !important;
+        gap: var(--sm) !important;
+        height: calc(100vh - 220px) !important;
+        margin-top: var(--xs) !important;
     }
     
-    /* Index becomes horizontal scrolling strip above reading pane */
     .article-index {
-        display: none; /* Hide on portrait - use bottom sheet instead */
+        border-right: 1px solid var(--rule) !important;
+        padding-right: var(--sm) !important;
+        overflow-y: auto !important;
     }
     
     .reading-pane {
-        grid-area: center;
-        overflow-y: auto;
-        padding-right: var(--md);
+        overflow-y: auto !important;
+        padding-right: var(--xs) !important;
     }
     
-    /* Context sidebar - visible and valuable! */
+    /* Hide sidebar on portrait */
     .context-sidebar {
-        grid-area: right;
-        display: block;
-        border-left: 1px solid var(--rule);
-        padding-left: var(--md);
-        overflow-y: auto;
+        display: none !important;
     }
     
-    /* Compact sidebar content */
-    .number-value {
-        font-size: 2.5rem;
-    }
-    
-    .number-metric {
-        font-size: 0.65rem;
-    }
-    
-    .mood-title {
-        font-size: 1.2rem;
-    }
-    
-    .nine-box-grid {
-        gap: 2px;
-    }
-    
-    .nine-box-cell {
-        padding: var(--xs);
-        font-size: 0.5rem;
-    }
-    
-    /* Reading pane - optimized for touch */
-    .article-header.with-image {
-        margin: 0 calc(-1 * var(--md));
-    }
-    
-    .article-title {
-        font-size: 1.6rem;
-        line-height: 1.25;
-    }
-    
-    .article-body {
-        font-size: 1rem;
-        line-height: 1.65;
-    }
-    
-    /* Index list overlay - slide up panel */
+    /* Compact index */
     .index-header {
-        padding-bottom: var(--sm);
-        margin-bottom: var(--sm);
+        padding-bottom: var(--xs) !important;
+        margin-bottom: var(--xs) !important;
     }
     
     .index-title {
-        font-size: 0.7rem;
+        font-size: 0.65rem !important;
+    }
+    
+    .index-date {
+        font-size: 0.6rem !important;
     }
     
     .brief-selector {
-        margin-bottom: var(--sm);
+        margin-bottom: var(--xs) !important;
     }
     
     .brief-tab {
-        padding: var(--sm) var(--md);
-        min-height: 48px;
+        padding: var(--xs) var(--sm) !important;
+        min-height: 40px !important;
     }
     
     .brief-tab-label {
-        font-size: 0.75rem;
+        font-size: 0.7rem !important;
     }
     
     .brief-tab-time {
-        font-size: 0.65rem;
+        font-size: 0.6rem !important;
     }
     
     .index-card {
-        padding: var(--sm) var(--md);
-        margin-bottom: var(--sm);
+        padding: var(--xs) var(--sm) !important;
+        margin-bottom: var(--xs) !important;
     }
     
     .index-label {
-        font-size: 0.55rem;
+        font-size: 0.5rem !important;
+        margin-bottom: 2px !important;
     }
     
     .index-headline {
-        font-size: 0.9rem;
+        font-size: 0.8rem !important;
+        line-height: 1.25 !important;
+        margin-bottom: 2px !important;
     }
     
     .index-excerpt {
-        font-size: 0.75rem;
-        -webkit-line-clamp: 2;
+        font-size: 0.7rem !important;
+        -webkit-line-clamp: 2 !important;
+        line-height: 1.3 !important;
+    }
+    
+    /* Reading pane */
+    .article-title {
+        font-size: 1.5rem !important;
+        line-height: 1.2 !important;
+    }
+    
+    .article-body {
+        font-size: 0.95rem !important;
+        line-height: 1.6 !important;
+    }
+    
+    .article-body p {
+        margin-bottom: var(--md) !important;
+    }
+    
+    .reading-byline {
+        font-size: 0.75rem !important;
+        margin-bottom: var(--sm) !important;
     }
     
     .mobile-back-btn {
-        display: none;
-    }
-    
-    /* Show article index as slide-up drawer */
-    .article-index {
-        display: block;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: var(--paper);
-        border-top: 1px solid var(--rule);
-        box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
-        max-height: 45vh;
-        overflow-y: auto;
-        z-index: 50;
-        padding: var(--md) var(--lg);
-        transform: translateY(calc(100% - 60px));
-        transition: transform 0.3s ease;
-        border-radius: 16px 16px 0 0;
-    }
-    
-    .article-index::before {
-        content: '';
-        display: block;
-        width: 40px;
-        height: 4px;
-        background: var(--rule);
-        border-radius: 2px;
-        margin: 0 auto var(--sm);
-    }
-    
-    .article-index:hover,
-    .article-index:focus-within,
-    .article-index.expanded {
-        transform: translateY(0);
-    }
-    
-    .index-content {
-        max-height: calc(45vh - 80px);
-        overflow-y: auto;
+        display: none !important;
     }
 }
 
-/* iPad Landscape (1025px - 1200px) */
+/* iPad Landscape & Large Tablets (1025px - 1200px) */
 @media (min-width: 1025px) and (max-width: 1200px) {
     .container {
-        padding: var(--md) var(--xl);
+        padding: var(--sm) var(--lg) !important;
     }
     
-    /* Compact header */
+    .header-fixed {
+        padding: var(--xs) var(--lg) 0 var(--lg) !important;
+    }
+    
     .masthead {
-        padding: var(--sm) 0;
+        padding: var(--xs) 0 !important;
     }
     
-    /* Week Focus - 4 columns, tighter */
+    /* Week Focus - 4 columns tighter */
     .week-focus {
-        margin-top: var(--md);
-        margin-bottom: var(--md);
+        margin-top: var(--sm) !important;
+        margin-bottom: var(--sm) !important;
     }
     
     .week-focus-cards {
-        grid-template-columns: repeat(4, 1fr);
-        gap: var(--sm);
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: var(--xs) !important;
     }
     
     .focus-card {
-        padding: var(--sm) var(--md);
+        padding: var(--xs) var(--sm) !important;
     }
     
     .focus-headline {
-        font-size: 0.85rem;
+        font-size: 0.8rem !important;
     }
     
-    /* Main grid - 3 columns, balanced */
+    .focus-excerpt {
+        font-size: 0.7rem !important;
+        -webkit-line-clamp: 2 !important;
+    }
+    
+    /* Main grid - 3 columns tighter */
     .editorial-grid {
-        display: grid;
-        grid-template-columns: 240px 1fr 260px;
-        gap: var(--md);
-        height: calc(100vh - 300px);
-        margin-top: var(--sm);
+        display: grid !important;
+        grid-template-columns: 200px 1fr 220px !important;
+        gap: var(--sm) !important;
+        height: calc(100vh - 220px) !important;
+        margin-top: var(--xs) !important;
     }
     
     .article-index {
-        position: relative;
-        transform: none;
-        border-top: none;
-        box-shadow: none;
-        max-height: none;
-        border-radius: 0;
-        padding: 0;
-        border-right: 1px solid var(--rule);
-        padding-right: var(--md);
-    }
-    
-    .article-index::before {
-        display: none;
+        border-right: 1px solid var(--rule) !important;
+        padding-right: var(--sm) !important;
     }
     
     .context-sidebar {
-        display: block;
-        border-left: 1px solid var(--rule);
-        padding-left: var(--md);
-        overflow-y: auto;
+        display: block !important;
+        border-left: 1px solid var(--rule) !important;
+        padding-left: var(--sm) !important;
+        overflow-y: auto !important;
     }
     
-    /* Compact nine-box */
+    /* Compact sidebar */
+    .number-block {
+        margin-bottom: var(--sm) !important;
+    }
+    
+    .number-value {
+        font-size: 2.2rem !important;
+    }
+    
+    .number-metric {
+        font-size: 0.6rem !important;
+    }
+    
+    .mood-title {
+        font-size: 1.1rem !important;
+    }
+    
     .nine-box-container {
-        transform: scale(0.85);
-        transform-origin: top center;
+        transform: scale(0.8) !important;
+        transform-origin: top center !important;
+    }
+    
+    /* Compact index */
+    .index-card {
+        padding: var(--xs) var(--sm) !important;
+        margin-bottom: var(--xs) !important;
+    }
+    
+    .index-headline {
+        font-size: 0.8rem !important;
+    }
+    
+    .index-excerpt {
+        font-size: 0.7rem !important;
+        -webkit-line-clamp: 2 !important;
     }
     
     .mobile-back-btn {
-        display: none;
+        display: none !important;
     }
 }
+
 
 /* Small laptops (13" MacBook ~1280-1440px) - tighter layout */
 @media (min-width: 1201px) and (max-width: 1440px) {
