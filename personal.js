@@ -454,8 +454,8 @@ function renderChart() {
     const chartArea = document.getElementById('chart-area');
     const marketLine = document.getElementById('market-line');
     
-    // Clear existing coins
-    chartArea.querySelectorAll('.coin-dot, .coin-watching').forEach(el => el.remove());
+    // Clear existing coins and segment lines
+    chartArea.querySelectorAll('.coin-dot, .coin-watching, .segment-line').forEach(el => el.remove());
     
     // Get market change for selected period
     const marketChange = state.period === 7 ? state.marketChange7d : 
@@ -481,6 +481,18 @@ function renderChart() {
         maxSpread = Math.max(maxSpread, Math.abs(relativeChange));
     });
     
+    // Also factor in segment spreads for axis range
+    Object.keys(SEGMENTS).forEach(segKey => {
+        const segData = state.segmentChanges[segKey];
+        if (segData) {
+            const segChange = state.period === 7 ? segData.change7d : 
+                             state.period === 90 ? segData.change90d : 
+                             segData.change30d;
+            const segRelative = segChange - marketChange;
+            maxSpread = Math.max(maxSpread, Math.abs(segRelative));
+        }
+    });
+    
     // Round up to nearest 5% for clean axis labels
     const axisRange = Math.ceil(maxSpread / 5) * 5;
     
@@ -496,6 +508,9 @@ function renderChart() {
     
     // Update Y-axis segment changes
     renderSegmentChanges();
+    
+    // Render segment indicator lines (from center to segment's relative position)
+    renderSegmentLines(chartArea, marketChange, axisRange);
     
     // Render each coin at relative position
     coinRelativeChanges.forEach(({ coin, relativeChange, absoluteChange }) => {
@@ -605,6 +620,63 @@ function segmentToY(row) {
     // 7 rows, evenly distributed
     const rowHeight = 100 / 7;
     return (row * rowHeight) + (rowHeight / 2);
+}
+
+// Render segment indicator lines from center (market) to segment's relative position
+function renderSegmentLines(chartArea, marketChange, axisRange) {
+    Object.keys(SEGMENTS).forEach(segKey => {
+        const segment = SEGMENTS[segKey];
+        const segData = state.segmentChanges[segKey];
+        
+        if (!segData) return;
+        
+        // Get segment change for current period
+        const segChange = state.period === 7 ? segData.change7d : 
+                         state.period === 90 ? segData.change90d : 
+                         segData.change30d;
+        
+        // Calculate relative to market
+        const relativeChange = segChange - marketChange;
+        
+        // Skip if essentially at market (within 0.5%)
+        if (Math.abs(relativeChange) < 0.5) return;
+        
+        const y = segmentToY(segment.row);
+        const endX = relativePercentToX(relativeChange, axisRange);
+        const startX = 50; // Center (market = 0%)
+        
+        // Determine color: teal if outperforming, gold if underperforming
+        const isOutperforming = relativeChange > 0;
+        const color = isOutperforming ? 'var(--teal)' : 'var(--gold)';
+        
+        // Create the line element
+        const lineEl = document.createElement('div');
+        lineEl.className = `segment-line ${isOutperforming ? 'outperforming' : 'underperforming'}`;
+        
+        // Position and size the line
+        const leftX = Math.min(startX, endX);
+        const width = Math.abs(endX - startX);
+        
+        lineEl.style.left = `${leftX}%`;
+        lineEl.style.top = `${y}%`;
+        lineEl.style.width = `${width}%`;
+        lineEl.style.backgroundColor = color;
+        
+        // Create the dot at the end
+        const dotEl = document.createElement('div');
+        dotEl.className = 'segment-dot';
+        dotEl.style.backgroundColor = color;
+        
+        // Position dot at the segment's end (not center)
+        if (isOutperforming) {
+            dotEl.style.right = '-4px'; // Dot on right end
+        } else {
+            dotEl.style.left = '-4px'; // Dot on left end
+        }
+        
+        lineEl.appendChild(dotEl);
+        chartArea.appendChild(lineEl);
+    });
 }
 
 function renderPortfolioRead() {

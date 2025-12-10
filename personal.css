@@ -505,6 +505,32 @@ body {
     background: var(--burgundy);
 }
 
+/* Segment indicator lines */
+.segment-line {
+    position: absolute;
+    height: 2px;
+    transform: translateY(-50%);
+    z-index: 5;
+    pointer-events: none;
+}
+
+.segment-line.outperforming {
+    background: var(--teal);
+}
+
+.segment-line.underperforming {
+    background: var(--gold);
+}
+
+.segment-dot {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
 /* Legend */
 .chart-legend {
     display: flex;
