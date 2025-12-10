@@ -83,7 +83,7 @@ a {
     z-index: 100;
     padding: var(--sm) var(--xl) 0 var(--xl);
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    overflow-x: hidden;
+    overflow: visible;
 }
 
 .header-fixed .masthead,
