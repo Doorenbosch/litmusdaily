@@ -2028,48 +2028,196 @@ BREAKPOINTS:
     }
 }
 
-/* Tablet: 2 columns - left+right stacked on left, reader on right */
-@media (min-width: 768px) and (max-width: 1200px) {
+/* ============================================
+   TABLET / iPAD OPTIMIZATION (768px - 1200px)
+   ============================================ */
+
+/* iPad Portrait & Small Tablets (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    /* Container */
+    .container {
+        padding: var(--lg);
+    }
+    
+    /* Header - more compact */
+    .header-fixed {
+        padding: var(--sm) var(--lg) 0 var(--lg);
+    }
+    
+    .masthead {
+        padding: var(--sm) 0;
+    }
+    
+    .brand-name {
+        font-size: 1.6rem;
+    }
+    
+    /* Market ticker - horizontal scroll if needed */
+    .market-ticker {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: var(--md);
+        padding-bottom: var(--xs);
+    }
+    
+    .ticker-item {
+        flex-shrink: 0;
+    }
+    
+    /* Section nav - scrollable */
+    .section-nav {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        justify-content: flex-start;
+        gap: var(--lg);
+        padding-bottom: var(--xs);
+    }
+    
+    /* Week Focus - 2x2 grid for better readability */
+    .week-focus-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--md);
+    }
+    
+    .focus-card {
+        padding: var(--md);
+    }
+    
+    .focus-headline {
+        font-size: 0.95rem;
+        -webkit-line-clamp: 3;
+    }
+    
+    .focus-excerpt {
+        font-size: 0.8rem;
+        -webkit-line-clamp: 2;
+    }
+    
+    /* Main grid - 2 columns, sidebar hidden */
     .editorial-grid {
         display: grid;
-        grid-template-columns: 300px 1fr;
-        grid-template-rows: auto auto;
+        grid-template-columns: 280px 1fr;
         grid-template-areas: 
-            "left center"
-            "right center";
+            "left center";
         gap: var(--lg);
+        height: calc(100vh - 280px);
     }
     
     .article-index {
         grid-area: left;
         border-right: 1px solid var(--rule);
         padding-right: var(--lg);
+        overflow-y: auto;
     }
     
     .reading-pane {
         grid-area: center;
-        grid-row: 1 / -1; /* Span full height */
+        overflow-y: auto;
     }
     
+    /* Hide context sidebar on iPad portrait - show as drawer or bottom sheet */
     .context-sidebar {
-        grid-area: right;
-        border-right: 1px solid var(--rule);
-        padding-right: var(--lg);
-        border-top: 1px solid var(--rule);
-        padding-top: var(--lg);
-        margin-top: var(--lg);
+        display: none;
+    }
+    
+    /* Index cards - larger touch targets */
+    .index-card {
+        padding: var(--md);
+        margin-bottom: var(--md);
+    }
+    
+    .index-headline {
+        font-size: 1rem;
+        line-height: 1.35;
+    }
+    
+    .index-excerpt {
+        font-size: 0.85rem;
+        -webkit-line-clamp: 2;
+    }
+    
+    /* Brief selector - larger buttons */
+    .brief-tab {
+        padding: var(--sm) var(--md);
+        min-height: 56px;
+    }
+    
+    .brief-tab-label {
+        font-size: 0.85rem;
+    }
+    
+    /* Reading pane optimizations */
+    .article-header {
+        padding: var(--lg) 0;
+    }
+    
+    .article-title {
+        font-size: 1.8rem;
+    }
+    
+    .article-body {
+        font-size: 1.05rem;
+        line-height: 1.7;
+    }
+    
+    .article-body p {
+        margin-bottom: var(--lg);
     }
     
     .mobile-back-btn {
         display: none;
     }
-    
+}
+
+/* iPad Landscape & Large Tablets (1025px - 1200px) */
+@media (min-width: 1025px) and (max-width: 1200px) {
     .container {
-        padding: var(--lg);
+        padding: var(--lg) var(--xl);
     }
     
-    .index-list {
-        display: block; /* Stacked list, not grid */
+    /* Week Focus - back to 4 columns but with better spacing */
+    .week-focus-cards {
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--sm);
+    }
+    
+    .focus-card {
+        padding: var(--sm) var(--md);
+    }
+    
+    .focus-headline {
+        font-size: 0.85rem;
+    }
+    
+    /* Main grid - include sidebar but narrower */
+    .editorial-grid {
+        display: grid;
+        grid-template-columns: 260px 1fr 240px;
+        gap: var(--lg);
+        height: calc(100vh - 270px);
+    }
+    
+    .article-index {
+        border-right: 1px solid var(--rule);
+        padding-right: var(--md);
+    }
+    
+    .context-sidebar {
+        display: block;
+        border-left: 1px solid var(--rule);
+        padding-left: var(--md);
+        overflow-y: auto;
+    }
+    
+    /* Smaller nine-box for sidebar */
+    .nine-box-container {
+        transform: scale(0.9);
+        transform-origin: top center;
+    }
+    
+    .mobile-back-btn {
+        display: none;
     }
 }
 
@@ -2825,8 +2973,8 @@ BREAKPOINTS:
     overflow: hidden;
 }
 
-/* Mobile: 2x2 grid */
-@media (max-width: 768px) {
+/* Tablet: 2x2 grid */
+@media (max-width: 1024px) {
     .week-focus-cards {
         grid-template-columns: repeat(2, 1fr);
     }
