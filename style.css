@@ -195,6 +195,15 @@ a {
     color: var(--gold);
 }
 
+/* Full SIRRUNA. masthead on daily page */
+.brand-name.brand-full {
+    font-family: var(--serif-display);
+    font-weight: 400;
+    font-size: 1.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
 /* Page-specific brand second word colors */
 .brand-name.brand-weekend .brand-word {
     color: var(--teal);
