@@ -380,6 +380,24 @@ body {
     border: 1px solid var(--rule);
 }
 
+/* Segment rows */
+.chart-area::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 50px,
+        var(--rule) 50px,
+        var(--rule) 51px
+    );
+    pointer-events: none;
+}
+
 /* Market benchmark line */
 .market-line {
     position: absolute;
