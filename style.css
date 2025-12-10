@@ -1254,9 +1254,9 @@ a {
 
 /* Article Body */
 .article-body {
-    font-family: var(--serif);
-    font-size: 1.15rem;
-    line-height: 1.75;
+    font-family: var(--sans);
+    font-size: 1rem;
+    line-height: 1.7;
     color: var(--ink-secondary);
     max-width: 720px;
 }
