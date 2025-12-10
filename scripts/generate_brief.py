@@ -145,7 +145,11 @@ UNSPLASH_API_URL = "https://api.unsplash.com/search/photos"
 import random
 
 def fetch_unsplash_image(keywords: str, region: str = "", brief_type: str = "morning") -> str:
-    """Fetch image from Unsplash API with variety and regional context"""
+    """Fetch image from Unsplash API with variety and regional context
+    
+    IMPORTANT: We prefer light, bright, optimistic imagery.
+    Dark, moody, dramatic images feel oppressive and don't match our editorial tone.
+    """
     
     if not UNSPLASH_ACCESS_KEY:
         print("  Warning: UNSPLASH_ACCESS_KEY not set, using fallback")
@@ -157,6 +161,10 @@ def fetch_unsplash_image(keywords: str, region: str = "", brief_type: str = "mor
     if not query_parts:
         print("  Warning: No keywords provided")
         return None
+    
+    # Filter out dark/moody terms that lead to oppressive imagery
+    dark_terms = ["dark", "dramatic", "storm", "night", "moody", "shadows", "noir"]
+    query_parts = [kw for kw in query_parts if not any(dark in kw.lower() for dark in dark_terms)]
     
     # Strategy: Try location-focused search first, then broaden if needed
     # Unsplash works better with 2-3 keywords than 5+
@@ -172,9 +180,16 @@ def fetch_unsplash_image(keywords: str, region: str = "", brief_type: str = "mor
         "financial district", "skyline", "tower", "skyscraper"
     ]
     
+    # Preferred light/bright mood terms
+    preferred_mood_terms = [
+        "dawn", "sunrise", "morning", "golden hour", "light", "bright", "clear sky",
+        "sunny", "airy", "calm", "soft light", "blue sky"
+    ]
+    
+    # Other acceptable mood terms
     mood_terms = [
-        "dawn", "sunrise", "morning", "sunset", "dusk", "evening", "night",
-        "golden hour", "light", "fog", "mist", "dramatic", "calm", "quiet"
+        "dawn", "sunrise", "morning", "sunset", "dusk", "evening",
+        "golden hour", "light", "fog", "mist", "calm", "quiet", "bright", "clear"
     ]
     
     for kw in query_parts:
@@ -186,12 +201,22 @@ def fetch_unsplash_image(keywords: str, region: str = "", brief_type: str = "mor
         else:
             mood_keywords.append(kw)
     
+    # Ensure we have a brightness-related term
+    has_light_term = any(
+        any(light in kw.lower() for light in ["light", "bright", "sunny", "morning", "dawn", "sunrise", "clear"])
+        for kw in mood_keywords
+    )
+    
     # Build search query: prioritize 1-2 location + 1 mood keyword
     search_parts = []
     if location_keywords:
         search_parts.extend(location_keywords[:2])
     if mood_keywords:
         search_parts.append(mood_keywords[0])
+    
+    # Add "bright" or "light" if no brightness term present
+    if not has_light_term and len(search_parts) < 3:
+        search_parts.append("bright")
     
     # Fallback: just use first 2-3 keywords
     if not search_parts:
