@@ -440,29 +440,48 @@ function renderChart() {
                          state.period === 90 ? state.marketChange90d : 
                          state.marketChange30d;
     
-    // Position market line
-    const marketX = percentToX(marketChange);
-    marketLine.style.left = `${marketX}%`;
+    // Calculate relative changes (coin vs market) and find max spread
+    let maxSpread = 5; // Minimum spread of 5%
+    const coinRelativeChanges = [];
     
-    // Update market label with value
+    state.userCoins.forEach(coin => {
+        const data = state.coinData[coin.id];
+        if (!data) return;
+        
+        const change = state.period === 7 ? data.change7d : 
+                       state.period === 90 ? data.change90d : 
+                       data.change30d;
+        
+        const relativeChange = change - marketChange;
+        coinRelativeChanges.push({ coin, relativeChange, absoluteChange: change });
+        
+        // Track max spread from market (0)
+        maxSpread = Math.max(maxSpread, Math.abs(relativeChange));
+    });
+    
+    // Round up to nearest 5% for clean axis labels
+    const axisRange = Math.ceil(maxSpread / 5) * 5;
+    
+    // Update x-axis labels dynamically
+    updateXAxisLabels(axisRange);
+    
+    // Position market line at center (0% relative = 50% position)
+    marketLine.style.left = '50%';
+    
+    // Update market label with absolute value
     const marketLabel = marketLine.querySelector('.market-label');
     marketLabel.textContent = `MARKET ${marketChange >= 0 ? '+' : ''}${marketChange.toFixed(0)}%`;
     
     // Update Y-axis segment changes
     renderSegmentChanges();
     
-    // Render each coin
-    state.userCoins.forEach(coin => {
+    // Render each coin at relative position
+    coinRelativeChanges.forEach(({ coin, relativeChange, absoluteChange }) => {
         const data = state.coinData[coin.id];
         const segment = SEGMENTS[coin.segment];
         if (!segment) return;
         
-        // For watching coins, render even without price data
-        const change = data ? (state.period === 7 ? data.change7d : 
-                       state.period === 90 ? data.change90d : 
-                       data.change30d) : 0;
-        
-        const x = percentToX(change);
+        const x = relativePercentToX(relativeChange, axisRange);
         const y = segmentToY(segment.row);
         
         if (coin.weight === 'watching') {
@@ -475,20 +494,66 @@ function renderChart() {
             el.onclick = () => openEditCoinModal(coin);
             chartArea.appendChild(el);
         } else {
-            // Dot for holdings - need data
-            if (!data) return;
-            
+            // Dot for holdings
             const el = document.createElement('div');
-            const isOutperforming = change > marketChange;
+            const isOutperforming = relativeChange > 0;
             el.className = `coin-dot ${coin.weight} ${isOutperforming ? 'outperforming' : 'underperforming'}`;
             el.style.left = `${x}%`;
             el.style.top = `${y}%`;
             el.innerHTML = `<span class="coin-symbol">${coin.symbol}</span>`;
-            el.title = `${coin.name}: ${change >= 0 ? '+' : ''}${change.toFixed(1)}%`;
+            el.title = `${coin.name}: ${absoluteChange >= 0 ? '+' : ''}${absoluteChange.toFixed(1)}% (${relativeChange >= 0 ? '+' : ''}${relativeChange.toFixed(1)}% vs market)`;
             el.onclick = () => openEditCoinModal(coin);
             chartArea.appendChild(el);
         }
     });
+    
+    // Also render watching coins without data
+    state.userCoins.filter(c => c.weight === 'watching' && !coinRelativeChanges.find(r => r.coin.id === c.id)).forEach(coin => {
+        const segment = SEGMENTS[coin.segment];
+        if (!segment) return;
+        
+        const x = 50; // Center (at market)
+        const y = segmentToY(segment.row);
+        
+        const el = document.createElement('div');
+        el.className = 'coin-watching';
+        el.textContent = coin.symbol;
+        el.style.left = `${x}%`;
+        el.style.top = `${y}%`;
+        el.onclick = () => openEditCoinModal(coin);
+        chartArea.appendChild(el);
+    });
+}
+
+function updateXAxisLabels(axisRange) {
+    const xAxis = document.querySelector('.x-axis');
+    if (!xAxis) return;
+    
+    // Clear existing labels
+    xAxis.innerHTML = '';
+    
+    // Create 5 labels: -range, -half, 0, +half, +range
+    const labels = [
+        { value: -axisRange, text: `${-axisRange}%` },
+        { value: -axisRange / 2, text: `${-axisRange / 2}%` },
+        { value: 0, text: '0%' },
+        { value: axisRange / 2, text: `+${axisRange / 2}%` },
+        { value: axisRange, text: `+${axisRange}%` }
+    ];
+    
+    labels.forEach(label => {
+        const span = document.createElement('span');
+        span.className = 'x-label';
+        span.textContent = label.text;
+        xAxis.appendChild(span);
+    });
+}
+
+function relativePercentToX(relativePct, axisRange) {
+    // Map -axisRange to +axisRange onto 0-100% of chart width
+    // -axisRange = 0%, 0 = 50%, +axisRange = 100%
+    const x = ((relativePct + axisRange) / (2 * axisRange)) * 100;
+    return Math.max(2, Math.min(98, x));
 }
 
 function renderSegmentChanges() {
@@ -512,15 +577,6 @@ function renderSegmentChanges() {
         changeEl.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(1)}%`;
         label.appendChild(changeEl);
     });
-}
-
-function percentToX(pct) {
-    // Map -20% to +40% onto 0-100% of chart width
-    // -20 = 0%, 0 = 33%, +20 = 66%, +40 = 100%
-    const min = -20;
-    const max = 40;
-    const x = ((pct - min) / (max - min)) * 100;
-    return Math.max(2, Math.min(98, x));
 }
 
 function segmentToY(row) {
