@@ -2036,6 +2036,11 @@ BREAKPOINTS:
 
 /* iPad Portrait (768px - 1024px) */
 @media (min-width: 768px) and (max-width: 1024px) {
+    /* Content offset for fixed header on iPad */
+    .container.content-offset {
+        padding-top: 160px !important;
+    }
+    
     /* Tighter container */
     .container {
         padding: var(--sm) var(--md) !important;
