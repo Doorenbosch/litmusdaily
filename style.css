@@ -95,7 +95,7 @@ a {
 
 /* Content offset for fixed header */
 .content-offset {
-    padding-top: 160px; /* Space for fixed header */
+    padding-top: 140px; /* Space for fixed header */
     position: relative;
     z-index: 1; /* Below header and dropdowns */
 }
