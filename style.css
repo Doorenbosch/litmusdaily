@@ -150,22 +150,21 @@ a {
     font-weight: 700;
 }
 
-.brand-name em {
-    font-style: normal;
-    font-weight: 400;
-    color: var(--ink);
+.brand-dot {
+    font-weight: 700;
+    color: var(--gold);
 }
 
-/* Page-specific brand colors */
-.brand-name.brand-weekend em {
+/* Page-specific brand second word colors */
+.brand-name.brand-weekend .brand-word {
     color: var(--teal);
 }
 
-.brand-name.brand-personal em {
+.brand-name.brand-personal .brand-word {
     color: var(--burgundy);
 }
 
-.brand-name.brand-media em {
+.brand-name.brand-media .brand-word {
     color: var(--ink-tertiary);
 }
 
