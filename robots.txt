@@ -1,11 +1,11 @@
-# Litmus Daily - Crypto Intelligence
-# https://www.litmusdaily.com
+# Sirruna - Crypto Intelligence
+# https://sirruna.com
 
 User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://www.litmusdaily.com/sitemap.xml
+Sitemap: https://sirruna.com/sitemap.xml
 
 # AI Crawlers - Welcome
 User-agent: GPTBot
@@ -23,5 +23,12 @@ Allow: /
 User-agent: PerplexityBot
 Allow: /
 
-# Block API endpoints from indexing
+User-agent: Bingbot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# Block API endpoints and auth from indexing
 Disallow: /api/
+Disallow: /__/

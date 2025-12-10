@@ -1,32 +1,43 @@
-# Litmus Daily
-> Institutional-grade crypto intelligence. Daily analysis with the editorial quality of the Financial Times and the behavioral insight of Rory Sutherland.
+# Sirruna - Crypto Intelligence
 
-## About
-Litmus Daily is a premium crypto intelligence publication delivering strategic market analysis for sophisticated investors. We combine rigorous financial journalism with behavioral economics insights to explain not just what's happening in crypto markets, but why it matters.
+> Sirruna is a premium crypto intelligence publication delivering daily market briefs for informed investors.
 
-## Content
-- Daily Edition: Morning, afternoon, and evening briefs with regional market analysis (APAC, EMEA, Americas)
-- Weekend Magazine: Deep-dive weekly analysis, sector reviews, and strategic outlook
-- Personal Edition: Personalized portfolio landscape and performance tracking
+## What We Do
 
-## Editorial Philosophy
-- "Daily check-in vs hook-on" - We deliver 15 minutes of focused intelligence, not endless scrolling
-- Insight over information - Anyone can show data; we explain what it means
-- Institutional quality - FT/Economist editorial standards applied to crypto
+Sirruna provides institutional-grade cryptocurrency market analysis through:
 
-## Key Topics
-- Bitcoin and Ethereum market analysis
-- Institutional flows and ETF activity
-- DeFi sector movements
-- Regulatory developments
-- Macroeconomic crypto correlations
-- Behavioral market psychology
+- **Daily Briefs**: Morning (06:00) and Evening (18:00) editions across Americas, EMEA, and APAC regions
+- **Weekend Magazine**: Deep-dive analysis and weekly reviews
+- **Personal Edition**: Customized portfolio insights for registered users
 
-## URLs
-- Homepage: https://www.litmusdaily.com/
-- Daily Edition: https://www.litmusdaily.com/index.html
-- Weekend Magazine: https://www.litmusdaily.com/weekend.html
-- Personal Edition: https://www.litmusdaily.com/personal.html
+## Content Structure
+
+### Daily Edition (S.Daily)
+- THE LEAD: Primary market narrative
+- THE ANGLE: Analytical perspective
+- THE DRIVER: What's moving markets
+- THE SIGNAL: Key metrics that matter
+- WEEK AHEAD: Forward-looking analysis
+
+### Weekend Edition (S.Weekend)
+- THE WEEK IN REVIEW: Comprehensive weekly analysis
+- THE GRAPH: Visual data analysis
+- KEY DATES: Calendar of market events
+
+## Editorial Approach
+
+- **No hype**: Institutional-grade analysis, not clickbait
+- **Regional editions**: Tailored to Americas, EMEA, APAC markets
+- **Data-driven**: Quantitative metrics with qualitative insight
+- **Editorial voice**: Financial Times meets crypto native
+
+## Target Audience
+
+- Institutional investors
+- Sophisticated retail investors
+- Crypto professionals and analysts
+- Financial advisors exploring digital assets
 
 ## Contact
-Website: https://www.litmusdaily.com
+
+Website: https://sirruna.com
