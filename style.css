@@ -95,7 +95,7 @@ a {
 
 /* Content offset for fixed header */
 .container.content-offset {
-    padding-top: 220px !important; /* Space for fixed header - masthead + ticker + nav */
+    padding-top: 500px !important; /* TEST - should be very obvious */
     position: relative;
     z-index: 1; /* Below header and dropdowns */
 }
