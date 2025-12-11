@@ -2667,6 +2667,33 @@ function closeMobileReader() {
 // Make closeMobileReader available globally
 window.closeMobileReader = closeMobileReader;
 
+// Show Market Mood detail view (phone)
+function showMarketMoodDetail() {
+    const detail = document.getElementById('phone-mood-detail');
+    const clone = document.getElementById('mood-widget-clone');
+    const moodSection = document.querySelector('.mood-section');
+    
+    if (detail && clone && moodSection) {
+        // Clone the mood widget content
+        clone.innerHTML = moodSection.innerHTML;
+        detail.classList.add('active');
+        document.body.classList.add('reader-open');
+    }
+}
+
+// Close Market Mood detail view
+function closeMarketMoodDetail() {
+    const detail = document.getElementById('phone-mood-detail');
+    if (detail) {
+        detail.classList.remove('active');
+        document.body.classList.remove('reader-open');
+    }
+}
+
+// Make functions available globally
+window.showMarketMoodDetail = showMarketMoodDetail;
+window.closeMarketMoodDetail = closeMarketMoodDetail;
+
 // ========== GOOGLE ANALYTICS 4 TRACKING ==========
 // Helper function to track custom events
 function trackEvent(eventName, params = {}) {

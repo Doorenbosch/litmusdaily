@@ -2905,13 +2905,14 @@ BREAKPOINTS:
     
     /* Arrow indicator for expandable cards (not LEAD) */
     .index-card:not(:first-child)::after {
-        content: "→";
+        content: "›";
         position: absolute;
         right: var(--md);
         top: 50%;
         transform: translateY(-50%);
         color: var(--ink-tertiary);
-        font-size: 1rem;
+        font-size: 1.5rem;
+        font-weight: 300;
     }
     
     .index-card:not(:first-child) {
@@ -2955,6 +2956,86 @@ BREAKPOINTS:
         float: right;
         color: var(--ink-tertiary);
         margin-top: -2em;
+        font-size: 1.5rem;
+        font-weight: 300;
+    }
+    
+    /* ========== PHONE MARKET MOOD DETAIL VIEW ========== */
+    .phone-mood-detail {
+        display: none;
+        position: fixed;
+        top: 140px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--paper);
+        z-index: 50;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .phone-mood-detail.active {
+        display: block;
+    }
+    
+    .phone-mood-back {
+        display: flex;
+        align-items: center;
+        gap: var(--sm);
+        position: sticky;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 10;
+        background: var(--paper);
+        border: none;
+        border-bottom: 1px solid var(--rule);
+        padding: var(--md);
+        font-family: var(--sans);
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--ink);
+        cursor: pointer;
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .phone-mood-back svg {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .phone-mood-content {
+        padding: var(--md);
+    }
+    
+    /* Clone the mood widget styles for phone */
+    .phone-mood-content .mood-section {
+        display: block;
+    }
+    
+    .phone-mood-content .mood-header {
+        margin-bottom: var(--md);
+    }
+    
+    .phone-mood-content .mood-label {
+        font-size: 0.7rem;
+        color: var(--burgundy);
+    }
+    
+    .phone-mood-content .mood-title {
+        font-size: 1.75rem;
+        margin-bottom: var(--sm);
+    }
+    
+    .phone-mood-content .mood-grid-container {
+        margin-bottom: var(--md);
+    }
+    
+    .phone-mood-content .mood-description {
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: var(--md);
     }
     
     /* ========== PHONE TAKEAWAY ========== */

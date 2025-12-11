@@ -44,7 +44,7 @@
     
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="apple-touch-icon" href="favicon.png">
-    <link rel="stylesheet" href="style.css?v=17">
+    <link rel="stylesheet" href="style.css?v=18">
     <link rel="stylesheet" href="footer.css">
     <link rel="stylesheet" href="auth.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -367,7 +367,7 @@
                         <div class="phone-mood-label">MARKET MOOD</div>
                         <div class="phone-mood-title" id="phone-mood-title">Loading...</div>
                         <div class="phone-mood-text" id="phone-mood-text"></div>
-                        <span class="phone-mood-arrow">→</span>
+                        <span class="phone-mood-arrow">›</span>
                     </div>
                     
                     <!-- THE TAKEAWAY - Rory-style quote box (not clickable) -->
@@ -657,5 +657,19 @@
         });
     }
     </script>
+    
+    <!-- Phone Market Mood Detail View -->
+    <div class="phone-mood-detail" id="phone-mood-detail">
+        <button class="phone-mood-back" onclick="closeMarketMoodDetail()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Back
+        </button>
+        <div class="phone-mood-content">
+            <!-- This will be populated by cloning the sidebar mood widget -->
+            <div class="mood-widget-clone" id="mood-widget-clone"></div>
+        </div>
+    </div>
 </body>
 </html>
