@@ -2247,6 +2247,12 @@ BREAKPOINTS:
         margin-bottom: var(--xs) !important;
     }
     
+    .index-card.active {
+        margin: 0 !important;
+        margin-bottom: var(--xs) !important;
+        padding: var(--xs) var(--sm) !important;
+    }
+    
     .index-label {
         font-size: 0.45rem !important;
         margin-bottom: 2px !important;
