@@ -2297,6 +2297,11 @@ BREAKPOINTS:
         padding: var(--sm) var(--md) !important;
     }
     
+    /* Content offset for fixed header */
+    .container.content-offset {
+        padding-top: 130px !important;
+    }
+    
     .header-fixed {
         padding: var(--xs) var(--md) 0 var(--md) !important;
     }
@@ -2310,8 +2315,13 @@ BREAKPOINTS:
         font-size: 1.5rem !important;
     }
     
+    .brand-name.brand-full {
+        font-size: 1.3rem !important;
+        letter-spacing: 0.12em !important;
+    }
+    
     /* Compact ticker */
-    .market-ticker {
+    .market-strip {
         gap: var(--sm) !important;
         padding: var(--xs) 0 !important;
     }
@@ -2334,10 +2344,11 @@ BREAKPOINTS:
         font-size: 0.8rem !important;
     }
     
-    /* Week Focus - 4 columns, compact */
+    /* Week Focus - 4 columns, compact, minimal top space */
     .week-focus {
-        margin-top: var(--sm) !important;
+        margin-top: var(--xs) !important;
         margin-bottom: var(--sm) !important;
+        padding-top: 0 !important;
     }
     
     .week-focus-header {
