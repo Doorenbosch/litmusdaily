@@ -44,7 +44,7 @@
     
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="apple-touch-icon" href="favicon.png">
-    <link rel="stylesheet" href="style.css?v=9">
+    <link rel="stylesheet" href="style.css?v=10">
     <link rel="stylesheet" href="footer.css">
     <link rel="stylesheet" href="auth.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -282,12 +282,20 @@
             </div>
         </div>
 
-        <!-- Section Navigation -->
+        <!-- Section Navigation (Desktop/Tablet) -->
         <nav class="section-nav">
             <a href="#" class="section-link active">Today</a>
             <a href="weekend.html" class="section-link">Weekend</a>
             <a href="personal.html" class="section-link">Personal</a>
             <a href="media.html" class="section-link">Media</a>
+        </nav>
+        
+        <!-- Phone Navigation -->
+        <nav class="phone-nav" id="phone-nav">
+            <button class="phone-nav-link active" data-view="day">The Day</button>
+            <button class="phone-nav-link disabled" data-view="recap" id="phone-recap-tab">The Recap</button>
+            <button class="phone-nav-link" data-view="week">The Week</button>
+            <a href="media.html" class="phone-nav-link">Media</a>
         </nav>
     </div>
     

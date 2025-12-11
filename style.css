@@ -526,6 +526,11 @@ a {
     border-bottom: 1px solid var(--rule);
 }
 
+/* Phone nav hidden on desktop */
+.phone-nav {
+    display: none;
+}
+
 .section-link {
     font-size: 0.8rem;
     font-weight: 500;
@@ -2512,17 +2517,36 @@ BREAKPOINTS:
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: var(--xs) 0;
+        padding: var(--sm) 0;
         margin-bottom: 0;
     }
     
     .masthead-left {
-        display: none; /* Hide region picker on phone - use icon instead */
+        display: block;
+        width: auto;
+        order: 1;
+    }
+    
+    /* Hide edition picker buttons, show badge instead */
+    .edition-picker {
+        display: none;
+    }
+    
+    .edition-badge {
+        display: block !important;
+    }
+    
+    .edition-badge-text {
+        font-size: 0.7rem;
+        font-weight: 500;
+        color: var(--teal);
     }
     
     .masthead-center {
-        order: 1;
-        flex: 0 0 auto;
+        order: 2;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
     }
     
     .brand-name {
@@ -2535,52 +2559,31 @@ BREAKPOINTS:
     }
     
     .masthead-right {
-        order: 2;
+        order: 3;
         display: flex;
         align-items: center;
         gap: var(--sm);
     }
     
     .publication-date {
-        display: none; /* Hide date on phone */
-    }
-    
-    /* Show region indicator as icon */
-    .phone-region-btn {
-        display: flex;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: var(--paper-dark);
-        border: 1px solid var(--rule);
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-    }
-    
-    .phone-region-btn svg {
-        width: 16px;
-        height: 16px;
-        color: var(--ink-secondary);
+        display: none;
     }
     
     .auth-button {
-        width: 32px;
-        height: 32px;
+        width: 36px;
+        height: 36px;
     }
     
     /* ========== PHONE TICKER ========== */
     .market-strip {
         display: flex;
         flex-wrap: nowrap;
+        align-items: baseline;
         gap: var(--md);
-        padding: var(--xs) 0;
+        padding: var(--sm) 0;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         border-bottom: 1px solid var(--rule);
-        margin: 0 calc(var(--md) * -1);
-        padding-left: var(--md);
-        padding-right: var(--md);
     }
     
     .ticker {
@@ -2589,59 +2592,101 @@ BREAKPOINTS:
     }
     
     .ticker-label {
-        font-size: 0.6rem;
+        display: none; /* Hide labels on phone */
     }
     
     .ticker-value {
-        font-size: 0.8rem;
+        font-size: 0.85rem;
+        font-weight: 600;
     }
     
     .ticker-change {
-        font-size: 0.7rem;
+        font-size: 0.75rem;
+    }
+    
+    /* Show abbreviated labels inline */
+    .ticker::before {
+        font-size: 0.65rem;
+        font-weight: 500;
+        color: var(--ink-tertiary);
+        margin-right: 4px;
+    }
+    
+    .ticker:nth-child(1)::before { content: "BTC"; }
+    .ticker:nth-child(2)::before { content: "ETH"; }
+    .ticker:nth-child(3)::before { content: "MKT"; }
+    
+    /* Hide Total Market label, just show value */
+    .ticker:nth-child(3) .ticker-change {
+        display: none;
+    }
+    
+    /* Market Activity - just show the word */
+    .ticker:nth-child(4) {
+        margin-left: auto;
+    }
+    
+    .ticker:nth-child(4)::before {
+        display: none;
     }
     
     .ticker-meta {
-        display: none; /* Hide "Updated" on phone */
+        display: none;
     }
     
     /* ========== PHONE NAVIGATION ========== */
-    /* Main section nav - simplified for phone */
     .section-nav {
+        display: none; /* Hide desktop nav on phone */
+    }
+    
+    /* Phone-specific nav */
+    .phone-nav {
         display: flex;
         gap: 0;
         padding: 0;
-        margin: 0 calc(var(--md) * -1);
         border-bottom: 1px solid var(--rule);
     }
     
-    .section-link {
+    .phone-nav-link {
         flex: 1;
         text-align: center;
         padding: var(--sm) var(--xs);
+        font-family: var(--sans);
         font-size: 0.8rem;
         font-weight: 500;
+        color: var(--ink-secondary);
+        text-decoration: none;
         white-space: nowrap;
         border-bottom: 2px solid transparent;
         margin-bottom: -1px;
+        background: none;
+        border-left: none;
+        border-right: none;
+        border-top: none;
+        cursor: pointer;
     }
     
-    .section-link.active {
+    .phone-nav-link.active {
         border-bottom-color: var(--burgundy);
         color: var(--burgundy);
     }
     
-    /* On phone: hide Personal, rename links */
-    .section-nav a[href="personal.html"] {
-        display: none;
-    }
-    
-    /* Hide the Evening link on desktop nav - it's in brief selector */
-    .section-nav .phone-recap {
-        display: none;
+    .phone-nav-link.disabled {
+        opacity: 0.4;
+        cursor: default;
     }
     
     /* ========== HIDE WEEK FOCUS ON PHONE ========== */
     .week-focus {
+        display: none;
+    }
+    
+    /* ========== HIDE BRIEF SELECTOR ON PHONE - Nav handles it ========== */
+    .brief-selector {
+        display: none;
+    }
+    
+    .index-header {
         display: none;
     }
     
