@@ -3007,20 +3007,19 @@ BREAKPOINTS:
         display: none;
     }
     
-    /* ========== PHONE READING PANE (Fullscreen Overlay) ========== */
+    /* ========== PHONE READING PANE (Below Header) ========== */
     .reading-pane {
         display: none;
         position: fixed;
-        top: 0;
+        top: 140px; /* Below header + ticker + nav */
         left: 0;
         right: 0;
         bottom: 0;
         background: var(--paper);
-        z-index: 2000; /* Higher than header */
+        z-index: 50;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
         padding: 0;
-        padding-top: env(safe-area-inset-top, 0); /* iOS safe area */
     }
     
     .reading-pane.active {
@@ -3035,12 +3034,11 @@ BREAKPOINTS:
         top: 0;
         left: 0;
         right: 0;
-        z-index: 100;
+        z-index: 10;
         background: var(--paper);
         border: none;
         border-bottom: 1px solid var(--rule);
         padding: var(--md);
-        padding-top: calc(var(--md) + env(safe-area-inset-top, 0)); /* Extra padding for iOS notch */
         font-family: var(--sans);
         font-size: 0.85rem;
         font-weight: 500;
@@ -3048,7 +3046,6 @@ BREAKPOINTS:
         cursor: pointer;
         width: 100%;
         justify-content: flex-start;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     
     .mobile-back-btn:hover {
