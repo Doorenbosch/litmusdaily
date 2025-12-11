@@ -855,14 +855,11 @@ a {
     padding: var(--md) 0;
     border-bottom: 1px solid var(--rule);
     cursor: pointer;
-    transition: all 0.15s;
+    transition: background 0.15s;
 }
 
 .index-card:hover {
     background: var(--paper-dark);
-    margin: 0 calc(var(--md) * -1);
-    padding-left: var(--md);
-    padding-right: var(--md);
 }
 
 .index-card.active {
