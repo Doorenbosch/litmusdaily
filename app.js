@@ -2706,26 +2706,18 @@ let weekAheadData = null;
 
 // Show The Week view (phone)
 function showPhoneWeekView() {
-    console.log('showPhoneWeekView called');
     const weekView = document.getElementById('phone-week-view');
     const cardsContainer = document.getElementById('phone-week-cards');
     const titleEl = document.getElementById('phone-week-title');
     
-    if (!weekView) {
-        console.log('phone-week-view not found');
-        return;
-    }
+    if (!weekView) return;
     
     // Hide other views
     document.getElementById('phone-mood-detail')?.classList.remove('active');
     document.querySelector('.reading-pane')?.classList.remove('active');
     
     // Try to get week data from the existing week-focus section
-    const weekFocus = document.getElementById('week-focus');
     const weekTitle = document.getElementById('week-focus-title');
-    
-    console.log('weekFocus:', weekFocus);
-    console.log('weekTitle:', weekTitle?.textContent);
     
     if (titleEl && weekTitle) {
         titleEl.textContent = weekTitle.textContent;
@@ -2734,7 +2726,6 @@ function showPhoneWeekView() {
     // Build cards from existing focus cards data
     if (cardsContainer) {
         const focusCards = document.querySelectorAll('.focus-card');
-        console.log('Found focus cards:', focusCards.length);
         cardsContainer.innerHTML = '';
         
         focusCards.forEach((card, index) => {
@@ -2742,8 +2733,6 @@ function showPhoneWeekView() {
             const headline = card.querySelector('.focus-headline')?.textContent || '';
             const excerpt = card.querySelector('.focus-excerpt')?.textContent || '';
             const sectionKey = card.dataset.weekSection || 'focus-' + index;
-            
-            console.log('Card:', label, headline);
             
             const phoneCard = document.createElement('div');
             phoneCard.className = 'phone-week-card';
@@ -2764,7 +2753,6 @@ function showPhoneWeekView() {
     
     weekView.classList.add('active');
     document.body.classList.add('reader-open');
-    console.log('Week view should now be active');
 }
 
 // Show week reading pane
@@ -2819,15 +2807,10 @@ window.closePhoneWeekReading = closePhoneWeekReading;
 
 // ========== PHONE NAV HANDLERS ==========
 function initPhoneNav() {
-    console.log('initPhoneNav called, width:', window.innerWidth);
     const phoneNav = document.getElementById('phone-nav');
-    if (!phoneNav) {
-        console.log('phone-nav not found');
-        return;
-    }
+    if (!phoneNav) return;
     
     const navLinks = phoneNav.querySelectorAll('.phone-nav-link');
-    console.log('Found nav links:', navLinks.length);
     
     navLinks.forEach(link => {
         if (link.tagName === 'A') return; // Skip actual links like Media
@@ -2835,7 +2818,6 @@ function initPhoneNav() {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const view = link.dataset.view;
-            console.log('Nav clicked:', view);
             
             // Don't do anything if disabled
             if (link.classList.contains('disabled')) return;
@@ -2853,11 +2835,9 @@ function initPhoneNav() {
             
             // Show appropriate view
             if (view === 'week') {
-                console.log('Showing week view');
                 showPhoneWeekView();
             } else if (view === 'day') {
                 // Default view - just show the index
-                // Already closed other views above
             } else if (view === 'recap') {
                 // Switch to evening brief
                 const eveningTab = document.querySelector('.brief-tab[data-brief="evening"]');
@@ -2869,13 +2849,12 @@ function initPhoneNav() {
     });
 }
 
-// Initialize phone nav - run immediately since script is at bottom of page
-if (window.innerWidth < 720) {
-    // Try immediately
-    initPhoneNav();
-    // Also try after DOM ready in case elements aren't ready
-    document.addEventListener('DOMContentLoaded', initPhoneNav);
-}
+// Initialize phone nav when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.innerWidth < 720) {
+        initPhoneNav();
+    }
+});
 
 // ========== GOOGLE ANALYTICS 4 TRACKING ==========
 // Helper function to track custom events
