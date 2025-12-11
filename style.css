@@ -2827,7 +2827,7 @@ BREAKPOINTS:
     /* THE LEAD card - label & headline full width, then image left + excerpt right */
     .index-card:first-child {
         display: grid;
-        grid-template-columns: 100px 1fr;
+        grid-template-columns: 90px 1fr;
         grid-template-rows: auto auto auto;
         gap: var(--xs) var(--md);
         background: var(--paper-dark);
@@ -2891,8 +2891,8 @@ BREAKPOINTS:
     /* Card image (for THE LEAD on phone) */
     .card-image {
         display: none;
-        width: 100px;
-        height: 85px;
+        width: 90px;
+        height: 75px;
         border-radius: 6px;
         overflow: hidden;
     }

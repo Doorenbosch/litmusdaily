@@ -2669,15 +2669,20 @@ window.closeMobileReader = closeMobileReader;
 
 // Show Market Mood detail view (phone)
 function showMarketMoodDetail() {
+    console.log('showMarketMoodDetail called');
     const detail = document.getElementById('phone-mood-detail');
     const clone = document.getElementById('mood-widget-clone');
     const moodSection = document.querySelector('.mood-section');
     
-    if (detail && clone && moodSection) {
-        // Clone the mood widget content
-        clone.innerHTML = moodSection.innerHTML;
+    if (detail) {
+        if (clone && moodSection) {
+            // Clone the mood widget content
+            clone.innerHTML = moodSection.innerHTML;
+        }
         detail.classList.add('active');
         document.body.classList.add('reader-open');
+    } else {
+        console.log('phone-mood-detail not found');
     }
 }
 
