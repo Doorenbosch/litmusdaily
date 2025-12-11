@@ -1206,10 +1206,11 @@ function renderIndexCards(data) {
             currentSection = key;
             renderReadingPane(key);
             
-            // Mobile: show reading pane
+            // Mobile: show reading pane as overlay
             const readingPane = document.querySelector('.reading-pane');
-            if (readingPane && window.innerWidth <= 768) {
+            if (readingPane && window.innerWidth < 720) {
                 readingPane.classList.add('active');
+                document.body.classList.add('reader-open');
             }
             
             trackEvent('section_selected', { section: key });

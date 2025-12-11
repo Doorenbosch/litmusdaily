@@ -3016,7 +3016,7 @@ BREAKPOINTS:
         right: 0;
         bottom: 0;
         background: var(--paper);
-        z-index: 1000;
+        z-index: 2000; /* Higher than header */
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
         padding: 0;
