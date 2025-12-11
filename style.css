@@ -2245,12 +2245,17 @@ BREAKPOINTS:
     .index-card {
         padding: var(--xs) var(--sm) !important;
         margin-bottom: var(--xs) !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
     }
     
-    .index-card.active {
-        margin: 0 !important;
-        margin-bottom: var(--xs) !important;
+    .index-card.active,
+    .article-index .index-card.active {
+        margin: 0 0 var(--xs) 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
         padding: var(--xs) var(--sm) !important;
+        box-sizing: border-box !important;
     }
     
     .index-label {
