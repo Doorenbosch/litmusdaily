@@ -390,7 +390,6 @@ async function checkBriefAvailability(region) {
         if (phoneRecapTab) {
             phoneRecapTab.classList.add('disabled');
         }
-        }
     }
     
     // If current tab is unavailable, switch to available one
