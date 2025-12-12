@@ -287,6 +287,7 @@ function initBriefSelector() {
 async function checkBriefAvailability(region) {
     const morningTab = document.querySelector('.brief-tab[data-brief="morning"]');
     const eveningTab = document.querySelector('.brief-tab[data-brief="evening"]');
+    const phoneRecapTab = document.getElementById('phone-recap-tab');
     
     let morningTimestamp = null;
     let eveningTimestamp = null;
@@ -319,9 +320,10 @@ async function checkBriefAvailability(region) {
             const eveningData = await eveningResponse.json();
             eveningTimestamp = eveningData.generated_at ? new Date(eveningData.generated_at) : null;
             
-            // Evening brief is only valid if it's AFTER the morning brief
-            // This prevents showing yesterday's evening brief after today's morning brief
+            // Evening brief is valid if it exists and has a timestamp
+            // For phone Recap tab, show if evening exists (even if from yesterday)
             const eveningIsValid = eveningTimestamp && morningTimestamp && (eveningTimestamp > morningTimestamp);
+            const eveningExists = eveningTimestamp !== null;
             
             if (eveningIsValid) {
                 if (eveningTab) {
@@ -331,6 +333,23 @@ async function checkBriefAvailability(region) {
                         timeEl.textContent = formatBriefTime(eveningData.generated_at);
                     }
                 }
+                // Enable phone recap tab
+                if (phoneRecapTab) {
+                    phoneRecapTab.classList.remove('disabled');
+                }
+            } else if (eveningExists) {
+                // Evening exists but is older than morning - still show on phone but mark desktop as unavailable
+                if (eveningTab) {
+                    eveningTab.classList.add('unavailable');
+                    const timeEl = eveningTab.querySelector('.brief-tab-time');
+                    if (timeEl) {
+                        timeEl.textContent = '18:00 · Soon';
+                    }
+                }
+                // Still enable phone recap for yesterday's evening
+                if (phoneRecapTab) {
+                    phoneRecapTab.classList.remove('disabled');
+                }
             } else {
                 // Evening exists but is older than morning - mark as unavailable
                 if (eveningTab) {
@@ -339,6 +358,10 @@ async function checkBriefAvailability(region) {
                     if (timeEl) {
                         timeEl.textContent = '18:00 · Soon';
                     }
+                }
+                // Keep phone recap disabled
+                if (phoneRecapTab) {
+                    phoneRecapTab.classList.add('disabled');
                 }
             }
         } else {
@@ -350,6 +373,10 @@ async function checkBriefAvailability(region) {
                     timeEl.textContent = '18:00 · Soon';
                 }
             }
+            // Keep phone recap disabled
+            if (phoneRecapTab) {
+                phoneRecapTab.classList.add('disabled');
+            }
         }
     } catch (e) {
         if (eveningTab) {
@@ -358,6 +385,11 @@ async function checkBriefAvailability(region) {
             if (timeEl) {
                 timeEl.textContent = '18:00 · Soon';
             }
+        }
+        // Keep phone recap disabled
+        if (phoneRecapTab) {
+            phoneRecapTab.classList.add('disabled');
+        }
         }
     }
     
@@ -2836,13 +2868,13 @@ function initPhoneNav() {
             if (view === 'week') {
                 showPhoneWeekView();
             } else if (view === 'day') {
-                // Default view - just show the index
+                // Load morning brief
+                currentBriefType = 'morning';
+                loadContent(currentRegion, 'morning');
             } else if (view === 'recap') {
-                // Switch to evening brief
-                const eveningTab = document.querySelector('.brief-tab[data-brief="evening"]');
-                if (eveningTab && !eveningTab.classList.contains('unavailable')) {
-                    eveningTab.click();
-                }
+                // Load evening brief directly
+                currentBriefType = 'evening';
+                loadContent(currentRegion, 'evening');
             }
         });
     });
