@@ -1235,15 +1235,21 @@ function renderIndexCards(data) {
             document.querySelectorAll('.index-card').forEach(c => c.classList.remove('active'));
             card.classList.add('active');
             
-            // Update current section and render
+            // Update current section
             currentSection = key;
-            renderReadingPane(key);
             
-            // Mobile: show reading pane as overlay
+            // Mobile: show reading pane as overlay FIRST (before render)
             const readingPane = document.querySelector('.reading-pane');
             if (readingPane && window.innerWidth < 720) {
                 readingPane.classList.add('active');
                 document.body.classList.add('reader-open');
+            }
+            
+            // Then render content
+            try {
+                renderReadingPane(key);
+            } catch (e) {
+                console.error('Error rendering section:', key, e);
             }
             
             trackEvent('section_selected', { section: key });
