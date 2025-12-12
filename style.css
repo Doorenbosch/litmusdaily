@@ -2986,7 +2986,7 @@ BREAKPOINTS:
     .phone-mood-back {
         display: flex;
         align-items: center;
-        gap: var(--sm);
+        gap: var(--xs);
         position: sticky;
         top: 0;
         left: 0;
@@ -2994,20 +2994,26 @@ BREAKPOINTS:
         z-index: 10;
         background: var(--paper);
         border: none;
-        border-bottom: 1px solid var(--rule);
         padding: var(--md);
         font-family: var(--sans);
-        font-size: 0.85rem;
-        font-weight: 500;
-        color: var(--ink);
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--burgundy);
         cursor: pointer;
         width: 100%;
         justify-content: flex-start;
     }
     
+    .phone-mood-back::before {
+        content: "‹";
+        font-size: 1.4rem;
+        font-weight: 300;
+        line-height: 1;
+        margin-right: var(--xs);
+    }
+    
     .phone-mood-back svg {
-        width: 20px;
-        height: 20px;
+        display: none;
     }
     
     .phone-mood-content {
@@ -3160,24 +3166,30 @@ BREAKPOINTS:
     .phone-week-back {
         display: flex;
         align-items: center;
-        gap: var(--sm);
+        gap: var(--xs);
         position: sticky;
         top: 0;
         background: var(--paper);
         border: none;
-        border-bottom: 1px solid var(--rule);
         padding: var(--md);
         font-family: var(--sans);
-        font-size: 0.85rem;
-        font-weight: 500;
-        color: var(--ink);
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--burgundy);
         cursor: pointer;
         width: 100%;
     }
     
+    .phone-week-back::before {
+        content: "‹";
+        font-size: 1.4rem;
+        font-weight: 300;
+        line-height: 1;
+        margin-right: var(--xs);
+    }
+    
     .phone-week-back svg {
-        width: 20px;
-        height: 20px;
+        display: none;
     }
     
     .phone-week-content {
@@ -3277,7 +3289,7 @@ BREAKPOINTS:
     .mobile-back-btn {
         display: flex !important;
         align-items: center;
-        gap: var(--sm);
+        gap: var(--xs);
         position: sticky;
         top: 0;
         left: 0;
@@ -3285,24 +3297,30 @@ BREAKPOINTS:
         z-index: 10;
         background: var(--paper);
         border: none;
-        border-bottom: 1px solid var(--rule);
         padding: var(--md);
         font-family: var(--sans);
-        font-size: 0.85rem;
-        font-weight: 500;
-        color: var(--ink);
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--burgundy);
         cursor: pointer;
         width: 100%;
         justify-content: flex-start;
     }
     
-    .mobile-back-btn:hover {
-        background: var(--paper-dark);
+    .mobile-back-btn::before {
+        content: "‹";
+        font-size: 1.4rem;
+        font-weight: 300;
+        line-height: 1;
+        margin-right: var(--xs);
     }
     
     .mobile-back-btn svg {
-        width: 20px;
-        height: 20px;
+        display: none;
+    }
+    
+    .mobile-back-btn:hover {
+        background: var(--paper-dark);
     }
     
     /* Reading pane content */
