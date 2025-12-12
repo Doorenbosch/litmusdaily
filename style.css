@@ -557,6 +557,30 @@ a {
     color: var(--ink);
 }
 
+/* ========== TOAST NOTIFICATION ========== */
+.toast-notification {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--ink);
+    color: white;
+    padding: var(--sm) var(--lg);
+    border-radius: 6px;
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 3000;
+}
+
+.toast-notification.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
 /* ========== LOGIN POPUP ========== */
 .login-overlay {
     display: none;

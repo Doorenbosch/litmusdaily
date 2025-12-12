@@ -2920,9 +2920,32 @@ function closeLoginPopup() {
 
 // Show user settings (for logged-in users)
 function showUserSettings() {
-    // For now, just log - later this could open a settings panel
-    console.log('User is logged in - show settings panel');
-    // TODO: Implement user settings panel with region/coin preferences
+    // Show a toast message directing to settings
+    showToast('Change your region in Settings');
+}
+
+// Toast notification
+function showToast(message) {
+    // Remove existing toast if any
+    const existingToast = document.querySelector('.toast-notification');
+    if (existingToast) {
+        existingToast.remove();
+    }
+    
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    // Trigger animation
+    setTimeout(() => toast.classList.add('visible'), 10);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        toast.classList.remove('visible');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }
 
 // Initialize login popup handlers
