@@ -163,8 +163,14 @@ def fetch_unsplash_image(keywords: str, region: str = "", brief_type: str = "mor
         return None
     
     # Filter out dark/moody terms that lead to oppressive imagery
-    dark_terms = ["dark", "dramatic", "storm", "night", "moody", "shadows", "noir"]
+    dark_terms = ["dark", "dramatic", "storm", "night", "moody", "shadows", "noir", "fog", "mist", "overcast", "gloomy", "brooding", "atmospheric", "cold", "harsh", "blue hour"]
     query_parts = [kw for kw in query_parts if not any(dark in kw.lower() for dark in dark_terms)]
+    
+    # Always add brightness term if not present
+    brightness_terms = ["bright", "sunlit", "daylight", "clear", "sunny", "golden", "light", "morning", "dawn"]
+    has_brightness = any(any(b in kw.lower() for b in brightness_terms) for kw in query_parts)
+    if not has_brightness:
+        query_parts.append("bright sunlight")
     
     # Strategy: Try location-focused search first, then broaden if needed
     # Unsplash works better with 2-3 keywords than 5+
@@ -657,19 +663,21 @@ ABSOLUTELY PROHIBITED:
 HERO IMAGE KEYWORDS:
 Generate 4-5 keywords for the hero image using EDITORIAL + MOOD approach (70/30 balance).
 
+CRITICAL: We need LIGHT, BRIGHT, EDITORIAL photography. Think Financial Times or Bloomberg Businessweek covers - professional, clean, optimistic. NOT moody, atmospheric, or dark.
+
 EDITORIAL (primary): What/where is the story happening?
 - Regional landmarks for {ctx['name']}: {ctx['landmarks']}
-- Scenes: financial district, trading floor, institutional office, glass towers
+- Scenes: financial district at dawn, modern office lobby, glass towers in sunlight, aerial city view
 - Named entities if story-relevant: BlackRock, SEC building, specific companies
 
-MOOD (secondary): How should it feel?
-- Light conditions: soft morning light, bright, golden hour, clear sky, blue hour
-- Atmosphere: quiet streets, calm, open, spacious, airy
-- PREFER: Light, bright, optimistic imagery. Avoid dark, moody, dramatic images.
+MOOD (mandatory brightness): Every image must feel LIGHT and PROFESSIONAL
+- ALWAYS include one of: "bright", "sunlit", "daylight", "clear sky", "soft morning light", "blue sky"
+- Atmosphere: clean, professional, editorial, crisp, airy
+- Time of day: prefer dawn, morning, golden hour (before sunset, not after)
 
-FORMAT: "Canary Wharf, soft morning light, glass towers, bright" or "Hong Kong skyline, clear sky, harbor"
+FORMAT: "Manhattan skyline, bright morning, glass towers, clear sky" or "Singapore Marina Bay, sunlit, modern architecture"
 
-✗ NEVER use: crypto, bitcoin, trading, chart, money, stock, market, coin, currency, generic, dark, dramatic, storm
+✗ ABSOLUTELY NEVER use: dark, moody, dramatic, storm, night, shadows, fog, mist, noir, atmospheric, brooding, gloomy, overcast
 
 CRITICAL JSON FORMATTING RULES:
 • All string values must have quotes escaped as \\"
@@ -889,19 +897,21 @@ ABSOLUTELY PROHIBITED:
 HERO IMAGE KEYWORDS:
 Generate 4-5 keywords for the hero image using EDITORIAL + MOOD approach (70/30 balance).
 
+CRITICAL: Even for evening briefs, we need WARM and BRIGHT imagery. Think golden hour photography - luminous, inviting, professional. NOT dark night scenes or moody atmospheres.
+
 EDITORIAL (primary): What/where is the story happening?
 - Regional landmarks for {ctx['name']}: {ctx['landmarks']}
-- Scenes: financial district, evening cityscape, office buildings, harbor
+- Scenes: financial district at golden hour, evening cityscape with warm light, glass buildings reflecting sunset
 - Named entities if story-relevant: specific exchanges, institutions
 
-MOOD (secondary): How should it feel?
-- Light conditions: golden sunset, warm light, golden hour, soft evening glow
-- Atmosphere: calm end of day, peaceful, reflective, warm tones
-- PREFER: Warm, golden, inviting imagery. Avoid dark, harsh, cold images.
+MOOD (mandatory warmth): Every image must feel WARM and LUMINOUS
+- ALWAYS include one of: "golden hour", "warm sunset", "golden light", "amber glow", "warm tones"
+- Atmosphere: inviting, professional, editorial, serene
+- Time of day: golden hour (NOT night, NOT after dark)
 
-FORMAT: "Manhattan skyline, golden sunset, warm light" or "Singapore Marina Bay, golden hour, harbor"
+FORMAT: "Manhattan skyline, golden sunset, warm light, clear sky" or "Singapore Marina Bay, golden hour, harbor reflections"
 
-✗ NEVER use: crypto, bitcoin, trading, chart, money, stock, market, coin, currency, generic, dark, cold, harsh
+✗ ABSOLUTELY NEVER use: dark, night, moody, dramatic, shadows, noir, cold, harsh, blue hour, streetlights, artificial light
 
 CRITICAL JSON FORMATTING RULES:
 • All string values must have quotes escaped as \\"
