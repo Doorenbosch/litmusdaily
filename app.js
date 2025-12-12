@@ -2918,12 +2918,30 @@ function closeLoginPopup() {
     }
 }
 
+// Show user settings (for logged-in users)
+function showUserSettings() {
+    // For now, just log - later this could open a settings panel
+    console.log('User is logged in - show settings panel');
+    // TODO: Implement user settings panel with region/coin preferences
+}
+
 // Initialize login popup handlers
 document.addEventListener('DOMContentLoaded', () => {
-    // Edition badge click -> show login popup
+    // Edition badge click -> show login popup OR user settings
     const editionBadge = document.getElementById('edition-badge');
     if (editionBadge) {
-        editionBadge.addEventListener('click', showLoginPopup);
+        editionBadge.addEventListener('click', () => {
+            // Check if user is signed in (using auth.js currentUser or Firebase directly)
+            const isLoggedIn = typeof currentUser !== 'undefined' && currentUser !== null;
+            
+            if (isLoggedIn) {
+                // User is signed in -> show settings/preferences
+                showUserSettings();
+            } else {
+                // Not signed in -> show login popup
+                showLoginPopup();
+            }
+        });
     }
     
     // Close button
@@ -2942,23 +2960,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Google login button (placeholder - connect to Firebase auth)
+    // Google login button
     const googleBtn = document.getElementById('login-google');
     if (googleBtn) {
         googleBtn.addEventListener('click', () => {
-            // TODO: Implement Google sign-in
-            console.log('Google sign-in clicked');
-            // signInWithGoogle(); // Uncomment when Firebase is ready
+            if (typeof signInWithGoogle === 'function') {
+                signInWithGoogle();
+            } else {
+                console.log('Google sign-in not configured');
+            }
         });
     }
     
-    // Apple login button (placeholder - connect to Firebase auth)
+    // Apple login button
     const appleBtn = document.getElementById('login-apple');
     if (appleBtn) {
         appleBtn.addEventListener('click', () => {
-            // TODO: Implement Apple sign-in
-            console.log('Apple sign-in clicked');
-            // signInWithApple(); // Uncomment when Firebase is ready
+            if (typeof signInWithApple === 'function') {
+                signInWithApple();
+            } else {
+                console.log('Apple sign-in not configured');
+            }
         });
     }
 });
